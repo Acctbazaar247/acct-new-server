@@ -67,10 +67,11 @@ const getAllCurrencyRequest = (filters, paginationOptions) => __awaiter(void 0, 
         });
     }
     const whereConditions = andCondition.length > 0 ? { AND: andCondition } : {};
+    console.log(JSON.stringify(andCondition), paginationOptions);
     const result = yield prisma_1.default.currencyRequest.findMany({
         where: whereConditions,
         skip,
-        take: limit,
+        take: 12,
         orderBy: paginationOptions.sortBy && paginationOptions.sortOrder
             ? {
                 [paginationOptions.sortBy]: paginationOptions.sortOrder,
@@ -79,7 +80,7 @@ const getAllCurrencyRequest = (filters, paginationOptions) => __awaiter(void 0, 
                 createdAt: 'desc',
             },
     });
-    const total = yield prisma_1.default.currencyRequest.count();
+    const total = yield prisma_1.default.currencyRequest.count({ where: whereConditions });
     const output = {
         data: result,
         meta: { page, limit, total },

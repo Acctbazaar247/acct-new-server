@@ -30,7 +30,6 @@ const getAllCurrencyRequest = async (
     paginationHelpers.calculatePagination(paginationOptions);
 
   const { searchTerm, ...filterData } = filters;
-
   const andCondition = [];
 
   if (searchTerm) {
@@ -60,11 +59,11 @@ const getAllCurrencyRequest = async (
 
   const whereConditions: Prisma.CurrencyRequestWhereInput =
     andCondition.length > 0 ? { AND: andCondition } : {};
-
+  console.log(JSON.stringify(andCondition), paginationOptions);
   const result = await prisma.currencyRequest.findMany({
     where: whereConditions,
     skip,
-    take: limit,
+    take: 12,
     orderBy:
       paginationOptions.sortBy && paginationOptions.sortOrder
         ? {
@@ -74,7 +73,7 @@ const getAllCurrencyRequest = async (
             createdAt: 'desc',
           },
   });
-  const total = await prisma.currencyRequest.count();
+  const total = await prisma.currencyRequest.count({ where: whereConditions });
   const output = {
     data: result,
     meta: { page, limit, total },

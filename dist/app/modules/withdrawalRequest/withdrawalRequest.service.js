@@ -86,7 +86,9 @@ const getAllWithdrawalRequest = (filters, paginationOptions) => __awaiter(void 0
             },
         },
     });
-    const total = yield prisma_1.default.withdrawalRequest.count();
+    const total = yield prisma_1.default.withdrawalRequest.count({
+        where: whereConditions,
+    });
     const output = {
         data: result,
         meta: { page, limit, total },

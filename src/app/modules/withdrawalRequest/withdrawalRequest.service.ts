@@ -77,7 +77,9 @@ const getAllWithdrawalRequest = async (
       },
     },
   });
-  const total = await prisma.withdrawalRequest.count();
+  const total = await prisma.withdrawalRequest.count({
+    where: whereConditions,
+  });
   const output = {
     data: result,
     meta: { page, limit, total },

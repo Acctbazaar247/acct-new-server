@@ -103,7 +103,7 @@ const payStackWebHook = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
     var _a, _b, _c, _d;
     const ipnData = req.body;
     if (ipnData.event === 'charge.success') {
-        const paymentReference = ipnData.data.reference;
+        // const paymentReference = ipnData.data.reference;
         // Perform additional actions, such as updating your database, sending emails, etc.
         const paymentType = (_b = (_a = ipnData === null || ipnData === void 0 ? void 0 : ipnData.data) === null || _a === void 0 ? void 0 : _a.metadata) === null || _b === void 0 ? void 0 : _b.payment_type;
         if (paymentType === common_1.EPaymentType.addFunds) {
