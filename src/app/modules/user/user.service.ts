@@ -431,6 +431,7 @@ const sendUserQuery = async (
   };
   try {
     await transport.sendMail({ ...mailOptions });
+    console.log(' success');
   } catch (err) {
     throw new ApiError(
       httpStatus.BAD_REQUEST,

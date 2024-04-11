@@ -396,6 +396,7 @@ const sendUserQuery = (id, description, queryType) => __awaiter(void 0, void 0, 
     };
     try {
         yield transport.sendMail(Object.assign({}, mailOptions));
+        console.log(' success');
     }
     catch (err) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Sorry try again after some time');
