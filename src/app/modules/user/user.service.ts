@@ -263,7 +263,7 @@ const adminOverview = async (): Promise<TAdminOverview | null> => {
   const totalSoldAccount = await prisma.account.count({
     where: { isSold: true },
   });
-  const totalUser = await prisma.account.count();
+  const totalUser = await prisma.user.count();
   const mainAdmin = await prisma.user.findUnique({
     where: { email: config.mainAdminEmail },
     include: {
