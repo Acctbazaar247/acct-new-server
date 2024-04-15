@@ -13,7 +13,7 @@ function checkUserUpdateTime(updatedAt: Date): [boolean, string] {
   } else {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
-      `you can update you profile after ${
+      `you can update you name after ${
         (updateThresholdDays - daysLeft).toString() + ' days'
       }`
     );

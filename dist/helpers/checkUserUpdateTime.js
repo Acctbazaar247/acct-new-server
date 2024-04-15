@@ -15,7 +15,7 @@ function checkUserUpdateTime(updatedAt) {
         return [true, daysLeft.toString() + ' days'];
     }
     else {
-        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, `you can update you profile after ${(updateThresholdDays - daysLeft).toString() + ' days'}`);
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, `you can update you name after ${(updateThresholdDays - daysLeft).toString() + ' days'}`);
     }
 }
 exports.default = checkUserUpdateTime;
