@@ -293,7 +293,6 @@ const adminOverview = async (): Promise<TAdminOverview | null> => {
       amount: true,
     },
   });
-
   return {
     totalAccount,
     totalSoldAccount,
