@@ -168,7 +168,7 @@ const updateUser = (id, payload, requestedUser) => __awaiter(void 0, void 0, voi
     if (isUserExist.role !== client_1.UserRole.superAdmin &&
         isUserExist.role !== client_1.UserRole.admin) {
         if (isUserExist.id === requestedUser.userId) {
-            if (payload.profileImg || payload.name) {
+            if (payload.name) {
                 (0, checkUserUpdateTime_1.default)(isUserExist.updatedAt);
             }
         }

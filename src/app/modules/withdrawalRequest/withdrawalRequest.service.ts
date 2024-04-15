@@ -80,6 +80,7 @@ const getAllWithdrawalRequest = async (
   const total = await prisma.withdrawalRequest.count({
     where: whereConditions,
   });
+  console.log(whereConditions, await prisma.withdrawalRequest.count());
   const output = {
     data: result,
     meta: { page, limit, total },

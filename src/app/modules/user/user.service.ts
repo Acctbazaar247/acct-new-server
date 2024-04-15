@@ -184,7 +184,7 @@ const updateUser = async (
     isUserExist.role !== UserRole.admin
   ) {
     if (isUserExist.id === requestedUser.userId) {
-      if (payload.profileImg || payload.name) {
+      if (payload.name) {
         checkUserUpdateTime(isUserExist.updatedAt);
       }
     }
@@ -197,7 +197,6 @@ const updateUser = async (
       ? { ...rest, password: genarateBycryptPass }
       : rest,
   });
-
   // if admin update a seller verification send email
   if (payload.isApprovedForSeller && result.role === UserRole.seller) {
     await sendEmail(
