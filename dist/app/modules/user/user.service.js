@@ -110,7 +110,7 @@ const getAllUser = (filters, paginationOptions) => __awaiter(void 0, void 0, voi
             },
         },
     });
-    const total = yield prisma_1.default.user.count();
+    const total = yield prisma_1.default.user.count({ where: whereConditions });
     const output = {
         data: result,
         meta: { page, limit, total },
@@ -239,7 +239,7 @@ const adminOverview = () => __awaiter(void 0, void 0, void 0, function* () {
     const totalSoldAccount = yield prisma_1.default.account.count({
         where: { isSold: true },
     });
-    const totalUser = yield prisma_1.default.account.count();
+    const totalUser = yield prisma_1.default.user.count();
     const mainAdmin = yield prisma_1.default.user.findUnique({
         where: { email: config_1.default.mainAdminEmail },
         include: {
