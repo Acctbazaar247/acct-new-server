@@ -84,6 +84,7 @@ enum accountCategory {
   Bumble
   Reddit
   Discord
+  Pof
 
   // Gaming accounts
   Playstation
@@ -93,7 +94,7 @@ enum accountCategory {
   Gta
   Fortnite
   Epic
-
+  Signal
   // Email and messaging accounts
   Gmail
   Ymail
