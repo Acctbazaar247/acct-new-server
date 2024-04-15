@@ -85,6 +85,7 @@ enum accountCategory {
   Reddit
   Discord
   Pof
+  Hinge
 
   // Gaming accounts
   Playstation
