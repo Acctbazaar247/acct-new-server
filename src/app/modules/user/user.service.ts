@@ -405,8 +405,8 @@ const sendUserQuery = async (
   // });
   const transport = await nodemailer.createTransport({
     host: 'mail.privateemail.com', // or 'smtp.privateemail.com'
-    port: 587, // or 465 for SSL
-    secure: false, // true for 465, false for 587
+    port: 465, // or 465 for SSL. or 587
+    secure: true, // true for 465, false for 587
     auth: {
       user: config.emailUser,
       pass: config.emailUserPass,
