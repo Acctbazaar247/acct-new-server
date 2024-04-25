@@ -236,6 +236,7 @@ model Account {
   additionalPassword    String?
   additionalDescription String?
   additionalImage       String?
+  messageFromAdmin       String?
   category              accountCategory
   accountType           accountType      @default(SocialMedia)
   approvedForSale       EApprovedForSale @default(pending)

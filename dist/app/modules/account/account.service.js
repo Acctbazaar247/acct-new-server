@@ -134,6 +134,7 @@ const getAllAccount = (filters, paginationOptions) => __awaiter(void 0, void 0, 
             ownById: true,
             accountType: true,
             preview: true,
+            messageFromAdmin: true,
             ownBy: {
                 select: {
                     name: true,

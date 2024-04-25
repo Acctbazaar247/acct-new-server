@@ -140,6 +140,7 @@ const getAllAccount = async (
       ownById: true,
       accountType: true,
       preview: true,
+      messageFromAdmin: true,
       ownBy: {
         select: {
           name: true,

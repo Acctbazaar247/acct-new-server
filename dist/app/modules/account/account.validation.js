@@ -9,6 +9,7 @@ const createValidation = zod_1.z.object({
         username: zod_1.z.string(),
         password: zod_1.z.string(),
         description: zod_1.z.string(),
+        messageFromAdmin: zod_1.z.string().optional(),
         preview: zod_1.z.string().optional(),
         price: zod_1.z.number(),
         category: zod_1.z.nativeEnum(client_1.accountCategory),
@@ -46,6 +47,7 @@ const updateValidation = zod_1.z.object({
         isSold: zod_1.z.boolean().optional(),
         ownById: zod_1.z.string().optional(),
         preview: zod_1.z.string().nullable().optional(),
+        messageFromAdmin: zod_1.z.string().optional(),
     }),
 });
 exports.AccountValidation = {
