@@ -183,6 +183,7 @@ const getSingleAccount = (id) => __awaiter(void 0, void 0, void 0, function* () 
     return result;
 });
 const updateAccount = (id, payload, { id: reqUserId, role }) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(payload);
     const isAccountExits = yield prisma_1.default.account.findUnique({
         where: { id },
         include: { ownBy: { select: { email: true } } },

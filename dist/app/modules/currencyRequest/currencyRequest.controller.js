@@ -53,19 +53,22 @@ const createCurrencyRequest = (0, catchAsync_1.default)((req, res) => __awaiter(
 const createCurrencyRequestInvoice = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const CurrencyRequestData = req.body;
     const user = req.user;
-    const userInfo = yield prisma_1.default.user.findFirst({
-        where: { id: user.userId },
-    });
+    // const userInfo = await prisma.user.findFirst({
+    //   where: { id: user.userId },
+    // });
     const result = yield currencyRequest_service_1.CurrencyRequestService.createCurrencyRequestInvoice(Object.assign(Object.assign({}, CurrencyRequestData), { ownById: user.userId }));
-    yield (0, sendEmail_1.default)({ to: config_1.default.emailUser }, {
-        subject: EmailTemplates_1.default.requestForCurrencyToAdmin.subject,
-        html: EmailTemplates_1.default.requestForCurrencyToAdmin.html({
-            amount: result === null || result === void 0 ? void 0 : result.amount,
-            userEmail: userInfo === null || userInfo === void 0 ? void 0 : userInfo.email,
-            userName: userInfo === null || userInfo === void 0 ? void 0 : userInfo.name,
-            userProfileImg: (userInfo === null || userInfo === void 0 ? void 0 : userInfo.profileImg) || '',
-        }),
-    });
+    // await sendEmail(
+    //   { to: config.emailUser as string },
+    //   {
+    //     subject: EmailTemplates.requestForCurrencyToAdmin.subject,
+    //     html: EmailTemplates.requestForCurrencyToAdmin.html({
+    //       amount: result?.amount,
+    //       userEmail: userInfo?.email,
+    //       userName: userInfo?.name,
+    //       userProfileImg: userInfo?.profileImg || '',
+    //     }),
+    //   }
+    // );
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
@@ -100,20 +103,20 @@ const getAllCurrencyRequest = (0, catchAsync_1.default)((req, res) => __awaiter(
     });
 }));
 const payStackWebHook = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d;
     const ipnData = req.body;
-    if (ipnData.event === 'charge.success') {
+    if (ipnData.status === 'successful') {
         // const paymentReference = ipnData.data.reference;
         // Perform additional actions, such as updating your database, sending emails, etc.
-        const paymentType = (_b = (_a = ipnData === null || ipnData === void 0 ? void 0 : ipnData.data) === null || _a === void 0 ? void 0 : _a.metadata) === null || _b === void 0 ? void 0 : _b.payment_type;
+        const paymentType = ipnData === null || ipnData === void 0 ? void 0 : ipnData.txRef.split('_$_')[0];
+        console.log({ paymentType });
         if (paymentType === common_1.EPaymentType.addFunds) {
             yield currencyRequest_service_1.CurrencyRequestService.payStackWebHook({
-                data: ipnData === null || ipnData === void 0 ? void 0 : ipnData.data,
+                data: ipnData,
             });
         }
         else if (paymentType === common_1.EPaymentType.seller) {
             yield (0, UpdateSellerAfterPay_1.default)({
-                order_id: (_d = (_c = ipnData === null || ipnData === void 0 ? void 0 : ipnData.data) === null || _c === void 0 ? void 0 : _c.metadata) === null || _d === void 0 ? void 0 : _d.orderId,
+                order_id: ipnData === null || ipnData === void 0 ? void 0 : ipnData.txRef.split('_$_')[1],
                 payment_status: 'finished',
                 price_amount: config_1.default.sellerOneTimePayment,
             });

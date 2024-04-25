@@ -26,14 +26,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const client_1 = require("@prisma/client");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const generate_unique_id_1 = __importDefault(require("generate-unique-id"));
 const http_status_1 = __importDefault(require("http-status"));
 const config_1 = __importDefault(require("../../../config"));
 const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const createBycryptPassword_1 = __importDefault(require("../../../helpers/createBycryptPassword"));
+const createFlutterWaveInvoice_1 = __importDefault(require("../../../helpers/createFlutterWaveInvoice"));
 const creeateInvoice_1 = __importDefault(require("../../../helpers/creeateInvoice"));
 const jwtHelpers_1 = require("../../../helpers/jwtHelpers");
-const paystackPayment_1 = require("../../../helpers/paystackPayment");
 const sendEmail_1 = __importDefault(require("../../../helpers/sendEmail"));
 const common_1 = require("../../../interfaces/common");
 const EmailTemplates_1 = __importDefault(require("../../../shared/EmailTemplates"));
@@ -246,9 +245,24 @@ const becomeSeller = (id, payType) => __awaiter(void 0, void 0, void 0, function
     let txId;
     if (payType === client_1.EPayWith.paystack) {
         // pay stack
-        const uid = (0, generate_unique_id_1.default)({ length: 20 });
-        const request = yield (0, paystackPayment_1.initiatePayment)(config_1.default.sellerOneTimePayment, isUserExist.email, uid, common_1.EPaymentType.seller, isUserExist.id, config_1.default.frontendUrl + `/account/sell-your-account`);
-        txId = request.data.authorization_url;
+        // const uid = generateUniqueId({ length: 20 });
+        // const request = await initiatePayment(
+        //   config.sellerOneTimePayment,
+        //   isUserExist.email,
+        //   uid,
+        //   EPaymentType.seller,
+        //   isUserExist.id,
+        //   config.frontendUrl + `/account/sell-your-account`
+        // );
+        const fluterWave = yield (0, createFlutterWaveInvoice_1.default)({
+            amount: config_1.default.sellerOneTimePayment,
+            customer_email: isUserExist.email,
+            redirect_url: config_1.default.frontendUrl + `/account/sell-your-account`,
+            tx_ref: isUserExist.id,
+            paymentType: common_1.EPaymentType.seller,
+        });
+        console.log({ fluterWave });
+        txId = fluterWave;
     }
     else {
         const data = yield (0, creeateInvoice_1.default)({
