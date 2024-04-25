@@ -45,4 +45,5 @@ export default {
   cloudName: process.env.CLOUD_NAME,
   cloudApiKey: process.env.CLOUD_API_KEY,
   cloudApiSecret: process.env.CLOUD_API_SECRET,
+  flutterwave_public_key: process.env.FLUTTERWAVE_PUBLIC_KEY,
 };

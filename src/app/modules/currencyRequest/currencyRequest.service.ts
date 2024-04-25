@@ -7,10 +7,10 @@ import httpStatus from 'http-status';
 import config from '../../../config';
 import ApiError from '../../../errors/ApiError';
 import UpdateCurrencyByRequestAfterPay from '../../../helpers/UpdateCurrencyByRequestAfterPay';
+import generateFlutterWavePaymentURL from '../../../helpers/createFlutterWaveInvoice';
 import createNowPayInvoice from '../../../helpers/creeateInvoice';
 import nowPaymentChecker from '../../../helpers/nowPaymentChecker';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
-import { initiatePayment } from '../../../helpers/paystackPayment';
 import sendEmail from '../../../helpers/sendEmail';
 import { EPaymentType, IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
@@ -142,24 +142,24 @@ const createCurrencyRequestWithPayStack = async (
       throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to create Invoie');
     }
 
-    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-    //   const data = await createNowPayInvoice({
-    //     price_amount: result.amount,
-    //     order_id: result.id,
-    //     ipn_callback_url: '/currency-request/nowpayments-ipn',
-    //     success_url: config.frontendUrl || '',
-    //     cancel_url: config.frontendUrl || '',
-    //     // additionalInfo: 'its adidinlal ',
-    //   });
-    const request = await initiatePayment(
-      result.amount,
-      result.ownBy.email,
-      result.id,
-      EPaymentType.addFunds,
-      result.id,
-      config.frontendUrl + 'account/wallet'
-    );
-    return { ...result, url: request.data.authorization_url || '' };
+    // const request = await initiatePayment(
+    //   result.amount,
+    //   result.ownBy.email,
+    //   result.id,
+    //   EPaymentType.addFunds,
+    //   result.id,
+    //   config.frontendUrl + 'account/wallet'
+    // );
+    const fluterWave = await generateFlutterWavePaymentURL({
+      amount: result.amount,
+      customer_email: result.ownBy.email,
+      redirect_url: config.frontendUrl + 'account/wallet',
+      tx_ref: result.id,
+      paymentType: EPaymentType.addFunds,
+    });
+    console.log({ fluterWave });
+    // return { ...result, url: request.data.authorization_url || '' };
+    return { ...result, url: fluterWave };
   });
 
   return newCurrencyRequest;
@@ -167,7 +167,9 @@ const createCurrencyRequestWithPayStack = async (
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const payStackWebHook = async (data: any): Promise<void> => {
-  const order_id = data.data.metadata.orderId;
+  console.log(data, 'from flutter wave');
+  const order_id = data.data.txRef.split('_$_')[1];
+  console.log({ order_id });
   const payment_status = 'finished';
   const isCurrencyRequestExits = await prisma.currencyRequest.findUnique({
     where: { id: order_id },

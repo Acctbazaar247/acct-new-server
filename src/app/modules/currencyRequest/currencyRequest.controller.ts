@@ -54,26 +54,26 @@ const createCurrencyRequestInvoice: RequestHandler = catchAsync(
     const CurrencyRequestData = req.body;
     const user = req.user as JwtPayload;
 
-    const userInfo = await prisma.user.findFirst({
-      where: { id: user.userId },
-    });
+    // const userInfo = await prisma.user.findFirst({
+    //   where: { id: user.userId },
+    // });
 
     const result = await CurrencyRequestService.createCurrencyRequestInvoice({
       ...CurrencyRequestData,
       ownById: user.userId,
     });
-    await sendEmail(
-      { to: config.emailUser as string },
-      {
-        subject: EmailTemplates.requestForCurrencyToAdmin.subject,
-        html: EmailTemplates.requestForCurrencyToAdmin.html({
-          amount: result?.amount,
-          userEmail: userInfo?.email,
-          userName: userInfo?.name,
-          userProfileImg: userInfo?.profileImg || '',
-        }),
-      }
-    );
+    // await sendEmail(
+    //   { to: config.emailUser as string },
+    //   {
+    //     subject: EmailTemplates.requestForCurrencyToAdmin.subject,
+    //     html: EmailTemplates.requestForCurrencyToAdmin.html({
+    //       amount: result?.amount,
+    //       userEmail: userInfo?.email,
+    //       userName: userInfo?.name,
+    //       userProfileImg: userInfo?.profileImg || '',
+    //     }),
+    //   }
+    // );
     sendResponse<CurrencyRequest>(res, {
       statusCode: httpStatus.OK,
       success: true,
@@ -127,19 +127,19 @@ const getAllCurrencyRequest = catchAsync(
 const payStackWebHook: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const ipnData = req.body;
-    if (ipnData.event === 'charge.success') {
+    if (ipnData.status === 'successful') {
       // const paymentReference = ipnData.data.reference;
 
       // Perform additional actions, such as updating your database, sending emails, etc.
-      const paymentType = ipnData?.data?.metadata?.payment_type;
-
+      const paymentType = ipnData?.txRef.split('_$_')[0];
+      console.log({ paymentType });
       if (paymentType === EPaymentType.addFunds) {
         await CurrencyRequestService.payStackWebHook({
-          data: ipnData?.data,
+          data: ipnData,
         });
       } else if (paymentType === EPaymentType.seller) {
         await UpdateSellerAfterPay({
-          order_id: ipnData?.data?.metadata?.orderId,
+          order_id: ipnData?.txRef.split('_$_')[1],
           payment_status: 'finished',
           price_amount: config.sellerOneTimePayment,
         });

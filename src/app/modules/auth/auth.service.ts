@@ -1,14 +1,13 @@
 import { EPayWith, EVerificationOtp, User, UserRole } from '@prisma/client';
 import bcryptjs from 'bcryptjs';
-import generateUniqueId from 'generate-unique-id';
 import httpStatus from 'http-status';
 import { Secret } from 'jsonwebtoken';
 import config from '../../../config';
 import ApiError from '../../../errors/ApiError';
 import createBycryptPassword from '../../../helpers/createBycryptPassword';
+import generateFlutterWavePaymentURL from '../../../helpers/createFlutterWaveInvoice';
 import createNowPayInvoice from '../../../helpers/creeateInvoice';
 import { jwtHelpers } from '../../../helpers/jwtHelpers';
-import { initiatePayment } from '../../../helpers/paystackPayment';
 import sendEmail from '../../../helpers/sendEmail';
 import { EPaymentType } from '../../../interfaces/common';
 import EmailTemplates from '../../../shared/EmailTemplates';
@@ -293,16 +292,24 @@ const becomeSeller = async (
   let txId;
   if (payType === EPayWith.paystack) {
     // pay stack
-    const uid = generateUniqueId({ length: 20 });
-    const request = await initiatePayment(
-      config.sellerOneTimePayment,
-      isUserExist.email,
-      uid,
-      EPaymentType.seller,
-      isUserExist.id,
-      config.frontendUrl + `/account/sell-your-account`
-    );
-    txId = request.data.authorization_url;
+    // const uid = generateUniqueId({ length: 20 });
+    // const request = await initiatePayment(
+    //   config.sellerOneTimePayment,
+    //   isUserExist.email,
+    //   uid,
+    //   EPaymentType.seller,
+    //   isUserExist.id,
+    //   config.frontendUrl + `/account/sell-your-account`
+    // );
+    const fluterWave = await generateFlutterWavePaymentURL({
+      amount: config.sellerOneTimePayment,
+      customer_email: isUserExist.email,
+      redirect_url: config.frontendUrl + `/account/sell-your-account`,
+      tx_ref: isUserExist.id,
+      paymentType: EPaymentType.seller,
+    });
+    console.log({ fluterWave });
+    txId = fluterWave;
   } else {
     const data = await createNowPayInvoice({
       price_amount: config.sellerOneTimePayment,
