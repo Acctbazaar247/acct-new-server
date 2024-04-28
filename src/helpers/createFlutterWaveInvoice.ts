@@ -46,6 +46,7 @@ export default async function generateFlutterWavePaymentURL(
     const paymentURL = response.data.data.link;
     return paymentURL;
   } catch (error) {
+    console.log(error);
     throw new ApiError(
       httpStatus.BAD_REQUEST,
       'Failed to generate payment url'

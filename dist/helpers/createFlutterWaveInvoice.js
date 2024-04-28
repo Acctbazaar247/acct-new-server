@@ -41,6 +41,7 @@ function generateFlutterWavePaymentURL(paymentData) {
             return paymentURL;
         }
         catch (error) {
+            console.log(error);
             throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Failed to generate payment url');
         }
     });

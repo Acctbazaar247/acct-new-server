@@ -47,7 +47,7 @@ const updateValidation = zod_1.z.object({
         isSold: zod_1.z.boolean().optional(),
         ownById: zod_1.z.string().optional(),
         preview: zod_1.z.string().nullable().optional(),
-        messageFromAdmin: zod_1.z.string().optional(),
+        messageFromAdmin: zod_1.z.string().optional().nullable(),
     }),
 });
 exports.AccountValidation = {

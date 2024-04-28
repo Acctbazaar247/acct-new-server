@@ -47,7 +47,7 @@ const updateValidation = z.object({
     isSold: z.boolean().optional(),
     ownById: z.string().optional(),
     preview: z.string().nullable().optional(),
-    messageFromAdmin: z.string().optional(),
+    messageFromAdmin: z.string().optional().nullable(),
   }),
 });
 export const AccountValidation = {
