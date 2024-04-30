@@ -2,9 +2,11 @@ import { Message, Prisma } from '@prisma/client';
 import httpStatus from 'http-status';
 import ApiError from '../../../errors/ApiError';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
+import sendEmail from '../../../helpers/sendEmail';
 import sendNotification from '../../../helpers/sendNotification';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
+import EmailTemplates from '../../../shared/EmailTemplates';
 import prisma from '../../../shared/prisma';
 import currentTime from '../../../utils/currentTime';
 import { messageSearchableFields } from './message.constant';
@@ -100,10 +102,27 @@ const getAllMessage = async (
 const createMessage = async (payload: Message): Promise<Message | null> => {
   const isOrderExits = await prisma.orders.findUnique({
     where: { id: payload.orderId },
-    include: {
+    select: {
+      id: true,
+      orderById: true,
+      orderBy: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
       account: {
         select: {
           ownById: true,
+          name: true,
+          ownBy: {
+            select: {
+              name: true,
+              email: true,
+              id: true,
+            },
+          },
         },
       },
     },
@@ -167,6 +186,25 @@ const createMessage = async (payload: Message): Promise<Message | null> => {
     ownById,
     link: `/order-details/${isOrderExits.id}`,
   });
+  const senderInfo =
+    payload.sendById === isOrderExits.orderById
+      ? isOrderExits.orderBy
+      : isOrderExits.account.ownBy;
+  const recInfo =
+    payload.sendById !== isOrderExits.orderById
+      ? isOrderExits.orderBy
+      : isOrderExits.account.ownBy;
+  //sent email
+  sendEmail(
+    { to: recInfo.email },
+    {
+      html: EmailTemplates.sendAMessage.html({
+        from: senderInfo.name,
+        productName: isOrderExits.account.name,
+      }),
+      subject: EmailTemplates.sendAMessage.subject,
+    }
+  );
   return newMessage;
 };
 
