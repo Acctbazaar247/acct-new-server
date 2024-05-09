@@ -1,5 +1,5 @@
 {
-  "name": "university-management-core-service",
+  "name": "acctbazzar-server",
   "version": "1.0.0",
   "description": "",
   "main": "dist/server.js",
@@ -17,7 +17,7 @@
     "postinstall": "prisma generate",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Programming Hero",
+  "author": "acctbazzar",
   "license": "ISC",
   "lint-staged": {
     "src/**/*.ts": "yarn lint-prettier"

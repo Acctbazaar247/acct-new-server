@@ -48,6 +48,7 @@ model User {
   Message             Message[]
   SeenMessage         SeenMessage[]
   Notifications       Notifications[]
+  Kyc                 Kyc?
 }
 
 enum EPayWith {
@@ -236,7 +237,7 @@ model Account {
   additionalPassword    String?
   additionalDescription String?
   additionalImage       String?
-  messageFromAdmin       String?
+  messageFromAdmin      String?
   category              accountCategory
   accountType           accountType      @default(SocialMedia)
   approvedForSale       EApprovedForSale @default(pending)
@@ -361,4 +362,29 @@ model Notifications {
   ownBy     User     @relation(fields: [ownById], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// new updated content!
+model Kyc {
+  id                    String   @id @unique @default(uuid())
+  ownById               String   @unique
+  ownBy                 User     @relation(fields: [ownById], references: [id], onDelete: Cascade)
+  userName              String
+  country               String
+  state                 String
+  address               String
+  city                  String
+  birthDate             DateTime
+  meansOfIdentification String
+  identificationNumber  String
+  identityImage         String
+  status                EStatusOfKyc @default(pending)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum EStatusOfKyc {
+  pending
+  approved
+  denied
 }
