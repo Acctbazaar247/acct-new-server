@@ -1,4 +1,4 @@
-import { Kyc, Prisma, UserRole } from '@prisma/client';
+import { EStatusOfKyc, Kyc, Prisma, UserRole } from '@prisma/client';
 import httpStatus from 'http-status';
 import ApiError from '../../../errors/ApiError';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
@@ -140,6 +140,19 @@ const updateKyc = async (
         'You can not able to update this kyc!'
       );
     }
+  }
+  const byAdmin = requestedUser.role === UserRole.superAdmin;
+  const statusIsApprove = payload.status === EStatusOfKyc.approved;
+  if (byAdmin && statusIsApprove) {
+    const result = await prisma.$transaction(async tx => {
+      await tx.user.update({
+        where: { id: isKycExits.ownById },
+        data: { isVerifiedByAdmin: true },
+      });
+      const updatedKyc = await tx.kyc.update({ where: { id }, data: payload });
+      return updatedKyc;
+    });
+    return result;
   }
   const result = await prisma.kyc.update({
     where: {
