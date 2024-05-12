@@ -72,7 +72,7 @@ const sendEmail = ({ to, multi }, { subject, html, text }) => __awaiter(void 0, 
             yield transport.sendMail(Object.assign({}, mailOptions));
         }
         catch (err) {
-            // console.log(err);
+            console.log(err);
             throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Sorry sending email is not available this time');
         }
         // console.log('its the main success after send to one email');

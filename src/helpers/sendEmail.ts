@@ -60,7 +60,7 @@ const sendEmail = async (
 
       await transport.sendMail({ ...mailOptions });
     } catch (err) {
-      // console.log(err);
+      console.log(err);
       throw new ApiError(
         httpStatus.BAD_REQUEST,
         'Sorry sending email is not available this time'
