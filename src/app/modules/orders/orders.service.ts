@@ -1,4 +1,10 @@
-import { EApprovedForSale, Orders, Prisma, UserRole } from '@prisma/client';
+import {
+  EApprovedForSale,
+  EOrderStatus,
+  Orders,
+  Prisma,
+  UserRole,
+} from '@prisma/client';
 import httpStatus from 'http-status';
 import { JwtPayload } from 'jsonwebtoken';
 import { round } from 'lodash';
@@ -361,6 +367,94 @@ const updateOrders = async (
   id: string,
   payload: Partial<Orders>
 ): Promise<Orders | null> => {
+  const isOrderExits = await prisma.orders.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      status: true,
+      orderBy: {
+        select: {
+          id: true,
+        },
+      },
+      account: {
+        select: {
+          id: true,
+          price: true,
+          ownBy: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (
+    !isOrderExits ||
+    !isOrderExits.account ||
+    !isOrderExits.account.ownBy ||
+    !isOrderExits.orderBy
+  ) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'order not found!');
+  }
+  if (isOrderExits.status === EOrderStatus.cancelled) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'order already cancel');
+  }
+
+  // if want to make it canceled
+  const isOrderCompleted = isOrderExits.status === EOrderStatus.completed;
+  const wantToUpdateItCancel = payload.status === EOrderStatus.cancelled;
+  if (isOrderCompleted && wantToUpdateItCancel) {
+    // check doe
+    // check does buyer has enough money left
+
+    const buyerCurrency = await prisma.currency.findUnique({
+      where: { ownById: isOrderExits.account.ownBy.id },
+    });
+    if (!buyerCurrency) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Buyer currency not found!');
+    }
+    if (isOrderExits.account.price > buyerCurrency.amount) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        "Buyer does't have enough money left to return"
+      );
+    }
+    const outPut = await prisma.$transaction(async tx => {
+      // update seller amount
+      const updatedAmount = await tx.currency.update({
+        where: { ownById: isOrderExits.account.ownBy.id },
+        data: { amount: { decrement: isOrderExits.account.price } },
+      });
+      if (0 > updatedAmount.amount) {
+        throw new ApiError(
+          httpStatus.BAD_REQUEST,
+          "Buyer does't have enough money left to return"
+        );
+      }
+
+      //update buyer or who make this order
+      await tx.currency.update({
+        where: {
+          ownById: isOrderExits.orderBy.id,
+        },
+        data: {
+          amount: { increment: isOrderExits.account.price },
+        },
+      });
+
+      return await tx.orders.update({
+        where: {
+          id,
+        },
+        data: payload,
+      });
+    });
+    return outPut;
+  }
+
   const result = await prisma.orders.update({
     where: {
       id,

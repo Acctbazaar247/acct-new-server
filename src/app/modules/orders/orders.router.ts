@@ -29,12 +29,12 @@ router.post(
   OrdersController.createOrders
 );
 
-// router.patch(
-//   '/:id',
-//   auth(UserRole.admin),
-//   validateRequest(OrdersValidation.updateValidation),
-//   OrdersController.updateOrders
-// );
+router.patch(
+  '/:id',
+  auth(UserRole.superAdmin),
+  validateRequest(OrdersValidation.updateValidation),
+  OrdersController.updateOrders
+);
 // router.delete('/:id', OrdersController.deleteOrders);
 
 export const OrdersRoutes = router;

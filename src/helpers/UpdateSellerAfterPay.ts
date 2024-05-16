@@ -39,7 +39,9 @@ const UpdateSellerAfterPay = async (data: {
       await tx.currency.update({
         where: { ownById: isAdminExist.id },
         data: {
-          amount: isAdminExist.Currency?.amount + config.sellerOneTimePayment,
+          amount: {
+            increment: config.sellerOneTimePayment,
+          },
         },
       });
     } catch (err) {

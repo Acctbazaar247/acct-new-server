@@ -327,6 +327,76 @@ const becomeSeller = async (
     txId,
   };
 };
+const becomeSellerWithWallet = async (
+  id: string,
+  payType: EPayWith
+): Promise<{ isSeller: boolean }> => {
+  console.log(payType);
+  const isUserExist = await prisma.user.findUnique({
+    where: { id },
+    include: {
+      Currency: true,
+    },
+  });
+  if (!isUserExist) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  // is already payed
+  if (isUserExist.isPaidForSeller) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Already paid');
+  }
+  // does he has enough wallet
+  if (!isUserExist.Currency) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Currency not found!');
+  }
+  if (config.sellerOneTimePayment > isUserExist.Currency.amount) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'Not enough money left on your wallet'
+    );
+  }
+  const admin = await prisma.user.findUnique({
+    where: { role: 'superAdmin', email: config.mainAdminEmail },
+    select: { id: true },
+  });
+  if (!admin) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Admin not found!');
+  }
+  // already have everything
+  await prisma.$transaction(async tx => {
+    // cut money and add to admin
+    const updateCurrency = await tx.currency.update({
+      where: { ownById: id },
+      data: {
+        amount: { decrement: config.sellerOneTimePayment },
+      },
+    });
+    if (0 > updateCurrency.amount) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        'Something went wrong trying again latter'
+      );
+    }
+    // add money to admin
+
+    await tx.currency.update({
+      where: { ownById: admin.id },
+      data: { amount: { increment: config.sellerOneTimePayment } },
+    });
+    await tx.user.update({
+      where: { id },
+      data: {
+        role: 'seller',
+        payWith: EPayWith.wallet,
+        isPaidForSeller: true,
+        isApprovedForSeller: true,
+      },
+    });
+  });
+  return {
+    isSeller: true,
+  };
+};
 const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
   //verify to ken
   // invalid token - synchronous
@@ -685,4 +755,5 @@ export const AuthService = {
   addWithdrawalPasswordFirstTime,
   sendWithdrawalTokenEmail,
   changeWithdrawPin,
+  becomeSellerWithWallet,
 };

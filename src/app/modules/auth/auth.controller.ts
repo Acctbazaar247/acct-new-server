@@ -220,6 +220,23 @@ const becomeSeller: RequestHandler = catchAsync(
     });
   }
 );
+const becomeSellerWithWallet: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const user = req.user as JwtPayload;
+    const { payWith } = req.body;
+    const output = await AuthService.becomeSellerWithWallet(
+      user.userId,
+      payWith
+    );
+
+    sendResponse<{ isSeller: boolean }>(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'successfully become a seller',
+      data: output,
+    });
+  }
+);
 const changePassword: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const data = req.body;
@@ -287,4 +304,5 @@ export const AuthController = {
   addWithdrawalPasswordFirstTime,
   sendWithdrawalTokenEmail,
   changeWithdrawPin,
+  becomeSellerWithWallet,
 };

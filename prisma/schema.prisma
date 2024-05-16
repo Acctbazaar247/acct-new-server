@@ -54,6 +54,7 @@ model User {
 enum EPayWith {
   paystack
   nowpay
+  wallet
 }
 
 model VerificationOtp {
