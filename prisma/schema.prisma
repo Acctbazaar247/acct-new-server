@@ -49,6 +49,7 @@ model User {
   SeenMessage         SeenMessage[]
   Notifications       Notifications[]
   Kyc                 Kyc?
+  Plan                Plan?
 }
 
 enum EPayWith {
@@ -367,9 +368,9 @@ model Notifications {
 
 // new updated content!
 model Kyc {
-  id                    String   @id @unique @default(uuid())
-  ownById               String   @unique
-  ownBy                 User     @relation(fields: [ownById], references: [id], onDelete: Cascade)
+  id                    String       @id @unique @default(uuid())
+  ownById               String       @unique
+  ownBy                 User         @relation(fields: [ownById], references: [id], onDelete: Cascade)
   userName              String
   country               String
   state                 String
@@ -380,12 +381,29 @@ model Kyc {
   identificationNumber  String
   identityImage         String
   status                EStatusOfKyc @default(pending)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
 }
 
 enum EStatusOfKyc {
   pending
   approved
   denied
+}
+
+model Plan {
+  id        String    @id @unique @default(uuid())
+  ownById   String    @unique
+  ownBy     User      @relation(fields: [ownById], references: [id], onDelete: Cascade)
+  isActive  Boolean   @default(true)
+  planType  EPlanType
+  limit     Int
+  days      Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+enum EPlanType { 
+  pro
+  proPlus
 }

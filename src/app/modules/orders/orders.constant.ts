@@ -1,2 +1,8 @@
 export const ordersSearchableFields = [];
-export const ordersFilterAbleFields = ['sellerId', 'status', 'orderById'];
+export const ordersFilterAbleFields = [
+  'sellerId',
+  'status',
+  'orderById',
+  'sellerEmail',
+  'buyerEmail',
+];

@@ -9,12 +9,12 @@ const router = express.Router();
 router.get('/', AccountController.getAllAccount);
 router.get('/:id', AccountController.getSingleAccount);
 
-router.post(
-  '/',
-  auth(UserRole.admin, UserRole.seller, UserRole.superAdmin),
-  validateRequest(AccountValidation.createValidation),
-  AccountController.createAccount
-);
+// router.post(
+//   '/',
+//   auth(UserRole.admin, UserRole.seller, UserRole.superAdmin),
+//   validateRequest(AccountValidation.createValidation),
+//   AccountController.createAccount
+// );
 router.post(
   '/multi-upload',
   auth(UserRole.admin, UserRole.seller, UserRole.superAdmin),

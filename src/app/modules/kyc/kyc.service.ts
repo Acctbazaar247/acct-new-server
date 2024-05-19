@@ -154,6 +154,9 @@ const updateKyc = async (
     });
     return result;
   }
+  if (statusIsApprove) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'You cannot update status');
+  }
   const result = await prisma.kyc.update({
     where: {
       id,
@@ -164,6 +167,16 @@ const updateKyc = async (
 };
 
 const deleteKyc = async (id: string): Promise<Kyc | null> => {
+  const isKycExits = await prisma.kyc.findUnique({
+    where: { id },
+    select: { id: true, status: true },
+  });
+  if (isKycExits && isKycExits.status === 'approved') {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'you cannot delete approved kyc'
+    );
+  }
   const result = await prisma.kyc.delete({
     where: { id },
   });

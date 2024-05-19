@@ -1,9 +1,2 @@
-
-        export const kycSearchableFields = [ 
-          
-        ];
-        export const kycFilterAbleFields = [
-            
-          ];
-          
-        
+export const kycSearchableFields = ['status'];
+export const kycFilterAbleFields = ['status'];

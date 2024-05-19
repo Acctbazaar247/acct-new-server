@@ -27,7 +27,8 @@ const getAllOrders = async (
   const { page, limit, skip } =
     paginationHelpers.calculatePagination(paginationOptions);
 
-  const { searchTerm, sellerId, ...filterData } = filters;
+  const { searchTerm, sellerId, buyerEmail, sellerEmail, ...filterData } =
+    filters;
 
   const andCondition = [];
 
@@ -60,6 +61,22 @@ const getAllOrders = async (
     const sellers: Prisma.OrdersWhereInput = {
       AND: {
         account: { ownById: sellerId },
+      },
+    };
+    andCondition.push(sellers);
+  }
+  if (sellerEmail) {
+    const sellers: Prisma.OrdersWhereInput = {
+      AND: {
+        account: { ownBy: { email: sellerEmail } },
+      },
+    };
+    andCondition.push(sellers);
+  }
+  if (buyerEmail) {
+    const sellers: Prisma.OrdersWhereInput = {
+      AND: {
+        orderBy: { email: buyerEmail },
       },
     };
     andCondition.push(sellers);
