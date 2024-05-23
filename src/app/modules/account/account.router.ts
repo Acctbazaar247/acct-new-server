@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.get('/', AccountController.getAllAccount);
 router.get('/:id', AccountController.getSingleAccount);
-
+// the upload limit only exist on multi-upload
 // router.post(
 //   '/',
 //   auth(UserRole.admin, UserRole.seller, UserRole.superAdmin),

@@ -10,9 +10,11 @@ const cart_router_1 = require("../modules/cart/cart.router");
 const currency_router_1 = require("../modules/currency/currency.router");
 const currencyRequest_router_1 = require("../modules/currencyRequest/currencyRequest.router");
 const fileUpload_route_1 = require("../modules/fileUpload/fileUpload.route");
+const kyc_router_1 = require("../modules/kyc/kyc.router");
 const message_router_1 = require("../modules/message/message.router");
 const notifications_router_1 = require("../modules/notifications/notifications.router");
 const orders_router_1 = require("../modules/orders/orders.router");
+const plan_router_1 = require("../modules/plan/plan.router");
 const profile_router_1 = require("../modules/profile/profile.router");
 const seenMessage_router_1 = require("../modules/seenMessage/seenMessage.router");
 const user_router_1 = require("../modules/user/user.router");
@@ -71,6 +73,14 @@ const moduleRoutes = [
     {
         path: '/notification',
         route: notifications_router_1.NotificationsRoutes,
+    },
+    {
+        path: '/kyc',
+        route: kyc_router_1.KycRoutes,
+    },
+    {
+        path: '/plan',
+        route: plan_router_1.PlanRoutes,
     },
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));

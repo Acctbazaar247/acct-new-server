@@ -201,6 +201,17 @@ const becomeSeller = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
         data: output,
     });
 }));
+const becomeSellerWithWallet = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = req.user;
+    const { payWith } = req.body;
+    const output = yield auth_service_1.AuthService.becomeSellerWithWallet(user.userId, payWith);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: 'successfully become a seller',
+        data: output,
+    });
+}));
 const changePassword = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const data = req.body;
     const output = yield auth_service_1.AuthService.changePassword(data);
@@ -255,4 +266,5 @@ exports.AuthController = {
     addWithdrawalPasswordFirstTime,
     sendWithdrawalTokenEmail,
     changeWithdrawPin,
+    becomeSellerWithWallet,
 };

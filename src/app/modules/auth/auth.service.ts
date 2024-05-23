@@ -1,4 +1,10 @@
-import { EPayWith, EVerificationOtp, User, UserRole } from '@prisma/client';
+import {
+  EPayWith,
+  EReferralStatus,
+  EVerificationOtp,
+  User,
+  UserRole,
+} from '@prisma/client';
 import bcryptjs from 'bcryptjs';
 import httpStatus from 'http-status';
 import { Secret } from 'jsonwebtoken';
@@ -19,23 +25,31 @@ import {
   ILoginResponse,
   IRefreshTokenResponse,
   IVerifyTokeResponse,
+  RefUser,
 } from './auth.Interface';
-const createUser = async (user: User): Promise<ILoginResponse> => {
+const createUser = async (user: RefUser): Promise<ILoginResponse> => {
   // checking is user buyer
-  const { password: givenPassword, ...rest } = user;
+  const { password: givenPassword, referralId, ...rest } = user;
   let newUser;
   const isUserExist = await prisma.user.findUnique({
     where: { email: user.email },
   });
-  // if user and account exits
+  // check referralId
+  if (referralId) {
+    const isReferralUserExits = await prisma.user.findUnique({
+      where: { id: referralId },
+      select: { id: true },
+    });
 
+    if (!isReferralUserExits) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Referral is not valid');
+    }
+  }
   // if seller and already exist
-  // user all ready paid
   const otp = generateOtp();
   if (isUserExist?.isVerified) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'user already Exits ');
   } else {
-    // seller account created but not paid , will let tme update and create it
     const genarateBycryptPass = await createBycryptPassword(givenPassword);
 
     // start new  transection  for new user
@@ -68,9 +82,10 @@ const createUser = async (user: User): Promise<ILoginResponse> => {
           ownById: newUserInfo.id,
         },
       });
-      await tx.verificationOtp.deleteMany({
-        where: { ownById: newUserInfo.id },
-      });
+      //this code is un useable
+      // await tx.verificationOtp.deleteMany({
+      //   where: { ownById: newUserInfo.id },
+      // });
       await tx.verificationOtp.create({
         data: {
           ownById: newUserInfo.id,
@@ -78,6 +93,16 @@ const createUser = async (user: User): Promise<ILoginResponse> => {
           type: EVerificationOtp.createUser,
         },
       });
+      if (referralId) {
+        await tx.referral.create({
+          data: {
+            ownById: newUserInfo.id,
+            referralById: referralId,
+            status: EReferralStatus.pending,
+            amount: config.referralAmount,
+          },
+        });
+      }
       // is is it seller
       return newUserInfo;
     });

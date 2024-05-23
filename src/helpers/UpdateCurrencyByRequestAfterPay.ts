@@ -1,4 +1,4 @@
-import { EStatusOfCurrencyRequest } from '@prisma/client';
+import { EReferralStatus, EStatusOfCurrencyRequest } from '@prisma/client';
 import httpStatus from 'http-status';
 import config from '../config';
 import ApiError from '../errors/ApiError';
@@ -14,25 +14,32 @@ const UpdateCurrencyByRequestAfterPay = async (data: {
 }) => {
   try {
     let userId: string = '';
+    const isCurrencyRequestExits = await prisma.currencyRequest.findUnique({
+      where: { id: data.order_id },
+    });
+    if (!isCurrencyRequestExits) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'something went wrong');
+    }
+    userId = isCurrencyRequestExits.ownById;
+    // user previous currency
+    const isUserCurrencyExist = await prisma.currency.findUnique({
+      where: { ownById: isCurrencyRequestExits.ownById },
+    });
+    if (!isUserCurrencyExist) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Currency not found!');
+    }
+
+    // check does user has any referral by another people,
+    const isReferralExist = await prisma.referral.findUnique({
+      where: {
+        ownById: isCurrencyRequestExits.ownById,
+        status: EReferralStatus.pending,
+      },
+    });
+
     await prisma.$transaction(async tx => {
       // check is request exits
-      const isCurrencyRequestExits = await tx.currencyRequest.findUnique({
-        where: { id: data.order_id },
-        include: {
-          ownBy: { include: { Currency: true } },
-        },
-      });
-      if (!isCurrencyRequestExits || !isCurrencyRequestExits.ownBy) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'something went wrong');
-      }
-      userId = isCurrencyRequestExits.ownById;
-      // user previous currency
-      const isUserCurrencyExist = await tx.currency.findUnique({
-        where: { ownById: isCurrencyRequestExits.ownById },
-      });
-      if (!isUserCurrencyExist) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Currency not found!');
-      }
+
       // change status to approved
       if (isCurrencyRequestExits.status === EStatusOfCurrencyRequest.pending) {
         //
@@ -44,6 +51,33 @@ const UpdateCurrencyByRequestAfterPay = async (data: {
           },
         });
         // add money to user
+
+        // check ref
+        const isAddedSameAmount =
+          config.referralFirstPayAmount === data.price_amount;
+        if (isReferralExist) {
+          // check the a
+          // update referred by user
+          await tx.currency.update({
+            where: { ownById: isReferralExist.referralById },
+            data: { amount: { increment: config.referralAmount } },
+          });
+          if (isAddedSameAmount) {
+            await tx.referral.update({
+              where: { id: isReferralExist.id },
+              data: {
+                status: EReferralStatus.completed,
+              },
+            });
+          } else {
+            await tx.referral.update({
+              where: { id: isReferralExist.id },
+              data: {
+                status: EReferralStatus.cancel,
+              },
+            });
+          }
+        }
         await tx.currency.update({
           where: { ownById: isCurrencyRequestExits.ownById },
           data: {

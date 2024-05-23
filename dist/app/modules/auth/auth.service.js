@@ -41,20 +41,27 @@ const prisma_1 = __importDefault(require("../../../shared/prisma"));
 const user_service_1 = require("../user/user.service");
 const createUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
     // checking is user buyer
-    const { password: givenPassword } = user, rest = __rest(user, ["password"]);
+    const { password: givenPassword, referralId } = user, rest = __rest(user, ["password", "referralId"]);
     let newUser;
     const isUserExist = yield prisma_1.default.user.findUnique({
         where: { email: user.email },
     });
-    // if user and account exits
+    // check referralId
+    if (referralId) {
+        const isReferralUserExits = yield prisma_1.default.user.findUnique({
+            where: { id: referralId },
+            select: { id: true },
+        });
+        if (!isReferralUserExits) {
+            throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Referral is not valid');
+        }
+    }
     // if seller and already exist
-    // user all ready paid
     const otp = (0, generateOTP_1.generateOtp)();
     if (isUserExist === null || isUserExist === void 0 ? void 0 : isUserExist.isVerified) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'user already Exits ');
     }
     else {
-        // seller account created but not paid , will let tme update and create it
         const genarateBycryptPass = yield (0, createBycryptPassword_1.default)(givenPassword);
         // start new  transection  for new user
         // delete that user
@@ -77,9 +84,10 @@ const createUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
                     ownById: newUserInfo.id,
                 },
             });
-            yield tx.verificationOtp.deleteMany({
-                where: { ownById: newUserInfo.id },
-            });
+            //this code is un useable
+            // await tx.verificationOtp.deleteMany({
+            //   where: { ownById: newUserInfo.id },
+            // });
             yield tx.verificationOtp.create({
                 data: {
                     ownById: newUserInfo.id,
@@ -87,6 +95,16 @@ const createUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
                     type: client_1.EVerificationOtp.createUser,
                 },
             });
+            if (referralId) {
+                yield tx.referral.create({
+                    data: {
+                        ownById: newUserInfo.id,
+                        referralById: referralId,
+                        status: client_1.EReferralStatus.pending,
+                        amount: config_1.default.referralAmount,
+                    },
+                });
+            }
             // is is it seller
             return newUserInfo;
         }));
@@ -279,6 +297,66 @@ const becomeSeller = (id, payType) => __awaiter(void 0, void 0, void 0, function
     console.log(txId);
     return {
         txId,
+    };
+});
+const becomeSellerWithWallet = (id, payType) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(payType);
+    const isUserExist = yield prisma_1.default.user.findUnique({
+        where: { id },
+        include: {
+            Currency: true,
+        },
+    });
+    if (!isUserExist) {
+        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User not found');
+    }
+    // is already payed
+    if (isUserExist.isPaidForSeller) {
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Already paid');
+    }
+    // does he has enough wallet
+    if (!isUserExist.Currency) {
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Currency not found!');
+    }
+    if (config_1.default.sellerOneTimePayment > isUserExist.Currency.amount) {
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Not enough money left on your wallet');
+    }
+    const admin = yield prisma_1.default.user.findUnique({
+        where: { role: 'superAdmin', email: config_1.default.mainAdminEmail },
+        select: { id: true },
+    });
+    if (!admin) {
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Admin not found!');
+    }
+    // already have everything
+    yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        // cut money and add to admin
+        const updateCurrency = yield tx.currency.update({
+            where: { ownById: id },
+            data: {
+                amount: { decrement: config_1.default.sellerOneTimePayment },
+            },
+        });
+        if (0 > updateCurrency.amount) {
+            throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Something went wrong trying again latter');
+        }
+        // add money to admin
+        yield tx.currency.update({
+            where: { ownById: admin.id },
+            data: { amount: { increment: config_1.default.sellerOneTimePayment } },
+        });
+        yield tx.user.update({
+            where: { id },
+            data: {
+                role: 'seller',
+                payWith: client_1.EPayWith.wallet,
+                isPaidForSeller: true,
+                isApprovedForSeller: true,
+            },
+        });
+    }));
+    return {
+        isSeller: true,
     };
 });
 const refreshToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
@@ -554,4 +632,5 @@ exports.AuthService = {
     addWithdrawalPasswordFirstTime,
     sendWithdrawalTokenEmail,
     changeWithdrawPin,
+    becomeSellerWithWallet,
 };

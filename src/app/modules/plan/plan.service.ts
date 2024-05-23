@@ -124,9 +124,9 @@ const createPlan = async (
   if (!isCurrencyExits) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'User wallet not found');
   }
-  let price;
-  let limit;
-  let days;
+  let price: number;
+  let limit: number;
+  let days: number;
   if (payload.planType === EPlanType.pro) {
     if (isCurrencyExits.amount < config.proPlanPrice) {
       throw new ApiError(

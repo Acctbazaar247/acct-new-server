@@ -23,25 +23,29 @@ const sendNotification_1 = __importDefault(require("./sendNotification"));
 const UpdateCurrencyByRequestAfterPay = (data) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let userId = '';
+        const isCurrencyRequestExits = yield prisma_1.default.currencyRequest.findUnique({
+            where: { id: data.order_id },
+        });
+        if (!isCurrencyRequestExits) {
+            throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'something went wrong');
+        }
+        userId = isCurrencyRequestExits.ownById;
+        // user previous currency
+        const isUserCurrencyExist = yield prisma_1.default.currency.findUnique({
+            where: { ownById: isCurrencyRequestExits.ownById },
+        });
+        if (!isUserCurrencyExist) {
+            throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Currency not found!');
+        }
+        // check does user has any referral by another people,
+        const isReferralExist = yield prisma_1.default.referral.findUnique({
+            where: {
+                ownById: isCurrencyRequestExits.ownById,
+                status: client_1.EReferralStatus.pending,
+            },
+        });
         yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
             // check is request exits
-            const isCurrencyRequestExits = yield tx.currencyRequest.findUnique({
-                where: { id: data.order_id },
-                include: {
-                    ownBy: { include: { Currency: true } },
-                },
-            });
-            if (!isCurrencyRequestExits || !isCurrencyRequestExits.ownBy) {
-                throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'something went wrong');
-            }
-            userId = isCurrencyRequestExits.ownById;
-            // user previous currency
-            const isUserCurrencyExist = yield tx.currency.findUnique({
-                where: { ownById: isCurrencyRequestExits.ownById },
-            });
-            if (!isUserCurrencyExist) {
-                throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Currency not found!');
-            }
             // change status to approved
             if (isCurrencyRequestExits.status === client_1.EStatusOfCurrencyRequest.pending) {
                 //
@@ -53,6 +57,32 @@ const UpdateCurrencyByRequestAfterPay = (data) => __awaiter(void 0, void 0, void
                     },
                 });
                 // add money to user
+                // check ref
+                const isAddedSameAmount = config_1.default.referralFirstPayAmount === data.price_amount;
+                if (isReferralExist) {
+                    // check the a
+                    // update referred by user
+                    yield tx.currency.update({
+                        where: { ownById: isReferralExist.referralById },
+                        data: { amount: { increment: config_1.default.referralAmount } },
+                    });
+                    if (isAddedSameAmount) {
+                        yield tx.referral.update({
+                            where: { id: isReferralExist.id },
+                            data: {
+                                status: client_1.EReferralStatus.completed,
+                            },
+                        });
+                    }
+                    else {
+                        yield tx.referral.update({
+                            where: { id: isReferralExist.id },
+                            data: {
+                                status: client_1.EReferralStatus.cancel,
+                            },
+                        });
+                    }
+                }
                 yield tx.currency.update({
                     where: { ownById: isCurrencyRequestExits.ownById },
                     data: {

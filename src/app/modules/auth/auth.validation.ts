@@ -8,7 +8,10 @@ const createAuthZodSchema = z.object({
     name: z.string({ required_error: 'Name is required' }),
     role: z.nativeEnum(UserRole).default(UserRole.user).optional(),
     paymentWithPaystack: z.boolean().default(false).optional(),
-    txId: z.string({ required_error: 'Name is required' }).optional(),
+    txId: z.string({ required_error: 'txId is required' }).optional(),
+    referralId: z
+      .string({ required_error: 'referralId is required' })
+      .optional(),
   }),
 });
 const loginZodSchema = z.object({

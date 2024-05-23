@@ -54,4 +54,8 @@ export default {
   proPlusPlanPrice: parseInt(process.env.PRO_PLUS_PLAN_PRICE as string),
   proPlusPlanLimit: parseInt(process.env.PRO_PLUS_PLAN_LIMIT as string),
   proPlusPlanDays: parseInt(process.env.PRO_PLUS_PLAN_DAYS as string),
+  referralAmount: parseInt(process.env.REFERRAL_AMOUNT as string),
+  referralFirstPayAmount: parseInt(
+    process.env.REFERRAL_FIRST_PAY_AMOUNT as string
+  ),
 };
