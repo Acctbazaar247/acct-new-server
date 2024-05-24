@@ -133,6 +133,9 @@ const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     if (!isUserExist) {
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User does not exist');
     }
+    if (isUserExist.failedLoginAttempt && isUserExist.failedLoginAttempt >= 3) {
+        throw new ApiError_1.default(http_status_1.default.FORBIDDEN, "We noticed several attempts to access this account with an incorrect password. To protect your information, this account has been locked. Please reset your password using the 'Forgot Password' for enhanced security. ");
+    }
     if (isUserExist.role === client_1.UserRole.seller) {
         if (isUserExist.isApprovedForSeller === false) {
             throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Seller does not exits');
@@ -140,8 +143,30 @@ const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     }
     if (isUserExist.password &&
         !(yield bcryptjs_1.default.compare(password, isUserExist.password))) {
+        if (isUserExist.failedLoginAttempt === null) {
+            yield prisma_1.default.user.update({
+                where: { id: isUserExist.id },
+                data: {
+                    failedLoginAttempt: 1,
+                },
+            });
+        }
+        else {
+            yield prisma_1.default.user.update({
+                where: { id: isUserExist.id },
+                data: {
+                    failedLoginAttempt: {
+                        increment: 1,
+                    },
+                },
+            });
+        }
         throw new ApiError_1.default(http_status_1.default.UNAUTHORIZED, 'Password is incorrect');
     }
+    yield prisma_1.default.user.update({
+        where: { id: isUserExist.id },
+        data: { failedLoginAttempt: 0 },
+    });
     //create access token & refresh token
     const { email, id, role, name } = isUserExist, others = __rest(isUserExist, ["email", "id", "role", "name"]);
     const accessToken = jwtHelpers_1.jwtHelpers.createToken({ userId: id, role }, config_1.default.jwt.secret, config_1.default.jwt.expires_in);
@@ -491,7 +516,7 @@ const changePassword = ({ password, email, prePassword, otp, }) => __awaiter(voi
             });
             return yield tx.user.update({
                 where: { id: isUserExist.id },
-                data: { password: genarateBycryptPass },
+                data: { password: genarateBycryptPass, failedLoginAttempt: 0 },
             });
         }));
     }
@@ -499,9 +524,20 @@ const changePassword = ({ password, email, prePassword, otp, }) => __awaiter(voi
         if (!prePassword) {
             throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'pre password in required!');
         }
+        if (isUserExist.failedLoginAttempt) {
+            if (isUserExist.failedLoginAttempt >= 3) {
+                throw new ApiError_1.default(http_status_1.default.FORBIDDEN, `We noticed several attempts to access this account with an incorrect password. To protect your information, this account has been locked. Please reset your password using the Otp option for enhanced security.`);
+            }
+        }
         // check
         const isMatch = yield bcryptjs_1.default.compare(prePassword, isUserExist.password);
         if (!isMatch) {
+            yield prisma_1.default.user.update({
+                where: { id: isUserExist.id },
+                data: {
+                    failedLoginAttempt: isUserExist.failedLoginAttempt === null ? 0 : { increment: 1 },
+                },
+            });
             throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Wrong password!');
         }
         result = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {

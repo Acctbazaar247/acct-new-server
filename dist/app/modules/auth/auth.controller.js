@@ -173,8 +173,7 @@ const sendWithdrawalTokenEmail = (0, catchAsync_1.default)((req, res) => __await
 }));
 const sendForgotEmail = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email } = req.params;
-    const output = yield auth_service_1.AuthService.sendForgotEmail(email || '');
-    const { otp } = output;
+    yield auth_service_1.AuthService.sendForgotEmail(email || '');
     // set refresh token into cookie
     const cookieOptions = {
         secure: config_1.default.env === 'production',
@@ -186,7 +185,7 @@ const sendForgotEmail = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
         success: true,
         message: 'Opt send successfully',
         data: {
-            otp,
+            otp: 'Opt send successfully',
         },
     });
 }));

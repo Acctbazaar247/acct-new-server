@@ -25,7 +25,11 @@ import { IUserFilters } from './user.interface';
 const getAllUser = async (
   filters: IUserFilters,
   paginationOptions: IPaginationOptions
-): Promise<IGenericResponse<Omit<User, 'password' | 'withdrawalPin'>[]>> => {
+): Promise<
+  IGenericResponse<
+    Omit<User, 'password' | 'withdrawalPin' | 'failedLoginAttempt'>[]
+  >
+> => {
   const { page, limit, skip } =
     paginationHelpers.calculatePagination(paginationOptions);
 

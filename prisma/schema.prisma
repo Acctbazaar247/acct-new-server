@@ -37,6 +37,7 @@ model User {
   city                String?
   address             String?
   dateOfBirth         DateTime?
+  failedLoginAttempt  Int?                @default(0)
   payWith             EPayWith?
   Account             Account[]
   Orders              Orders[]
@@ -51,8 +52,7 @@ model User {
   Kyc                 Kyc?
   Plan                Plan?
   Referral            Referral?           @relation(name: "Referral_OwnBy")
-  ReferredByMe      Referral[]          @relation(name:"Referral_By")
-
+  ReferredByMe        Referral[]          @relation(name: "Referral_By")
 }
 
 enum EPayWith {
@@ -406,29 +406,28 @@ model Plan {
   updatedAt DateTime  @updatedAt
 }
 
-enum EPlanType { 
+enum EPlanType {
   pro
   proPlus
 }
 
 model Referral {
-id            String   @id @unique @default(uuid())
-  ownById       String   @unique
-  ownBy         User     @relation(name: "Referral_OwnBy", fields: [ownById], references: [id], onDelete: Cascade)
-  
-  referralById  String
-  referralBy    User     @relation(name: "Referral_By", fields: [referralById], references: [id], onDelete: Cascade)
+  id      String @id @unique @default(uuid())
+  ownById String @unique
+  ownBy   User   @relation(name: "Referral_OwnBy", fields: [ownById], references: [id], onDelete: Cascade)
 
-  status      EReferralStatus
-  amount      Int
-  
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  referralById String
+  referralBy   User   @relation(name: "Referral_By", fields: [referralById], references: [id], onDelete: Cascade)
+
+  status EReferralStatus
+  amount Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum EReferralStatus {
   pending
   completed
   cancel
-
 }

@@ -144,6 +144,12 @@ const loginUser = async (payload: ILogin): Promise<ILoginResponse> => {
   if (!isUserExist) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist');
   }
+  if (isUserExist.failedLoginAttempt && isUserExist.failedLoginAttempt >= 3) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      "We noticed several attempts to access this account with an incorrect password. To protect your information, this account has been locked. Please reset your password using the 'Forgot Password' for enhanced security. "
+    );
+  }
   if (isUserExist.role === UserRole.seller) {
     if (isUserExist.isApprovedForSeller === false) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'Seller does not exits');
@@ -153,9 +159,29 @@ const loginUser = async (payload: ILogin): Promise<ILoginResponse> => {
     isUserExist.password &&
     !(await bcryptjs.compare(password, isUserExist.password))
   ) {
+    if (isUserExist.failedLoginAttempt === null) {
+      await prisma.user.update({
+        where: { id: isUserExist.id },
+        data: {
+          failedLoginAttempt: 1,
+        },
+      });
+    } else {
+      await prisma.user.update({
+        where: { id: isUserExist.id },
+        data: {
+          failedLoginAttempt: {
+            increment: 1,
+          },
+        },
+      });
+    }
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Password is incorrect');
   }
-
+  await prisma.user.update({
+    where: { id: isUserExist.id },
+    data: { failedLoginAttempt: 0 },
+  });
   //create access token & refresh token
 
   const { email, id, role, name, ...others } = isUserExist;
@@ -603,16 +629,31 @@ const changePassword = async ({
       });
       return await tx.user.update({
         where: { id: isUserExist.id },
-        data: { password: genarateBycryptPass },
+        data: { password: genarateBycryptPass, failedLoginAttempt: 0 },
       });
     });
   } else {
     if (!prePassword) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'pre password in required!');
     }
+    if (isUserExist.failedLoginAttempt) {
+      if (isUserExist.failedLoginAttempt >= 3) {
+        throw new ApiError(
+          httpStatus.FORBIDDEN,
+          `We noticed several attempts to access this account with an incorrect password. To protect your information, this account has been locked. Please reset your password using the Otp option for enhanced security.`
+        );
+      }
+    }
     // check
     const isMatch = await bcryptjs.compare(prePassword, isUserExist.password);
     if (!isMatch) {
+      await prisma.user.update({
+        where: { id: isUserExist.id },
+        data: {
+          failedLoginAttempt:
+            isUserExist.failedLoginAttempt === null ? 0 : { increment: 1 },
+        },
+      });
       throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong password!');
     }
     result = await prisma.$transaction(async tx => {

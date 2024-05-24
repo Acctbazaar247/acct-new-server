@@ -237,6 +237,7 @@ const getActivePlan = async (id: string): Promise<Plan | null | IBasicPlan> => {
     if (update.isActive) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'Try again latter');
     }
+    return update;
   }
   return result;
 };

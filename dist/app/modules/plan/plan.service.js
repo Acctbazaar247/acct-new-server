@@ -241,6 +241,7 @@ const getActivePlan = (id) => __awaiter(void 0, void 0, void 0, function* () {
         if (update.isActive) {
             throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Try again latter');
         }
+        return update;
     }
     return result;
 });

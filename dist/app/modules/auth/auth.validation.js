@@ -48,7 +48,7 @@ const changePassword = zod_1.z.object({
             .string({ required_error: 'Password is required' })
             .min(8, { message: 'Password must be at least 8 characters long' }),
         prePassword: zod_1.z
-            .string({ required_error: 'Password is required' })
+            .string({ required_error: 'Pre Password is required' })
             .min(8, { message: 'Password must be at least 8 characters long' })
             .optional(),
     }),
