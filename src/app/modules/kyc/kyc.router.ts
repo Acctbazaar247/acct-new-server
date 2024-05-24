@@ -12,8 +12,8 @@ router.get(
   KycController.getAllKyc
 );
 router.get(
-  '/single-user-kyc/:id',
-  auth(UserRole.admin, UserRole.superAdmin, UserRole.seller),
+  '/single-user-kyc',
+  auth(UserRole.seller),
   KycController.getSingleKycOfUser
 );
 router.get(

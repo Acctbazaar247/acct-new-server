@@ -43,7 +43,7 @@ function uploadToCloudinary(file, publicId) {
         return new Promise((resolve, reject) => {
             cloudinary_1.v2.uploader
                 .upload(file.tempFilePath, {
-                resource_type: 'auto',
+                resource_type: 'auto', // Automatically determine the resource type
                 public_id: publicId,
             })
                 .then(result => {

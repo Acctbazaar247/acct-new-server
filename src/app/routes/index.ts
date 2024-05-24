@@ -11,6 +11,7 @@ import { NotificationsRoutes } from '../modules/notifications/notifications.rout
 import { OrdersRoutes } from '../modules/orders/orders.router';
 import { PlanRoutes } from '../modules/plan/plan.router';
 import { ProfileRoutes } from '../modules/profile/profile.router';
+import { ReferralRoutes } from '../modules/referral/referral.router';
 import { SeenMessageRoutes } from '../modules/seenMessage/seenMessage.router';
 import { UserRoutes } from '../modules/user/user.router';
 import { WithdrawalRequestRoutes } from '../modules/withdrawalRequest/withdrawalRequest.router';
@@ -75,6 +76,10 @@ const moduleRoutes = [
   {
     path: '/kyc',
     route: KycRoutes,
+  },
+  {
+    path: '/referral',
+    route: ReferralRoutes,
   },
   {
     path: '/plan',

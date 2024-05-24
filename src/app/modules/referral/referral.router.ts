@@ -1,8 +1,14 @@
+import { UserRole } from '@prisma/client';
 import express from 'express';
+import auth from '../../middlewares/auth';
 import { ReferralController } from './referral.controller';
 const router = express.Router();
 
-router.get('/', ReferralController.getAllReferral);
+router.get(
+  '/',
+  auth(UserRole.admin, UserRole.superAdmin, UserRole.seller, UserRole.user),
+  ReferralController.getAllReferral
+);
 router.get('/:id', ReferralController.getSingleReferral);
 
 // router.post(

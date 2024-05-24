@@ -136,8 +136,13 @@ const updateKyc = (id, payload, requestedUserId) => __awaiter(void 0, void 0, vo
     if (!isKycExits) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Kyc not found!');
     }
-    if (requestedUser.role === client_1.UserRole.seller) {
-        // check is own by this seller
+    const isSeller = requestedUser.role === client_1.UserRole.seller;
+    const isWantToUpdateStatus = Boolean(payload.status);
+    if (isSeller && isWantToUpdateStatus) {
+        throw new ApiError_1.default(http_status_1.default.FORBIDDEN, 'You can not able to update this kyc!');
+    }
+    // check is own by this seller
+    if (isSeller) {
         if (isKycExits.ownById !== requestedUser.id) {
             throw new ApiError_1.default(http_status_1.default.FORBIDDEN, 'You can not able to update this kyc!');
         }
@@ -155,9 +160,9 @@ const updateKyc = (id, payload, requestedUserId) => __awaiter(void 0, void 0, vo
         }));
         return result;
     }
-    if (statusIsApprove) {
-        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'You cannot update status');
-    }
+    // if (statusIsApprove) {
+    //   throw new ApiError(httpStatus.BAD_REQUEST, 'You cannot update status');
+    // }
     const result = yield prisma_1.default.kyc.update({
         where: {
             id,

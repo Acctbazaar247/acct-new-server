@@ -58,14 +58,14 @@ const getSingleKyc: RequestHandler = catchAsync(
 );
 const getSingleKycOfUser: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const user = req.user as JwtPayload;
 
-    const result = await KycService.getSingleKycOfUser(id);
+    const result = await KycService.getSingleKycOfUser(user.userId);
 
     sendResponse<Kyc>(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: 'Kyc retrieved  successfully!',
+      message: 'Kyc retrieved successfully!',
       data: result,
     });
   }

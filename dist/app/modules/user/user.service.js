@@ -371,9 +371,9 @@ const sendUserQuery = (id, description, queryType) => __awaiter(void 0, void 0, 
     //   },
     // });
     const transport = yield nodemailer_1.default.createTransport({
-        host: 'mail.privateemail.com',
-        port: 465,
-        secure: true,
+        host: 'mail.privateemail.com', // or 'smtp.privateemail.com'
+        port: 465, // or 465 for SSL. or 587
+        secure: true, // true for 465, false for 587
         auth: {
             user: config_1.default.emailUser,
             pass: config_1.default.emailUserPass,
