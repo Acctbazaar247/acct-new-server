@@ -137,7 +137,7 @@ const updateKyc = (id, payload, requestedUserId) => __awaiter(void 0, void 0, vo
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Kyc not found!');
     }
     const isSeller = requestedUser.role === client_1.UserRole.seller;
-    const isWantToUpdateStatus = Boolean(payload.status);
+    const isWantToUpdateStatus = payload.status === client_1.EStatusOfKyc.approved;
     if (isSeller && isWantToUpdateStatus) {
         throw new ApiError_1.default(http_status_1.default.FORBIDDEN, 'You can not able to update this kyc!');
     }

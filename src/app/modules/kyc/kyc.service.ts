@@ -133,7 +133,7 @@ const updateKyc = async (
     throw new ApiError(httpStatus.BAD_REQUEST, 'Kyc not found!');
   }
   const isSeller = requestedUser.role === UserRole.seller;
-  const isWantToUpdateStatus = Boolean(payload.status);
+  const isWantToUpdateStatus = payload.status === EStatusOfKyc.approved;
   if (isSeller && isWantToUpdateStatus) {
     throw new ApiError(
       httpStatus.FORBIDDEN,
