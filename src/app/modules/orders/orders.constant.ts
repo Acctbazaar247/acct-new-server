@@ -5,4 +5,5 @@ export const ordersFilterAbleFields = [
   'orderById',
   'sellerEmail',
   'buyerEmail',
+  'id',
 ];
