@@ -107,6 +107,7 @@ const getAllOrders = (filters, paginationOptions) => __awaiter(void 0, void 0, v
                     profileImg: true,
                     name: true,
                     id: true,
+                    isVerifiedByAdmin: true,
                 },
             },
         },

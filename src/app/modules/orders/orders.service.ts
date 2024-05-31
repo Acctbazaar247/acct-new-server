@@ -103,6 +103,7 @@ const getAllOrders = async (
           profileImg: true,
           name: true,
           id: true,
+          isVerifiedByAdmin: true,
         },
       },
     },
