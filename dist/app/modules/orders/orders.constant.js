@@ -8,4 +8,5 @@ exports.ordersFilterAbleFields = [
     'orderById',
     'sellerEmail',
     'buyerEmail',
+    'id',
 ];
