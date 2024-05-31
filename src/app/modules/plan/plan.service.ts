@@ -104,12 +104,11 @@ const createPlan = async (
 
   const isActivePlanExits = await prisma.plan.findFirst({
     where: {
-      isActive: true,
       ownById: userId,
     },
   });
 
-  if (isActivePlanExits) {
+  if (isActivePlanExits && isActivePlanExits.isActive) {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
       'You already have a active plan'
@@ -165,7 +164,9 @@ const createPlan = async (
 
   const newPlan = await prisma.$transaction(async tx => {
     // delete previous plan
-    await tx.plan.delete({ where: { ownById: userId } });
+    if (isActivePlanExits) {
+      await tx.plan.delete({ where: { ownById: userId } });
+    }
     // cut money form user
     await tx.currency.update({
       where: { ownById: userId },

@@ -132,11 +132,10 @@ const createPlan = (payload, userId) => __awaiter(void 0, void 0, void 0, functi
     // check does he has active plan
     const isActivePlanExits = yield prisma_1.default.plan.findFirst({
         where: {
-            isActive: true,
             ownById: userId,
         },
     });
-    if (isActivePlanExits) {
+    if (isActivePlanExits && isActivePlanExits.isActive) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'You already have a active plan');
     }
     // check wallet of user
@@ -178,7 +177,9 @@ const createPlan = (payload, userId) => __awaiter(void 0, void 0, void 0, functi
     }
     const newPlan = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
         // delete previous plan
-        yield tx.plan.delete({ where: { ownById: userId } });
+        if (isActivePlanExits) {
+            yield tx.plan.delete({ where: { ownById: userId } });
+        }
         // cut money form user
         yield tx.currency.update({
             where: { ownById: userId },

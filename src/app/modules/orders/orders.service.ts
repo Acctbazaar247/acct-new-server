@@ -160,10 +160,17 @@ const createOrders = async (payload: Orders): Promise<Orders | null> => {
       id: true,
       email: true,
       role: true,
+      isBlocked: true,
       Currency: { select: { amount: true, id: true } },
     },
   });
 
+  if (isSellerExist?.isBlocked) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      'You can not buy this account! (Seller blocked.)'
+    );
+  }
   // the only 10 percent will receive by admin and expect the 10 percent seller will receive
   // get admin info
   const isAdminExist = await prisma.user.findFirst({

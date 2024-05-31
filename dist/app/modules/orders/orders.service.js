@@ -156,9 +156,13 @@ const createOrders = (payload) => __awaiter(void 0, void 0, void 0, function* ()
             id: true,
             email: true,
             role: true,
+            isBlocked: true,
             Currency: { select: { amount: true, id: true } },
         },
     });
+    if (isSellerExist === null || isSellerExist === void 0 ? void 0 : isSellerExist.isBlocked) {
+        throw new ApiError_1.default(http_status_1.default.FORBIDDEN, 'You can not buy this account! (Seller blocked.)');
+    }
     // the only 10 percent will receive by admin and expect the 10 percent seller will receive
     // get admin info
     const isAdminExist = yield prisma_1.default.user.findFirst({
