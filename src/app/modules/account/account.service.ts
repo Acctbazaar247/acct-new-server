@@ -149,6 +149,7 @@ const getAllAccount = async (
           email: true,
           id: true,
           isVerified: true,
+          isVerifiedByAdmin: true,
         },
       },
     },
