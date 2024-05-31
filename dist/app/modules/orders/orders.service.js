@@ -301,7 +301,15 @@ const getSingleOrders = (id, requestedUer) => __awaiter(void 0, void 0, void 0, 
         include: {
             account: {
                 include: {
-                    ownBy: true,
+                    ownBy: {
+                        select: {
+                            email: true,
+                            profileImg: true,
+                            name: true,
+                            id: true,
+                            isVerifiedByAdmin: true,
+                        },
+                    },
                 },
             },
             orderBy: {
@@ -309,6 +317,7 @@ const getSingleOrders = (id, requestedUer) => __awaiter(void 0, void 0, void 0, 
                     profileImg: true,
                     name: true,
                     id: true,
+                    isVerifiedByAdmin: true,
                 },
             },
         },

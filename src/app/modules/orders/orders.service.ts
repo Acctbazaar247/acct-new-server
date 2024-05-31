@@ -340,7 +340,15 @@ const getSingleOrders = async (
     include: {
       account: {
         include: {
-          ownBy: true,
+          ownBy: {
+            select: {
+              email: true,
+              profileImg: true,
+              name: true,
+              id: true,
+              isVerifiedByAdmin: true,
+            },
+          },
         },
       },
       orderBy: {
@@ -348,6 +356,7 @@ const getSingleOrders = async (
           profileImg: true,
           name: true,
           id: true,
+          isVerifiedByAdmin: true,
         },
       },
     },
