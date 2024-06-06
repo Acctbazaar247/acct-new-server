@@ -3,6 +3,10 @@ import { z } from 'zod';
 const createValidation = z.object({
   body: z.object({
     name: z.string({ required_error: 'name is required' }),
+    phoneNumber: z.string({ required_error: 'phoneNumber is required' }),
+    whatsAppNumber: z.string({ required_error: 'whatsAppNumber is required' }),
+    telegramNumber: z.string({ required_error: 'telegramNumber is required' }),
+
     userName: z.string({ required_error: 'userName is required' }),
     country: z.string({ required_error: 'country is required' }),
     address: z.string({ required_error: 'address is required' }),
@@ -11,7 +15,7 @@ const createValidation = z.object({
     birthDate: z.string({ required_error: 'Birthday is required' }),
     meansOfIdentification: z.enum([
       'PASSPORT',
-      `DRIVER_LICENCE`,
+      `DRIVER_LICENSE`,
       'NATIONAL_ID',
     ]),
     identificationNumber: z.string({

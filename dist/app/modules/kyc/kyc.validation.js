@@ -5,6 +5,9 @@ const zod_1 = require("zod");
 const createValidation = zod_1.z.object({
     body: zod_1.z.object({
         name: zod_1.z.string({ required_error: 'name is required' }),
+        phoneNumber: zod_1.z.string({ required_error: 'phoneNumber is required' }),
+        whatsAppNumber: zod_1.z.string({ required_error: 'whatsAppNumber is required' }),
+        telegramNumber: zod_1.z.string({ required_error: 'telegramNumber is required' }),
         userName: zod_1.z.string({ required_error: 'userName is required' }),
         country: zod_1.z.string({ required_error: 'country is required' }),
         address: zod_1.z.string({ required_error: 'address is required' }),
@@ -13,7 +16,7 @@ const createValidation = zod_1.z.object({
         birthDate: zod_1.z.string({ required_error: 'Birthday is required' }),
         meansOfIdentification: zod_1.z.enum([
             'PASSPORT',
-            `DRIVER_LICENCE`,
+            `DRIVER_LICENSE`,
             'NATIONAL_ID',
         ]),
         identificationNumber: zod_1.z.string({

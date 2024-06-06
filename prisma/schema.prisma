@@ -377,6 +377,7 @@ model Kyc {
   ownBy                     User         @relation(fields: [ownById], references: [id], onDelete: Cascade)
   userName                  String
   name                      String?
+  phoneNumber               String?
   country                   String
   state                     String
   address                   String
@@ -387,6 +388,8 @@ model Kyc {
   identificationExpiredDate DateTime?
   identityImage             String
   messageByAdmin            String?
+  whatsAppNumber            String?
+  telegramNumber            String?
   status                    EStatusOfKyc @default(pending)
   createdAt                 DateTime     @default(now())
   updatedAt                 DateTime     @updatedAt
