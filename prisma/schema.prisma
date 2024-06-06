@@ -20,6 +20,7 @@ model User {
   email               String              @unique
   password            String
   phoneNumber         String?
+  userName            String?
   shouldSendEmail     Boolean             @default(true)
   txId                String?
   createdAt           DateTime            @default(now())
@@ -371,21 +372,24 @@ model Notifications {
 
 // new updated content!
 model Kyc {
-  id                    String       @id @unique @default(uuid())
-  ownById               String       @unique
-  ownBy                 User         @relation(fields: [ownById], references: [id], onDelete: Cascade)
-  userName              String
-  country               String
-  state                 String
-  address               String
-  city                  String
-  birthDate             DateTime
-  meansOfIdentification String
-  identificationNumber  String
-  identityImage         String
-  status                EStatusOfKyc @default(pending)
-  createdAt             DateTime     @default(now())
-  updatedAt             DateTime     @updatedAt
+  id                        String       @id @unique @default(uuid())
+  ownById                   String       @unique
+  ownBy                     User         @relation(fields: [ownById], references: [id], onDelete: Cascade)
+  userName                  String
+  name                      String?
+  country                   String
+  state                     String
+  address                   String
+  city                      String
+  birthDate                 DateTime
+  meansOfIdentification     String
+  identificationNumber      String
+  identificationExpiredDate DateTime?
+  identityImage             String
+  messageByAdmin            String?
+  status                    EStatusOfKyc @default(pending)
+  createdAt                 DateTime     @default(now())
+  updatedAt                 DateTime     @updatedAt
 }
 
 enum EStatusOfKyc {
@@ -407,6 +411,7 @@ model Plan {
 }
 
 enum EPlanType {
+  basic
   pro
   proPlus
 }

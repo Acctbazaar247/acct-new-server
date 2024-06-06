@@ -87,6 +87,14 @@ const createKyc = async (payload: Kyc): Promise<Kyc | null> => {
   if (isExits) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Kyc Already exits');
   }
+  if (payload.meansOfIdentification === 'PASSPORT') {
+    if (!payload.identificationExpiredDate) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        'identificationExpiredDate is required'
+      );
+    }
+  }
   const newKyc = await prisma.kyc.create({
     data: payload,
   });
@@ -127,7 +135,7 @@ const updateKyc = async (
   }
   const isKycExits = await prisma.kyc.findUnique({
     where: { id },
-    select: { id: true, ownById: true },
+    select: { id: true, ownById: true, userName: true, name: true },
   });
   if (!isKycExits) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Kyc not found!');
@@ -155,7 +163,7 @@ const updateKyc = async (
     const result = await prisma.$transaction(async tx => {
       await tx.user.update({
         where: { id: isKycExits.ownById },
-        data: { isVerifiedByAdmin: true },
+        data: { isVerifiedByAdmin: true, userName: isKycExits.userName },
       });
       const updatedKyc = await tx.kyc.update({ where: { id }, data: payload });
       return updatedKyc;

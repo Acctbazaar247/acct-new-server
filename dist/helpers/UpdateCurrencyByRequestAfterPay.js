@@ -58,15 +58,15 @@ const UpdateCurrencyByRequestAfterPay = (data) => __awaiter(void 0, void 0, void
                 });
                 // add money to user
                 // check ref
-                const isAddedSameAmount = config_1.default.referralFirstPayAmount === data.price_amount;
+                const isAddedSameAmount = config_1.default.referralFirstPayAmount <= data.price_amount;
                 if (isReferralExist) {
                     // check the a
                     // update referred by user
-                    yield tx.currency.update({
-                        where: { ownById: isReferralExist.referralById },
-                        data: { amount: { increment: config_1.default.referralAmount } },
-                    });
                     if (isAddedSameAmount) {
+                        yield tx.currency.update({
+                            where: { ownById: isReferralExist.referralById },
+                            data: { amount: { increment: config_1.default.referralAmount } },
+                        });
                         yield tx.referral.update({
                             where: { id: isReferralExist.id },
                             data: {

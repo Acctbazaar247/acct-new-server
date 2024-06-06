@@ -250,6 +250,7 @@ const createOrders = async (payload: Orders): Promise<Orders | null> => {
         'Something went wrong tray again latter '
       );
     }
+
     const isAdmin = isSellerExist.role === UserRole.admin;
     const isSuperAdmin = isSellerExist.role === UserRole.superAdmin;
     if (isAdmin || isSuperAdmin) {

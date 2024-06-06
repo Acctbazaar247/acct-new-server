@@ -109,10 +109,22 @@ const createPlan = async (
   });
 
   if (isActivePlanExits && isActivePlanExits.isActive) {
-    throw new ApiError(
-      httpStatus.BAD_REQUEST,
-      'You already have a active plan'
-    );
+    if (
+      !calculateDaysLeft(isActivePlanExits.createdAt, isActivePlanExits.days)
+    ) {
+      const update = await prisma.plan.update({
+        where: { ownById: userId },
+        data: { isActive: false },
+      });
+      if (update.isActive) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Try again latter');
+      }
+    } else {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        'You already have a active plan'
+      );
+    }
   }
 
   // check wallet of user
@@ -146,6 +158,16 @@ const createPlan = async (
     price = config.proPlusPlanPrice;
     limit = config.proPlusPlanLimit;
     days = config.proPlusPlanDays;
+  } else if (payload.planType === EPlanType.basic) {
+    if (isCurrencyExits.amount < config.basicPlanPrice) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        'Not enough money left in wallet'
+      );
+    }
+    price = config.basicPlanPrice;
+    limit = config.basicPlanLimit;
+    days = config.basicPlanDays;
   } else {
     throw new ApiError(httpStatus.BAD_REQUEST, 'You request is not valid');
   }
@@ -221,8 +243,8 @@ const getActivePlan = async (id: string): Promise<Plan | null | IBasicPlan> => {
       id,
       ownById: id,
       isActive: true,
-      planType: 'basic',
-      limit: config.basicPlanLimit,
+      planType: 'default',
+      limit: config.defaultPlanLimit,
       days: 'life time',
       createdAt: new Date(),
       updatedAt: new Date(),

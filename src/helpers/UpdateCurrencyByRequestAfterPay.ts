@@ -54,15 +54,16 @@ const UpdateCurrencyByRequestAfterPay = async (data: {
 
         // check ref
         const isAddedSameAmount =
-          config.referralFirstPayAmount === data.price_amount;
+          config.referralFirstPayAmount <= data.price_amount;
         if (isReferralExist) {
           // check the a
           // update referred by user
-          await tx.currency.update({
-            where: { ownById: isReferralExist.referralById },
-            data: { amount: { increment: config.referralAmount } },
-          });
+
           if (isAddedSameAmount) {
+            await tx.currency.update({
+              where: { ownById: isReferralExist.referralById },
+              data: { amount: { increment: config.referralAmount } },
+            });
             await tx.referral.update({
               where: { id: isReferralExist.id },
               data: {

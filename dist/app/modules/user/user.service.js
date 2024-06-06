@@ -103,6 +103,7 @@ const getAllUser = (filters, paginationOptions) => __awaiter(void 0, void 0, voi
             state: true,
             address: true,
             dateOfBirth: true,
+            userName: true,
             Currency: {
                 select: {
                     amount: true,

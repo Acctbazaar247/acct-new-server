@@ -97,6 +97,11 @@ const createKyc = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     if (isExits) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Kyc Already exits');
     }
+    if (payload.meansOfIdentification === 'PASSPORT') {
+        if (!payload.identificationExpiredDate) {
+            throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'identificationExpiredDate is required');
+        }
+    }
     const newKyc = yield prisma_1.default.kyc.create({
         data: payload,
     });
@@ -131,7 +136,7 @@ const updateKyc = (id, payload, requestedUserId) => __awaiter(void 0, void 0, vo
     }
     const isKycExits = yield prisma_1.default.kyc.findUnique({
         where: { id },
-        select: { id: true, ownById: true },
+        select: { id: true, ownById: true, userName: true, name: true },
     });
     if (!isKycExits) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Kyc not found!');
@@ -153,7 +158,7 @@ const updateKyc = (id, payload, requestedUserId) => __awaiter(void 0, void 0, vo
         const result = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
             yield tx.user.update({
                 where: { id: isKycExits.ownById },
-                data: { isVerifiedByAdmin: true },
+                data: { isVerifiedByAdmin: true, userName: isKycExits.userName },
             });
             const updatedKyc = yield tx.kyc.update({ where: { id }, data: payload });
             return updatedKyc;

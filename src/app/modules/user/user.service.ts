@@ -103,6 +103,7 @@ const getAllUser = async (
       state: true,
       address: true,
       dateOfBirth: true,
+      userName: true,
       Currency: {
         select: {
           amount: true,

@@ -136,7 +136,18 @@ const createPlan = (payload, userId) => __awaiter(void 0, void 0, void 0, functi
         },
     });
     if (isActivePlanExits && isActivePlanExits.isActive) {
-        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'You already have a active plan');
+        if (!(0, plan_utils_1.default)(isActivePlanExits.createdAt, isActivePlanExits.days)) {
+            const update = yield prisma_1.default.plan.update({
+                where: { ownById: userId },
+                data: { isActive: false },
+            });
+            if (update.isActive) {
+                throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Try again latter');
+            }
+        }
+        else {
+            throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'You already have a active plan');
+        }
     }
     // check wallet of user
     const isCurrencyExits = yield prisma_1.default.currency.findUnique({
@@ -163,6 +174,14 @@ const createPlan = (payload, userId) => __awaiter(void 0, void 0, void 0, functi
         price = config_1.default.proPlusPlanPrice;
         limit = config_1.default.proPlusPlanLimit;
         days = config_1.default.proPlusPlanDays;
+    }
+    else if (payload.planType === client_1.EPlanType.basic) {
+        if (isCurrencyExits.amount < config_1.default.basicPlanPrice) {
+            throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Not enough money left in wallet');
+        }
+        price = config_1.default.basicPlanPrice;
+        limit = config_1.default.basicPlanLimit;
+        days = config_1.default.basicPlanDays;
     }
     else {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'You request is not valid');
@@ -226,8 +245,8 @@ const getActivePlan = (id) => __awaiter(void 0, void 0, void 0, function* () {
             id,
             ownById: id,
             isActive: true,
-            planType: 'basic',
-            limit: config_1.default.basicPlanLimit,
+            planType: 'default',
+            limit: config_1.default.defaultPlanLimit,
             days: 'life time',
             createdAt: new Date(),
             updatedAt: new Date(),
