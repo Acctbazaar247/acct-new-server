@@ -271,7 +271,7 @@ const getHowManyUploadLeft = async (id: string): Promise<IPlanUploadCount> => {
   const isPlanExist = await prisma.plan.findUnique({ where: { ownById: id } });
   let totalPossibleUpload = 0;
   if (!isPlanExist) {
-    totalPossibleUpload = config.basicPlanLimit;
+    totalPossibleUpload = config.defaultPlanLimit;
   } else {
     totalPossibleUpload = isPlanExist.limit;
   }

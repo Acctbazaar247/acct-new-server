@@ -271,7 +271,7 @@ const getHowManyUploadLeft = (id) => __awaiter(void 0, void 0, void 0, function*
     const isPlanExist = yield prisma_1.default.plan.findUnique({ where: { ownById: id } });
     let totalPossibleUpload = 0;
     if (!isPlanExist) {
-        totalPossibleUpload = config_1.default.basicPlanLimit;
+        totalPossibleUpload = config_1.default.defaultPlanLimit;
     }
     else {
         totalPossibleUpload = isPlanExist.limit;
