@@ -33,7 +33,7 @@ const plan_service_1 = require("../plan/plan.service");
 const account_constant_1 = require("./account.constant");
 const getAllAccount = (filters, paginationOptions) => __awaiter(void 0, void 0, void 0, function* () {
     const { page, limit, skip } = paginationHelper_1.paginationHelpers.calculatePagination(paginationOptions);
-    const { searchTerm, maxPrice, minPrice, category } = filters, filterData = __rest(filters, ["searchTerm", "maxPrice", "minPrice", "category"]);
+    const { searchTerm, maxPrice, minPrice, category, planType } = filters, filterData = __rest(filters, ["searchTerm", "maxPrice", "minPrice", "category", "planType"]);
     const andCondition = [];
     if (searchTerm) {
         const searchAbleFields = account_constant_1.accountSearchableFields.map(single => {
@@ -89,6 +89,18 @@ const getAllAccount = (filters, paginationOptions) => __awaiter(void 0, void 0, 
             AND: {
                 category: {
                     in: categories,
+                },
+            },
+        };
+        andCondition.push(categoryQuery);
+    }
+    if (planType) {
+        const categoryQuery = {
+            AND: {
+                ownBy: {
+                    Plan: {
+                        planType: planType,
+                    },
                 },
             },
         };

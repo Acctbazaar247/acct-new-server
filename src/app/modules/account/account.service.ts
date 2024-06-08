@@ -34,7 +34,8 @@ const getAllAccount = async (
   const { page, limit, skip } =
     paginationHelpers.calculatePagination(paginationOptions);
 
-  const { searchTerm, maxPrice, minPrice, category, ...filterData } = filters;
+  const { searchTerm, maxPrice, minPrice, category, planType, ...filterData } =
+    filters;
 
   const andCondition = [];
 
@@ -92,6 +93,18 @@ const getAllAccount = async (
       AND: {
         category: {
           in: categories,
+        },
+      },
+    };
+    andCondition.push(categoryQuery);
+  }
+  if (planType) {
+    const categoryQuery: Prisma.AccountWhereInput = {
+      AND: {
+        ownBy: {
+          Plan: {
+            planType: planType,
+          },
         },
       },
     };

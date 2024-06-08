@@ -53,9 +53,12 @@ const updateValidation = zod_1.z.object({
             required_error: 'identificationNumber is required',
         })
             .optional(),
-        identificationExpiredDate: zod_1.z.string({
+        identificationExpiredDate: zod_1.z
+            .string({
             required_error: 'identificationExpiredDate is required',
-        }),
+        })
+            .optional()
+            .nullable(),
         identityImage: zod_1.z
             .string({ required_error: 'identityImage is required' })
             .optional(),

@@ -9,5 +9,6 @@ exports.accountFilterAbleFields = [
     'ownById',
     'isSold',
     'accountType',
+    'planType',
 ];
 exports.accountFilterByPrice = ['maxPrice', 'minPrice'];
