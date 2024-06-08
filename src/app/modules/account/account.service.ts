@@ -99,7 +99,7 @@ const getAllAccount = async (
     andCondition.push(categoryQuery);
   }
   if (planType) {
-    const categoryQuery: Prisma.AccountWhereInput = {
+    const planQuery: Prisma.AccountWhereInput = {
       AND: {
         ownBy: {
           Plan: {
@@ -108,7 +108,7 @@ const getAllAccount = async (
         },
       },
     };
-    andCondition.push(categoryQuery);
+    andCondition.push(planQuery);
   }
   const forNotBlockedSeller: Prisma.AccountWhereInput = {
     OR: [

@@ -1,5 +1,4 @@
-
-        export type IKycFilters = {
-            searchTerm?: string;
-          }; 
-        
+export type IKycFilters = {
+  searchTerm?: string;
+  email?: string;
+};

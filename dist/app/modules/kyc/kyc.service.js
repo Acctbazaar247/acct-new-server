@@ -32,7 +32,7 @@ const prisma_1 = __importDefault(require("../../../shared/prisma"));
 const kyc_constant_1 = require("./kyc.constant");
 const getAllKyc = (filters, paginationOptions) => __awaiter(void 0, void 0, void 0, function* () {
     const { page, limit, skip } = paginationHelper_1.paginationHelpers.calculatePagination(paginationOptions);
-    const { searchTerm } = filters, filterData = __rest(filters, ["searchTerm"]);
+    const { searchTerm, email } = filters, filterData = __rest(filters, ["searchTerm", "email"]);
     const andCondition = [];
     if (searchTerm) {
         const searchAbleFields = kyc_constant_1.kycSearchableFields.map(single => {
@@ -47,6 +47,16 @@ const getAllKyc = (filters, paginationOptions) => __awaiter(void 0, void 0, void
         andCondition.push({
             OR: searchAbleFields,
         });
+    }
+    if (email) {
+        const emailQuery = {
+            AND: {
+                ownBy: {
+                    email,
+                },
+            },
+        };
+        andCondition.push(emailQuery);
     }
     if (Object.keys(filters).length) {
         andCondition.push({

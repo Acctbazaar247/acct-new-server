@@ -15,7 +15,7 @@ const getAllKyc = async (
   const { page, limit, skip } =
     paginationHelpers.calculatePagination(paginationOptions);
 
-  const { searchTerm, ...filterData } = filters;
+  const { searchTerm, email, ...filterData } = filters;
 
   const andCondition = [];
 
@@ -32,6 +32,16 @@ const getAllKyc = async (
     andCondition.push({
       OR: searchAbleFields,
     });
+  }
+  if (email) {
+    const emailQuery: Prisma.KycWhereInput = {
+      AND: {
+        ownBy: {
+          email,
+        },
+      },
+    };
+    andCondition.push(emailQuery);
   }
   if (Object.keys(filters).length) {
     andCondition.push({

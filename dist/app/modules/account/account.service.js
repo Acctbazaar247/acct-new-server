@@ -95,7 +95,7 @@ const getAllAccount = (filters, paginationOptions) => __awaiter(void 0, void 0, 
         andCondition.push(categoryQuery);
     }
     if (planType) {
-        const categoryQuery = {
+        const planQuery = {
             AND: {
                 ownBy: {
                     Plan: {
@@ -104,7 +104,7 @@ const getAllAccount = (filters, paginationOptions) => __awaiter(void 0, void 0, 
                 },
             },
         };
-        andCondition.push(categoryQuery);
+        andCondition.push(planQuery);
     }
     const forNotBlockedSeller = {
         OR: [
