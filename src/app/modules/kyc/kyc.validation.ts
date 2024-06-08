@@ -25,7 +25,8 @@ const createValidation = z.object({
       .string({
         required_error: 'identificationExpiredDate is required',
       })
-      .optional(),
+      .optional()
+      .nullable(),
     identityImage: z.string({ required_error: 'identityImage is required' }),
   }),
 });
@@ -51,6 +52,9 @@ const updateValidation = z.object({
         required_error: 'identificationNumber is required',
       })
       .optional(),
+    identificationExpiredDate: z.string({
+      required_error: 'identificationExpiredDate is required',
+    }),
     identityImage: z
       .string({ required_error: 'identityImage is required' })
       .optional(),
