@@ -98,9 +98,43 @@ const createCart = async (
   // check is
   const newCart = await prisma.cart.create({
     data: payload,
-    include: {
-      account: true,
-      ownBy: true,
+    select: {
+      accountId: true,
+      createdAt: true,
+      id: true,
+      ownById: true,
+      updatedAt: true,
+      account: {
+        select: {
+          id: true,
+          name: true,
+          accountType: true,
+          approvedForSale: true,
+          preview: true,
+          category: true,
+          createdAt: true,
+          updatedAt: true,
+          isSold: true,
+          price: true,
+          ownBy: {
+            select: {
+              email: true,
+              id: true,
+              name: true,
+              profileImg: true,
+              isVerifiedByAdmin: true,
+            },
+          },
+        },
+      },
+      ownBy: {
+        select: {
+          email: true,
+          id: true,
+          name: true,
+          profileImg: true,
+        },
+      },
     },
   });
   return newCart;

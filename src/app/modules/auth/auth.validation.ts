@@ -8,7 +8,10 @@ const createAuthZodSchema = z.object({
     name: z.string({ required_error: 'Name is required' }),
     role: z.nativeEnum(UserRole).default(UserRole.user).optional(),
     paymentWithPaystack: z.boolean().default(false).optional(),
-    txId: z.string({ required_error: 'Name is required' }).optional(),
+    txId: z.string({ required_error: 'txId is required' }).optional(),
+    referralId: z
+      .string({ required_error: 'referralId is required' })
+      .optional(),
   }),
 });
 const loginZodSchema = z.object({
@@ -43,7 +46,7 @@ const changePassword = z.object({
       .string({ required_error: 'Password is required' })
       .min(8, { message: 'Password must be at least 8 characters long' }),
     prePassword: z
-      .string({ required_error: 'Password is required' })
+      .string({ required_error: 'Pre Password is required' })
       .min(8, { message: 'Password must be at least 8 characters long' })
       .optional(),
   }),

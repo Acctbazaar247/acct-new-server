@@ -35,7 +35,9 @@ const getAllUser = catchAsync(async (req: Request, res: Response) => {
   const paginationOptions = pick(req.query, paginationFields);
   const result = await UserService.getAllUser(filters, paginationOptions);
 
-  sendResponse<Omit<User, 'password' | 'withdrawalPin'>[]>(res, {
+  sendResponse<
+    Omit<User, 'password' | 'withdrawalPin' | 'failedLoginAttempt'>[]
+  >(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'User fetched  successfully !',

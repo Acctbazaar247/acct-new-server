@@ -11,6 +11,7 @@ import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
 import prisma from '../../../shared/prisma';
+import { PlanService } from '../plan/plan.service';
 import { accountSearchableFields } from './account.constant';
 import { IAccountFilters } from './account.interface';
 
@@ -33,7 +34,8 @@ const getAllAccount = async (
   const { page, limit, skip } =
     paginationHelpers.calculatePagination(paginationOptions);
 
-  const { searchTerm, maxPrice, minPrice, category, ...filterData } = filters;
+  const { searchTerm, maxPrice, minPrice, category, planType, ...filterData } =
+    filters;
 
   const andCondition = [];
 
@@ -96,6 +98,18 @@ const getAllAccount = async (
     };
     andCondition.push(categoryQuery);
   }
+  if (planType) {
+    const planQuery: Prisma.AccountWhereInput = {
+      AND: {
+        ownBy: {
+          Plan: {
+            planType: planType,
+          },
+        },
+      },
+    };
+    andCondition.push(planQuery);
+  }
   const forNotBlockedSeller: Prisma.AccountWhereInput = {
     OR: [
       {
@@ -148,6 +162,7 @@ const getAllAccount = async (
           email: true,
           id: true,
           isVerified: true,
+          isVerifiedByAdmin: true,
         },
       },
     },
@@ -184,6 +199,22 @@ const createAccount = async (payload: Account): Promise<Account | null> => {
 const createAccountMultiple = async (
   payload: Account[]
 ): Promise<Prisma.BatchPayload | null> => {
+  const info = await PlanService.getHowManyUploadLeft(payload[0].ownById);
+  // check is upload limit exist
+  if (!info.left) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      `You have already upload ${info.uploaded} accounts.`
+    );
+  }
+  // check if
+  const currentUploadWillBe = info.left - payload.length;
+  if (currentUploadWillBe < 0) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      `You have ${info.left} accounts left to upload today`
+    );
+  }
   const newAccount = await prisma.account.createMany({
     data: payload,
   });

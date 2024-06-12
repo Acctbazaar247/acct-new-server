@@ -16,3 +16,7 @@ export type ILoginResponse = {
   refreshToken?: string;
   otp?: number;
 };
+
+export type RefUser = {
+  referralId?: string;
+} & User;

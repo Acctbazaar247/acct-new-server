@@ -66,4 +66,9 @@ router.post(
   auth(UserRole.user),
   AuthController.becomeSeller
 );
+router.post(
+  '/become-seller-with-wallet',
+  auth(UserRole.user),
+  AuthController.becomeSellerWithWallet
+);
 export const AuthRoutes = router;

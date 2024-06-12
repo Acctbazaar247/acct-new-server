@@ -1,4 +1,10 @@
-import { EApprovedForSale, Orders, Prisma, UserRole } from '@prisma/client';
+import {
+  EApprovedForSale,
+  EOrderStatus,
+  Orders,
+  Prisma,
+  UserRole,
+} from '@prisma/client';
 import httpStatus from 'http-status';
 import { JwtPayload } from 'jsonwebtoken';
 import { round } from 'lodash';
@@ -21,7 +27,8 @@ const getAllOrders = async (
   const { page, limit, skip } =
     paginationHelpers.calculatePagination(paginationOptions);
 
-  const { searchTerm, sellerId, ...filterData } = filters;
+  const { searchTerm, sellerId, buyerEmail, sellerEmail, ...filterData } =
+    filters;
 
   const andCondition = [];
 
@@ -58,6 +65,22 @@ const getAllOrders = async (
     };
     andCondition.push(sellers);
   }
+  if (sellerEmail) {
+    const sellers: Prisma.OrdersWhereInput = {
+      AND: {
+        account: { ownBy: { email: sellerEmail } },
+      },
+    };
+    andCondition.push(sellers);
+  }
+  if (buyerEmail) {
+    const sellers: Prisma.OrdersWhereInput = {
+      AND: {
+        orderBy: { email: buyerEmail },
+      },
+    };
+    andCondition.push(sellers);
+  }
   const whereConditions: Prisma.OrdersWhereInput =
     andCondition.length > 0 ? { AND: andCondition } : {};
 
@@ -80,6 +103,7 @@ const getAllOrders = async (
           profileImg: true,
           name: true,
           id: true,
+          isVerifiedByAdmin: true,
         },
       },
     },
@@ -137,10 +161,17 @@ const createOrders = async (payload: Orders): Promise<Orders | null> => {
       id: true,
       email: true,
       role: true,
+      isBlocked: true,
       Currency: { select: { amount: true, id: true } },
     },
   });
 
+  if (isSellerExist?.isBlocked) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      'You can not buy this account! (Seller blocked.)'
+    );
+  }
   // the only 10 percent will receive by admin and expect the 10 percent seller will receive
   // get admin info
   const isAdminExist = await prisma.user.findFirst({
@@ -219,6 +250,7 @@ const createOrders = async (payload: Orders): Promise<Orders | null> => {
         'Something went wrong tray again latter '
       );
     }
+
     const isAdmin = isSellerExist.role === UserRole.admin;
     const isSuperAdmin = isSellerExist.role === UserRole.superAdmin;
     if (isAdmin || isSuperAdmin) {
@@ -309,7 +341,15 @@ const getSingleOrders = async (
     include: {
       account: {
         include: {
-          ownBy: true,
+          ownBy: {
+            select: {
+              email: true,
+              profileImg: true,
+              name: true,
+              id: true,
+              isVerifiedByAdmin: true,
+            },
+          },
         },
       },
       orderBy: {
@@ -317,6 +357,7 @@ const getSingleOrders = async (
           profileImg: true,
           name: true,
           id: true,
+          isVerifiedByAdmin: true,
         },
       },
     },
@@ -361,6 +402,94 @@ const updateOrders = async (
   id: string,
   payload: Partial<Orders>
 ): Promise<Orders | null> => {
+  const isOrderExits = await prisma.orders.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      status: true,
+      orderBy: {
+        select: {
+          id: true,
+        },
+      },
+      account: {
+        select: {
+          id: true,
+          price: true,
+          ownBy: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (
+    !isOrderExits ||
+    !isOrderExits.account ||
+    !isOrderExits.account.ownBy ||
+    !isOrderExits.orderBy
+  ) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'order not found!');
+  }
+  if (isOrderExits.status === EOrderStatus.cancelled) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'order already cancel');
+  }
+
+  // if want to make it canceled
+  const isOrderCompleted = isOrderExits.status === EOrderStatus.completed;
+  const wantToUpdateItCancel = payload.status === EOrderStatus.cancelled;
+  if (isOrderCompleted && wantToUpdateItCancel) {
+    // check doe
+    // check does buyer has enough money left
+
+    const buyerCurrency = await prisma.currency.findUnique({
+      where: { ownById: isOrderExits.account.ownBy.id },
+    });
+    if (!buyerCurrency) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Buyer currency not found!');
+    }
+    if (isOrderExits.account.price > buyerCurrency.amount) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        "Buyer does't have enough money left to return"
+      );
+    }
+    const outPut = await prisma.$transaction(async tx => {
+      // update seller amount
+      const updatedAmount = await tx.currency.update({
+        where: { ownById: isOrderExits.account.ownBy.id },
+        data: { amount: { decrement: isOrderExits.account.price } },
+      });
+      if (0 > updatedAmount.amount) {
+        throw new ApiError(
+          httpStatus.BAD_REQUEST,
+          "Buyer does't have enough money left to return"
+        );
+      }
+
+      //update buyer or who make this order
+      await tx.currency.update({
+        where: {
+          ownById: isOrderExits.orderBy.id,
+        },
+        data: {
+          amount: { increment: isOrderExits.account.price },
+        },
+      });
+
+      return await tx.orders.update({
+        where: {
+          id,
+        },
+        data: payload,
+      });
+    });
+    return outPut;
+  }
+
   const result = await prisma.orders.update({
     where: {
       id,

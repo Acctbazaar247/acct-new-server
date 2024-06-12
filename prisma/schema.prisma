@@ -20,6 +20,7 @@ model User {
   email               String              @unique
   password            String
   phoneNumber         String?
+  userName            String?
   shouldSendEmail     Boolean             @default(true)
   txId                String?
   createdAt           DateTime            @default(now())
@@ -37,6 +38,7 @@ model User {
   city                String?
   address             String?
   dateOfBirth         DateTime?
+  failedLoginAttempt  Int?                @default(0)
   payWith             EPayWith?
   Account             Account[]
   Orders              Orders[]
@@ -48,11 +50,16 @@ model User {
   Message             Message[]
   SeenMessage         SeenMessage[]
   Notifications       Notifications[]
+  Kyc                 Kyc?
+  Plan                Plan?
+  Referral            Referral?           @relation(name: "Referral_OwnBy")
+  ReferredByMe        Referral[]          @relation(name: "Referral_By")
 }
 
 enum EPayWith {
   paystack
   nowpay
+  wallet
 }
 
 model VerificationOtp {
@@ -236,7 +243,7 @@ model Account {
   additionalPassword    String?
   additionalDescription String?
   additionalImage       String?
-  messageFromAdmin       String?
+  messageFromAdmin      String?
   category              accountCategory
   accountType           accountType      @default(SocialMedia)
   approvedForSale       EApprovedForSale @default(pending)
@@ -361,4 +368,74 @@ model Notifications {
   ownBy     User     @relation(fields: [ownById], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// new updated content!
+model Kyc {
+  id                        String       @id @unique @default(uuid())
+  ownById                   String       @unique
+  ownBy                     User         @relation(fields: [ownById], references: [id], onDelete: Cascade)
+  userName                  String
+  name                      String?
+  phoneNumber               String?
+  country                   String
+  state                     String
+  address                   String
+  city                      String
+  birthDate                 DateTime
+  meansOfIdentification     String
+  identificationNumber      String
+  identificationExpiredDate DateTime?
+  identityImage             String
+  messageByAdmin            String?
+  whatsAppNumber            String?
+  telegramNumber            String?
+  status                    EStatusOfKyc @default(pending)
+  createdAt                 DateTime     @default(now())
+  updatedAt                 DateTime     @updatedAt
+}
+
+enum EStatusOfKyc {
+  pending
+  approved
+  denied
+}
+
+model Plan {
+  id        String    @id @unique @default(uuid())
+  ownById   String    @unique
+  ownBy     User      @relation(fields: [ownById], references: [id], onDelete: Cascade)
+  isActive  Boolean   @default(true)
+  planType  EPlanType
+  limit     Int
+  days      Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+enum EPlanType {
+  basic
+  pro
+  proPlus
+}
+
+model Referral {
+  id      String @id @unique @default(uuid())
+  ownById String @unique
+  ownBy   User   @relation(name: "Referral_OwnBy", fields: [ownById], references: [id], onDelete: Cascade)
+
+  referralById String
+  referralBy   User   @relation(name: "Referral_By", fields: [referralById], references: [id], onDelete: Cascade)
+
+  status EReferralStatus
+  amount Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum EReferralStatus {
+  pending
+  completed
+  cancel
 }

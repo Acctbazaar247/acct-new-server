@@ -23,4 +23,5 @@ router.post('/change-withdrawal-password', (0, validateRequest_1.default)(auth_v
 router.post('/send-withdrawal-password-forgot-token', (0, auth_1.default)(client_1.UserRole.seller), auth_controller_1.AuthController.sendWithdrawalTokenEmail);
 router.post('/send-forgot-email/:email', auth_controller_1.AuthController.sendForgotEmail);
 router.post('/become-seller', (0, validateRequest_1.default)(auth_validation_1.AuthValidation.becomeSeller), (0, auth_1.default)(client_1.UserRole.user), auth_controller_1.AuthController.becomeSeller);
+router.post('/become-seller-with-wallet', (0, auth_1.default)(client_1.UserRole.user), auth_controller_1.AuthController.becomeSellerWithWallet);
 exports.AuthRoutes = router;

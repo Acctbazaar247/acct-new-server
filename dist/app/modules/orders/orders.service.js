@@ -37,7 +37,7 @@ const prisma_1 = __importDefault(require("../../../shared/prisma"));
 const orders_constant_1 = require("./orders.constant");
 const getAllOrders = (filters, paginationOptions) => __awaiter(void 0, void 0, void 0, function* () {
     const { page, limit, skip } = paginationHelper_1.paginationHelpers.calculatePagination(paginationOptions);
-    const { searchTerm, sellerId } = filters, filterData = __rest(filters, ["searchTerm", "sellerId"]);
+    const { searchTerm, sellerId, buyerEmail, sellerEmail } = filters, filterData = __rest(filters, ["searchTerm", "sellerId", "buyerEmail", "sellerEmail"]);
     const andCondition = [];
     if (searchTerm) {
         const searchAbleFields = orders_constant_1.ordersSearchableFields.map(single => {
@@ -72,6 +72,22 @@ const getAllOrders = (filters, paginationOptions) => __awaiter(void 0, void 0, v
         };
         andCondition.push(sellers);
     }
+    if (sellerEmail) {
+        const sellers = {
+            AND: {
+                account: { ownBy: { email: sellerEmail } },
+            },
+        };
+        andCondition.push(sellers);
+    }
+    if (buyerEmail) {
+        const sellers = {
+            AND: {
+                orderBy: { email: buyerEmail },
+            },
+        };
+        andCondition.push(sellers);
+    }
     const whereConditions = andCondition.length > 0 ? { AND: andCondition } : {};
     const result = yield prisma_1.default.orders.findMany({
         where: whereConditions,
@@ -91,6 +107,7 @@ const getAllOrders = (filters, paginationOptions) => __awaiter(void 0, void 0, v
                     profileImg: true,
                     name: true,
                     id: true,
+                    isVerifiedByAdmin: true,
                 },
             },
         },
@@ -140,9 +157,13 @@ const createOrders = (payload) => __awaiter(void 0, void 0, void 0, function* ()
             id: true,
             email: true,
             role: true,
+            isBlocked: true,
             Currency: { select: { amount: true, id: true } },
         },
     });
+    if (isSellerExist === null || isSellerExist === void 0 ? void 0 : isSellerExist.isBlocked) {
+        throw new ApiError_1.default(http_status_1.default.FORBIDDEN, 'You can not buy this account! (Seller blocked.)');
+    }
     // the only 10 percent will receive by admin and expect the 10 percent seller will receive
     // get admin info
     const isAdminExist = yield prisma_1.default.user.findFirst({
@@ -280,7 +301,15 @@ const getSingleOrders = (id, requestedUer) => __awaiter(void 0, void 0, void 0, 
         include: {
             account: {
                 include: {
-                    ownBy: true,
+                    ownBy: {
+                        select: {
+                            email: true,
+                            profileImg: true,
+                            name: true,
+                            id: true,
+                            isVerifiedByAdmin: true,
+                        },
+                    },
                 },
             },
             orderBy: {
@@ -288,6 +317,7 @@ const getSingleOrders = (id, requestedUer) => __awaiter(void 0, void 0, void 0, 
                     profileImg: true,
                     name: true,
                     id: true,
+                    isVerifiedByAdmin: true,
                 },
             },
         },
@@ -322,6 +352,80 @@ const getMyOrders = (id) => __awaiter(void 0, void 0, void 0, function* () {
     return result;
 });
 const updateOrders = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const isOrderExits = yield prisma_1.default.orders.findUnique({
+        where: { id },
+        select: {
+            id: true,
+            status: true,
+            orderBy: {
+                select: {
+                    id: true,
+                },
+            },
+            account: {
+                select: {
+                    id: true,
+                    price: true,
+                    ownBy: {
+                        select: {
+                            id: true,
+                        },
+                    },
+                },
+            },
+        },
+    });
+    if (!isOrderExits ||
+        !isOrderExits.account ||
+        !isOrderExits.account.ownBy ||
+        !isOrderExits.orderBy) {
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'order not found!');
+    }
+    if (isOrderExits.status === client_1.EOrderStatus.cancelled) {
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'order already cancel');
+    }
+    // if want to make it canceled
+    const isOrderCompleted = isOrderExits.status === client_1.EOrderStatus.completed;
+    const wantToUpdateItCancel = payload.status === client_1.EOrderStatus.cancelled;
+    if (isOrderCompleted && wantToUpdateItCancel) {
+        // check doe
+        // check does buyer has enough money left
+        const buyerCurrency = yield prisma_1.default.currency.findUnique({
+            where: { ownById: isOrderExits.account.ownBy.id },
+        });
+        if (!buyerCurrency) {
+            throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Buyer currency not found!');
+        }
+        if (isOrderExits.account.price > buyerCurrency.amount) {
+            throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, "Buyer does't have enough money left to return");
+        }
+        const outPut = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+            // update seller amount
+            const updatedAmount = yield tx.currency.update({
+                where: { ownById: isOrderExits.account.ownBy.id },
+                data: { amount: { decrement: isOrderExits.account.price } },
+            });
+            if (0 > updatedAmount.amount) {
+                throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, "Buyer does't have enough money left to return");
+            }
+            //update buyer or who make this order
+            yield tx.currency.update({
+                where: {
+                    ownById: isOrderExits.orderBy.id,
+                },
+                data: {
+                    amount: { increment: isOrderExits.account.price },
+                },
+            });
+            return yield tx.orders.update({
+                where: {
+                    id,
+                },
+                data: payload,
+            });
+        }));
+        return outPut;
+    }
     const result = yield prisma_1.default.orders.update({
         where: {
             id,

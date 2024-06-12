@@ -5,9 +5,9 @@ const client_1 = require("@prisma/client");
 const zod_1 = require("zod");
 const createValidation = zod_1.z.object({
     body: zod_1.z.object({
-        name: zod_1.z.string({ required_error: 'name is required' }),
-        email: zod_1.z.string({ required_error: 'email is required' }).email(),
-        contactNo: zod_1.z.string({ required_error: 'contactNo is required' }),
+        name: zod_1.z.string({ required_error: 'name is required' }), // Minimum 2 characters for the name
+        email: zod_1.z.string({ required_error: 'email is required' }).email(), // Valid email format
+        contactNo: zod_1.z.string({ required_error: 'contactNo is required' }), // 10-digit phone number
         address: zod_1.z.string({ required_error: 'address is required' }),
         profileImg: zod_1.z.string({ required_error: 'profileImg is required' }),
         password: zod_1.z.string({ required_error: 'password is required' }),

@@ -46,4 +46,22 @@ export default {
   cloudApiKey: process.env.CLOUD_API_KEY,
   cloudApiSecret: process.env.CLOUD_API_SECRET,
   flutterwave_public_key: process.env.FLUTTERWAVE_PUBLIC_KEY,
+
+  defaultPlanLimit: parseInt(process.env.DEFAULT_PLAN_LIMIT as string),
+  basicPlanLimit: parseInt(process.env.BASIC_PLAN_LIMIT as string),
+  basicPlanPrice: parseFloat(process.env.BASIC_PLAN_PRICE as string),
+  basicPlanDays: parseInt(process.env.PRO_PLAN_DAYS as string),
+
+  proPlanPrice: parseFloat(process.env.PRO_PLAN_PRICE as string),
+  proPlanLimit: parseInt(process.env.PRO_PLAN_LIMIT as string),
+  proPlanDays: parseInt(process.env.PRO_PLAN_DAYS as string),
+
+  proPlusPlanPrice: parseFloat(process.env.PRO_PLUS_PLAN_PRICE as string),
+  proPlusPlanLimit: parseInt(process.env.PRO_PLUS_PLAN_LIMIT as string),
+  proPlusPlanDays: parseInt(process.env.PRO_PLUS_PLAN_DAYS as string),
+
+  referralAmount: parseInt(process.env.REFERRAL_AMOUNT as string),
+  referralFirstPayAmount: parseInt(
+    process.env.REFERRAL_FIRST_PAY_AMOUNT as string
+  ),
 };

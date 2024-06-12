@@ -35,7 +35,6 @@ const UpdateSellerAfterPay = (data) => __awaiter(void 0, void 0, void 0, functio
         data: { isPaidForSeller: true, isApprovedForSeller: true, role: 'seller' },
     });
     yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
-        var _a;
         // update admin
         try {
             const isAdminExist = yield tx.user.findUnique({
@@ -49,7 +48,9 @@ const UpdateSellerAfterPay = (data) => __awaiter(void 0, void 0, void 0, functio
             yield tx.currency.update({
                 where: { ownById: isAdminExist.id },
                 data: {
-                    amount: ((_a = isAdminExist.Currency) === null || _a === void 0 ? void 0 : _a.amount) + config_1.default.sellerOneTimePayment,
+                    amount: {
+                        increment: config_1.default.sellerOneTimePayment,
+                    },
                 },
             });
         }

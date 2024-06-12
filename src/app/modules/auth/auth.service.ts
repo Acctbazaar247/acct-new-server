@@ -1,4 +1,10 @@
-import { EPayWith, EVerificationOtp, User, UserRole } from '@prisma/client';
+import {
+  EPayWith,
+  EReferralStatus,
+  EVerificationOtp,
+  User,
+  UserRole,
+} from '@prisma/client';
 import bcryptjs from 'bcryptjs';
 import httpStatus from 'http-status';
 import { Secret } from 'jsonwebtoken';
@@ -19,23 +25,31 @@ import {
   ILoginResponse,
   IRefreshTokenResponse,
   IVerifyTokeResponse,
+  RefUser,
 } from './auth.Interface';
-const createUser = async (user: User): Promise<ILoginResponse> => {
+const createUser = async (user: RefUser): Promise<ILoginResponse> => {
   // checking is user buyer
-  const { password: givenPassword, ...rest } = user;
+  const { password: givenPassword, referralId, ...rest } = user;
   let newUser;
   const isUserExist = await prisma.user.findUnique({
     where: { email: user.email },
   });
-  // if user and account exits
+  // check referralId
+  if (referralId) {
+    const isReferralUserExits = await prisma.user.findUnique({
+      where: { id: referralId },
+      select: { id: true },
+    });
 
+    if (!isReferralUserExits) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Referral is not valid');
+    }
+  }
   // if seller and already exist
-  // user all ready paid
   const otp = generateOtp();
   if (isUserExist?.isVerified) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'user already Exits ');
   } else {
-    // seller account created but not paid , will let tme update and create it
     const genarateBycryptPass = await createBycryptPassword(givenPassword);
 
     // start new  transection  for new user
@@ -68,9 +82,10 @@ const createUser = async (user: User): Promise<ILoginResponse> => {
           ownById: newUserInfo.id,
         },
       });
-      await tx.verificationOtp.deleteMany({
-        where: { ownById: newUserInfo.id },
-      });
+      //this code is un useable
+      // await tx.verificationOtp.deleteMany({
+      //   where: { ownById: newUserInfo.id },
+      // });
       await tx.verificationOtp.create({
         data: {
           ownById: newUserInfo.id,
@@ -78,6 +93,16 @@ const createUser = async (user: User): Promise<ILoginResponse> => {
           type: EVerificationOtp.createUser,
         },
       });
+      if (referralId) {
+        await tx.referral.create({
+          data: {
+            ownById: newUserInfo.id,
+            referralById: referralId,
+            status: EReferralStatus.pending,
+            amount: config.referralAmount,
+          },
+        });
+      }
       // is is it seller
       return newUserInfo;
     });
@@ -119,6 +144,12 @@ const loginUser = async (payload: ILogin): Promise<ILoginResponse> => {
   if (!isUserExist) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist');
   }
+  if (isUserExist.failedLoginAttempt && isUserExist.failedLoginAttempt >= 3) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      "We noticed several attempts to access this account with an incorrect password. To protect your information, this account has been locked. Please reset your password using the 'Forgot Password' for enhanced security. "
+    );
+  }
   if (isUserExist.role === UserRole.seller) {
     if (isUserExist.isApprovedForSeller === false) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'Seller does not exits');
@@ -128,9 +159,29 @@ const loginUser = async (payload: ILogin): Promise<ILoginResponse> => {
     isUserExist.password &&
     !(await bcryptjs.compare(password, isUserExist.password))
   ) {
+    if (isUserExist.failedLoginAttempt === null) {
+      await prisma.user.update({
+        where: { id: isUserExist.id },
+        data: {
+          failedLoginAttempt: 1,
+        },
+      });
+    } else {
+      await prisma.user.update({
+        where: { id: isUserExist.id },
+        data: {
+          failedLoginAttempt: {
+            increment: 1,
+          },
+        },
+      });
+    }
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Password is incorrect');
   }
-
+  await prisma.user.update({
+    where: { id: isUserExist.id },
+    data: { failedLoginAttempt: 0 },
+  });
   //create access token & refresh token
 
   const { email, id, role, name, ...others } = isUserExist;
@@ -327,6 +378,76 @@ const becomeSeller = async (
     txId,
   };
 };
+const becomeSellerWithWallet = async (
+  id: string,
+  payType: EPayWith
+): Promise<{ isSeller: boolean }> => {
+  console.log(payType);
+  const isUserExist = await prisma.user.findUnique({
+    where: { id },
+    include: {
+      Currency: true,
+    },
+  });
+  if (!isUserExist) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  // is already payed
+  if (isUserExist.isPaidForSeller) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Already paid');
+  }
+  // does he has enough wallet
+  if (!isUserExist.Currency) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Currency not found!');
+  }
+  if (config.sellerOneTimePayment > isUserExist.Currency.amount) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'Not enough money left on your wallet'
+    );
+  }
+  const admin = await prisma.user.findUnique({
+    where: { role: 'superAdmin', email: config.mainAdminEmail },
+    select: { id: true },
+  });
+  if (!admin) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Admin not found!');
+  }
+  // already have everything
+  await prisma.$transaction(async tx => {
+    // cut money and add to admin
+    const updateCurrency = await tx.currency.update({
+      where: { ownById: id },
+      data: {
+        amount: { decrement: config.sellerOneTimePayment },
+      },
+    });
+    if (0 > updateCurrency.amount) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        'Something went wrong trying again latter'
+      );
+    }
+    // add money to admin
+
+    await tx.currency.update({
+      where: { ownById: admin.id },
+      data: { amount: { increment: config.sellerOneTimePayment } },
+    });
+    await tx.user.update({
+      where: { id },
+      data: {
+        role: 'seller',
+        payWith: EPayWith.wallet,
+        isPaidForSeller: true,
+        isApprovedForSeller: true,
+      },
+    });
+  });
+  return {
+    isSeller: true,
+  };
+};
 const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
   //verify to ken
   // invalid token - synchronous
@@ -508,16 +629,31 @@ const changePassword = async ({
       });
       return await tx.user.update({
         where: { id: isUserExist.id },
-        data: { password: genarateBycryptPass },
+        data: { password: genarateBycryptPass, failedLoginAttempt: 0 },
       });
     });
   } else {
     if (!prePassword) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'pre password in required!');
     }
+    if (isUserExist.failedLoginAttempt) {
+      if (isUserExist.failedLoginAttempt >= 3) {
+        throw new ApiError(
+          httpStatus.FORBIDDEN,
+          `We noticed several attempts to access this account with an incorrect password. To protect your information, this account has been locked. Please reset your password using the Otp option for enhanced security.`
+        );
+      }
+    }
     // check
     const isMatch = await bcryptjs.compare(prePassword, isUserExist.password);
     if (!isMatch) {
+      await prisma.user.update({
+        where: { id: isUserExist.id },
+        data: {
+          failedLoginAttempt:
+            isUserExist.failedLoginAttempt === null ? 0 : { increment: 1 },
+        },
+      });
       throw new ApiError(httpStatus.BAD_REQUEST, 'Wrong password!');
     }
     result = await prisma.$transaction(async tx => {
@@ -685,4 +821,5 @@ export const AuthService = {
   addWithdrawalPasswordFirstTime,
   sendWithdrawalTokenEmail,
   changeWithdrawPin,
+  becomeSellerWithWallet,
 };
