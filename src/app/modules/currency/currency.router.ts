@@ -26,7 +26,7 @@ router.post(
 
 router.patch(
   '/:id',
-  auth(UserRole.superAdmin),
+  auth(UserRole.superAdmin, UserRole.financeAdmin),
   validateRequest(CurrencyValidation.updateValidation),
   CurrencyController.updateCurrency
 );

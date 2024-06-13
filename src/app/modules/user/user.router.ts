@@ -9,7 +9,12 @@ const router = express.Router();
 
 router.get(
   '/',
-  auth(UserRole.admin, UserRole.superAdmin),
+  auth(
+    UserRole.admin,
+    UserRole.superAdmin,
+    UserRole.ccAdmin,
+    UserRole.financeAdmin
+  ),
   UserController.getAllUser
 );
 router.get(
@@ -32,16 +37,33 @@ router.post(
 );
 router.get(
   '/:id',
-  auth(UserRole.admin, UserRole.seller, UserRole.user),
+  auth(
+    UserRole.admin,
+    UserRole.seller,
+    UserRole.user,
+    UserRole.ccAdmin,
+    UserRole.financeAdmin
+  ),
   UserController.getSingleUser
 );
 
 router.patch(
   '/:id',
-  auth(UserRole.admin, UserRole.user, UserRole.seller, UserRole.superAdmin),
+  auth(
+    UserRole.admin,
+    UserRole.user,
+    UserRole.seller,
+    UserRole.superAdmin,
+    UserRole.ccAdmin,
+    UserRole.financeAdmin
+  ),
   validateRequest(UserValidation.updateValidation),
   UserController.updateUser
 );
-router.delete('/:id', auth(UserRole.superAdmin), UserController.deleteUser);
+router.delete(
+  '/:id',
+  auth(UserRole.superAdmin, UserRole.ccAdmin, UserRole.financeAdmin),
+  UserController.deleteUser
+);
 
 export const UserRoutes = router;

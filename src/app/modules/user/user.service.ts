@@ -179,9 +179,13 @@ const updateUser = async (
       'User role can only be changed by super admin'
     );
   }
-
-  if (requestedUser.role !== UserRole.admin && payload.isApprovedForSeller) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'only admin can verify seller ');
+  const isUser = requestedUser.role !== UserRole.user;
+  const isSeller = requestedUser.role !== UserRole.seller;
+  if ((isUser || isSeller) && payload.isApprovedForSeller) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'only admin(ccAdmin,financeAdmin) can verify seller '
+    );
   }
 
   if (

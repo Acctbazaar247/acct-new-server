@@ -24,13 +24,25 @@ router.post(
 
 router.patch(
   '/:id',
-  auth(UserRole.admin, UserRole.seller, UserRole.superAdmin),
+  auth(
+    UserRole.admin,
+    UserRole.seller,
+    UserRole.superAdmin,
+    UserRole.ccAdmin,
+    UserRole.prAdmin
+  ),
   validateRequest(AccountValidation.updateValidation),
   AccountController.updateAccount
 );
 router.delete(
   '/:id',
-  auth(UserRole.admin, UserRole.seller, UserRole.superAdmin),
+  auth(
+    UserRole.admin,
+    UserRole.seller,
+    UserRole.superAdmin,
+    UserRole.ccAdmin,
+    UserRole.prAdmin
+  ),
   AccountController.deleteAccount
 );
 
