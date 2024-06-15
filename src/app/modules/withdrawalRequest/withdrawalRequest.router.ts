@@ -8,18 +8,36 @@ const router = express.Router();
 
 router.get(
   '/',
-  auth(UserRole.admin, UserRole.seller, UserRole.user, UserRole.superAdmin),
+  auth(
+    UserRole.admin,
+    UserRole.seller,
+    UserRole.user,
+    UserRole.superAdmin,
+    UserRole.financeAdmin
+  ),
   WithdrawalRequestController.getAllWithdrawalRequest
 );
 router.get(
   '/single-user-request',
-  auth(UserRole.admin, UserRole.seller, UserRole.user, UserRole.superAdmin),
+  auth(
+    UserRole.admin,
+    UserRole.seller,
+    UserRole.user,
+    UserRole.superAdmin,
+    UserRole.financeAdmin
+  ),
   WithdrawalRequestController.getSingleUserWithdrawalRequest
 );
 router.get('/withdrawal-banks', WithdrawalRequestController.getWithdrawalBank);
 router.get(
   '/:id',
-  auth(UserRole.admin, UserRole.seller, UserRole.user, UserRole.superAdmin),
+  auth(
+    UserRole.admin,
+    UserRole.seller,
+    UserRole.user,
+    UserRole.superAdmin,
+    UserRole.financeAdmin
+  ),
   WithdrawalRequestController.getSingleWithdrawalRequest
 );
 
@@ -32,7 +50,12 @@ router.post(
 
 router.patch(
   '/:id',
-  auth(UserRole.admin, UserRole.seller, UserRole.superAdmin),
+  auth(
+    UserRole.admin,
+    UserRole.seller,
+    UserRole.superAdmin,
+    UserRole.financeAdmin
+  ),
   validateRequest(WithdrawalRequestValidation.updateValidation),
   WithdrawalRequestController.updateWithdrawalRequest
 );
