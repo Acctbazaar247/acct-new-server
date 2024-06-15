@@ -21,6 +21,6 @@ router.get('/:id', account_controller_1.AccountController.getSingleAccount);
 //   AccountController.createAccount
 // );
 router.post('/multi-upload', (0, auth_1.default)(client_1.UserRole.admin, client_1.UserRole.seller, client_1.UserRole.superAdmin), (0, validateRequest_1.default)(account_validation_1.AccountValidation.createValidationMulti), account_controller_1.AccountController.createAccountMultiple);
-router.patch('/:id', (0, auth_1.default)(client_1.UserRole.admin, client_1.UserRole.seller, client_1.UserRole.superAdmin), (0, validateRequest_1.default)(account_validation_1.AccountValidation.updateValidation), account_controller_1.AccountController.updateAccount);
-router.delete('/:id', (0, auth_1.default)(client_1.UserRole.admin, client_1.UserRole.seller, client_1.UserRole.superAdmin), account_controller_1.AccountController.deleteAccount);
+router.patch('/:id', (0, auth_1.default)(client_1.UserRole.admin, client_1.UserRole.seller, client_1.UserRole.superAdmin, client_1.UserRole.ccAdmin, client_1.UserRole.prAdmin), (0, validateRequest_1.default)(account_validation_1.AccountValidation.updateValidation), account_controller_1.AccountController.updateAccount);
+router.delete('/:id', (0, auth_1.default)(client_1.UserRole.admin, client_1.UserRole.seller, client_1.UserRole.superAdmin, client_1.UserRole.ccAdmin, client_1.UserRole.prAdmin), account_controller_1.AccountController.deleteAccount);
 exports.AccountRoutes = router;

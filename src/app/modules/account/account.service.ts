@@ -242,7 +242,9 @@ const updateAccount = async (
   });
   const notAdmin = role !== UserRole.admin;
   const notSuperAdmin = role !== UserRole.superAdmin;
-  if (notAdmin && notSuperAdmin) {
+  const notCcAdmin = role !== UserRole.ccAdmin;
+  const notPrAdmin = role !== UserRole.prAdmin;
+  if (notAdmin && notSuperAdmin && notCcAdmin && notPrAdmin) {
     // check if he is not owner
     if (isAccountExits?.ownById !== reqUserId) {
       throw new ApiError(

@@ -12,6 +12,9 @@ enum UserRole {
   admin
   seller
   superAdmin
+  prAdmin
+  ccAdmin
+  financeAdmin
 }
 
 model User {

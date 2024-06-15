@@ -215,7 +215,9 @@ const updateAccount = (id, payload, { id: reqUserId, role }) => __awaiter(void 0
     });
     const notAdmin = role !== client_1.UserRole.admin;
     const notSuperAdmin = role !== client_1.UserRole.superAdmin;
-    if (notAdmin && notSuperAdmin) {
+    const notCcAdmin = role !== client_1.UserRole.ccAdmin;
+    const notPrAdmin = role !== client_1.UserRole.prAdmin;
+    if (notAdmin && notSuperAdmin && notCcAdmin && notPrAdmin) {
         // check if he is not owner
         if ((isAccountExits === null || isAccountExits === void 0 ? void 0 : isAccountExits.ownById) !== reqUserId) {
             throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, "You didn't own this account!");

@@ -163,8 +163,10 @@ const updateUser = (id, payload, requestedUser) => __awaiter(void 0, void 0, voi
     if (isRoleExits && isRoleNotMatch && isRequestedUSerNotSuperAdmin) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'User role can only be changed by super admin');
     }
-    if (requestedUser.role !== client_1.UserRole.admin && payload.isApprovedForSeller) {
-        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'only admin can verify seller ');
+    const isUser = requestedUser.role !== client_1.UserRole.user;
+    const isSeller = requestedUser.role !== client_1.UserRole.seller;
+    if ((isUser || isSeller) && payload.isApprovedForSeller) {
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'only admin(ccAdmin,financeAdmin) can verify seller ');
     }
     if (isUserExist.role !== client_1.UserRole.superAdmin &&
         isUserExist.role !== client_1.UserRole.admin) {

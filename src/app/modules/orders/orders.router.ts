@@ -8,7 +8,13 @@ const router = express.Router();
 
 router.get(
   '/',
-  auth(UserRole.admin, UserRole.seller, UserRole.superAdmin, UserRole.user),
+  auth(
+    UserRole.admin,
+    UserRole.seller,
+    UserRole.superAdmin,
+    UserRole.user,
+    UserRole.financeAdmin
+  ),
   OrdersController.getAllOrders
 );
 router.get(
@@ -18,7 +24,13 @@ router.get(
 );
 router.get(
   '/:id',
-  auth(UserRole.admin, UserRole.superAdmin, UserRole.user, UserRole.seller),
+  auth(
+    UserRole.admin,
+    UserRole.superAdmin,
+    UserRole.user,
+    UserRole.seller,
+    UserRole.financeAdmin
+  ),
   OrdersController.getSingleOrders
 );
 
@@ -31,7 +43,7 @@ router.post(
 
 router.patch(
   '/:id',
-  auth(UserRole.superAdmin),
+  auth(UserRole.superAdmin, UserRole.financeAdmin),
   validateRequest(OrdersValidation.updateValidation),
   OrdersController.updateOrders
 );
