@@ -13,7 +13,8 @@ router.get(
     UserRole.seller,
     UserRole.superAdmin,
     UserRole.user,
-    UserRole.financeAdmin
+    UserRole.financeAdmin,
+    UserRole.ccAdmin
   ),
   OrdersController.getAllOrders
 );
@@ -29,7 +30,8 @@ router.get(
     UserRole.superAdmin,
     UserRole.user,
     UserRole.seller,
-    UserRole.financeAdmin
+    UserRole.financeAdmin,
+    UserRole.ccAdmin
   ),
   OrdersController.getSingleOrders
 );
@@ -43,7 +45,7 @@ router.post(
 
 router.patch(
   '/:id',
-  auth(UserRole.superAdmin, UserRole.financeAdmin),
+  auth(UserRole.superAdmin, UserRole.financeAdmin, UserRole.ccAdmin),
   validateRequest(OrdersValidation.updateValidation),
   OrdersController.updateOrders
 );
