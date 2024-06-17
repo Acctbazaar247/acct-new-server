@@ -119,7 +119,7 @@ const EmailTemplates = {
                 ${data?.token}
                       <p class="end">
                           This is an automatically generated email please do not reply to this email. 
-                          If you face any issues, please contact us at support@acctbazaar.com
+                          If you face any issues, please contact us at help@acctbazaar.com
                       </p>
                      
                       <p class="end">Copyright &copy; 2024 Acctbazaar Ltd.</p>
@@ -569,7 +569,7 @@ const EmailTemplates = {
                 <a href="${config.frontendUrl}/dashboard/myOrders" class="btn">View</a>
                 <p class="end">
                     This is an automatically generated email please do not reply to this email. 
-                    If you face any issues, please contact us at support@acctbazaar.com
+                    If you face any issues, please contact us at help@acctbazaar.com
                 </p>
                 <hr>
                
@@ -693,7 +693,7 @@ const EmailTemplates = {
                     <a href="${config.frontendUrl}" class="btn">View</a>
                     <p class="end">
                         This is an automatically generated email please do not reply to this email. 
-                        If you face any issues, please contact us at support@acctbazaar.com
+                        If you face any issues, please contact us at help@acctbazaar.com
                     </p>
                     <hr> 
                     <p class="end">Copyright &copy; 2024 Acctbazaar Ltd.</p>
@@ -821,7 +821,7 @@ const EmailTemplates = {
                     <a href="${config.frontendUrl}" class="btn">View</a>
                     <p class="end">
                         This is an automatically generated email please do not reply to this email. 
-                        If you face any issues, please contact us at support@acctbazaar.com
+                        If you face any issues, please contact us at help@acctbazaar.com
                     </p>
                     <hr> 
                     <p class="end">Copyright &copy; 2024 Acctbazaar Ltd.</p>
