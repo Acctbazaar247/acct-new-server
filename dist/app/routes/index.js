@@ -17,6 +17,7 @@ const orders_router_1 = require("../modules/orders/orders.router");
 const plan_router_1 = require("../modules/plan/plan.router");
 const profile_router_1 = require("../modules/profile/profile.router");
 const referral_router_1 = require("../modules/referral/referral.router");
+const review_router_1 = require("../modules/review/review.router");
 const seenMessage_router_1 = require("../modules/seenMessage/seenMessage.router");
 const user_router_1 = require("../modules/user/user.router");
 const withdrawalRequest_router_1 = require("../modules/withdrawalRequest/withdrawalRequest.router");
@@ -86,6 +87,10 @@ const moduleRoutes = [
     {
         path: '/plan',
         route: plan_router_1.PlanRoutes,
+    },
+    {
+        path: '/review',
+        route: review_router_1.ReviewRoutes,
     },
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));

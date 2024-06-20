@@ -101,7 +101,11 @@ const getAllOrders = (filters, paginationOptions) => __awaiter(void 0, void 0, v
                 createdAt: 'desc',
             },
         include: {
-            account: true,
+            account: {
+                include: {
+                    Review: true,
+                },
+            },
             orderBy: {
                 select: {
                     profileImg: true,

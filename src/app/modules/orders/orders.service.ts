@@ -97,7 +97,11 @@ const getAllOrders = async (
             createdAt: 'desc',
           },
     include: {
-      account: true,
+      account: {
+        include: {
+          Review: true,
+        },
+      },
       orderBy: {
         select: {
           profileImg: true,

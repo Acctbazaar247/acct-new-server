@@ -1,4 +1,10 @@
-import { Prisma, User, UserRole } from '@prisma/client';
+import {
+  EOrderStatus,
+  EReviewStatus,
+  Prisma,
+  User,
+  UserRole,
+} from '@prisma/client';
 import httpStatus from 'http-status';
 import { JwtPayload } from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
@@ -20,7 +26,7 @@ import { IPaginationOptions } from '../../../interfaces/pagination';
 import EmailTemplates from '../../../shared/EmailTemplates';
 import prisma from '../../../shared/prisma';
 import { userSearchableFields } from './user.constant';
-import { IUserFilters } from './user.interface';
+import { IUserFilters, TSellerProfileInfo } from './user.interface';
 
 const getAllUser = async (
   filters: IUserFilters,
@@ -222,45 +228,6 @@ const updateUser = async (
 
 const deleteUser = async (id: string): Promise<User | null> => {
   return await prisma.$transaction(async tx => {
-    // // Inside the transaction, perform your database operations
-
-    // // eslint-disable-next-line no-unused-vars, , @typescript-eslint/no-unused-vars
-    // const deleteMessage = await tx.message.deleteMany({
-    //   where: { sendById: id },
-    // });
-    // // eslint-disable-next-line no-unused-vars, , @typescript-eslint/no-unused-vars
-    // const deleteSeen = await tx.seenMessage.deleteMany({
-    //   where: { seenById: id },
-    // });
-    // // eslint-disable-next-line no-unused-vars, , @typescript-eslint/no-unused-vars
-    // const deleteVerification = await tx.verificationOtp.deleteMany({
-    //   where: { ownById: id },
-    // });
-    // // eslint-disable-next-line no-unused-vars, , @typescript-eslint/no-unused-vars
-    // const deleteOrder = await tx.orders.deleteMany({
-    //   where: { orderById: id },
-    // });
-
-    // // eslint-disable-next-line no-unused-vars, , @typescript-eslint/no-unused-vars
-    // const deleteCarts = await tx.cart.deleteMany({
-    //   where: { ownById: id },
-    // });
-    // // eslint-disable-next-line no-unused-vars, , @typescript-eslint/no-unused-vars
-    // const deleteAccount = await tx.account.deleteMany({
-    //   where: { ownById: id },
-    // });
-    // // eslint-disable-next-line no-unused-vars, , @typescript-eslint/no-unused-vars
-    // const deleteCurrency = await tx.currency.deleteMany({
-    //   where: { ownById: id },
-    // });
-    // // eslint-disable-next-line no-unused-vars, , @typescript-eslint/no-unused-vars
-    // const deleteCurrencyRequest = await tx.currencyRequest.deleteMany({
-    //   where: { ownById: id },
-    // });
-    // // eslint-disable-next-line no-unused-vars, , @typescript-eslint/no-unused-vars
-    // const deleteWithdrawalRequest = await tx.withdrawalRequest.deleteMany({
-    //   where: { ownById: id },
-    // });
     const deleteUser = await tx.user.delete({ where: { id } });
     return deleteUser;
   });
@@ -380,6 +347,59 @@ const sellerOverview = async (id: string): Promise<TSellerOverview | null> => {
     pastYearData: pastYearData || [],
   };
 };
+const sellerProfileInfo = async (
+  id: string
+): Promise<TSellerProfileInfo | null> => {
+  const isSellerExist = await prisma.user.findUnique({
+    where: { id },
+    select: {
+      name: true,
+      id: true,
+      profileImg: true,
+      isVerifiedByAdmin: true,
+      country: true,
+      createdAt: true,
+    },
+  });
+  if (!isSellerExist) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Seller doesn't");
+  }
+  const totalAccountApprove = await prisma.account.count({
+    where: { ownById: id, approvedForSale: 'approved' },
+  });
+  const totalSoldAccount = await prisma.account.count({
+    where: { isSold: true, ownById: id },
+  });
+  const totalCancelOrder = await prisma.orders.count({
+    where: {
+      account: {
+        ownById: id,
+      },
+      status: EOrderStatus.cancelled,
+    },
+  });
+  const totalOrder = await prisma.orders.count({ where: { orderById: id } });
+  const totalReviews = await prisma.review.count({ where: { sellerId: id } });
+  const totalPositiveReviews = await prisma.review.count({
+    where: { sellerId: id, reviewStatus: EReviewStatus.positive },
+  });
+  const totalNegativeReviews = await prisma.review.count({
+    where: { sellerId: id, reviewStatus: EReviewStatus.positive },
+  });
+
+  return {
+    totalSoldAccount,
+    totalOrder,
+    totalAccountApprove,
+    totalCancelOrder: totalCancelOrder,
+    totalPositiveReviews,
+    totalNegativeReviews,
+    totalReviews,
+    sellerInfo: {
+      ...isSellerExist,
+    },
+  };
+};
 const userOverview = async (id: string): Promise<TUserOverview | null> => {
   const totalOrder = await prisma.orders.count({ where: { orderById: id } });
   const totalAccountOnCart = await prisma.cart.count({
@@ -458,4 +478,5 @@ export const UserService = {
   adminOverview,
   sellerOverview,
   userOverview,
+  sellerProfileInfo,
 };

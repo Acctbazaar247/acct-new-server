@@ -27,6 +27,19 @@ router.get(
   auth(UserRole.seller),
   UserController.sellerOverview
 );
+router.get(
+  '/seller/profile/:id',
+  auth(
+    UserRole.seller,
+    UserRole.admin,
+    UserRole.user,
+    UserRole.superAdmin,
+    UserRole.financeAdmin,
+    UserRole.ccAdmin,
+    UserRole.prAdmin
+  ),
+  UserController.sellerProfileInfo
+);
 router.get('/user/overview', auth(UserRole.user), UserController.userOverview);
 router.post('/nowpayments-ipn', UserController.sellerIpn);
 router.post(

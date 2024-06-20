@@ -14,6 +14,7 @@ const router = express_1.default.Router();
 router.get('/', (0, auth_1.default)(client_1.UserRole.admin, client_1.UserRole.superAdmin, client_1.UserRole.ccAdmin, client_1.UserRole.financeAdmin), user_controller_1.UserController.getAllUser);
 router.get('/admin/overview', (0, auth_1.default)(client_1.UserRole.admin, client_1.UserRole.superAdmin), user_controller_1.UserController.adminOverview);
 router.get('/seller/overview', (0, auth_1.default)(client_1.UserRole.seller), user_controller_1.UserController.sellerOverview);
+router.get('/seller/profile/:id', (0, auth_1.default)(client_1.UserRole.seller, client_1.UserRole.admin, client_1.UserRole.user, client_1.UserRole.superAdmin, client_1.UserRole.financeAdmin, client_1.UserRole.ccAdmin, client_1.UserRole.prAdmin), user_controller_1.UserController.sellerProfileInfo);
 router.get('/user/overview', (0, auth_1.default)(client_1.UserRole.user), user_controller_1.UserController.userOverview);
 router.post('/nowpayments-ipn', user_controller_1.UserController.sellerIpn);
 router.post('/send-query', (0, validateRequest_1.default)(user_validation_1.UserValidation.sendQueryValidation), (0, auth_1.default)(client_1.UserRole.admin, client_1.UserRole.seller, client_1.UserRole.superAdmin, client_1.UserRole.user), user_controller_1.UserController.sendUserQuery);

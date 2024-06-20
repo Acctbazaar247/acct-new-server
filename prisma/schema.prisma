@@ -259,6 +259,7 @@ model Account {
   ownBy                 User             @relation(fields: [ownById], references: [id], onDelete: Cascade)
   Cart                  Cart[]
   Orders                Orders?
+  Review                Review?
 }
 
 model Orders {
@@ -447,6 +448,8 @@ enum EReferralStatus {
 
 model Review {
   id           String        @id @unique @default(uuid())
+  accountId    String        @unique
+  account      Account       @relation(fields: [accountId], references: [id])
   ownById      String
   ownBy        User          @relation(name: "Review_By", fields: [ownById], references: [id], onDelete: Cascade)
   sellerId     String

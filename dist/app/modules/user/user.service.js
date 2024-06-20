@@ -195,43 +195,6 @@ const updateUser = (id, payload, requestedUser) => __awaiter(void 0, void 0, voi
 });
 const deleteUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
     return yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
-        // // Inside the transaction, perform your database operations
-        // // eslint-disable-next-line no-unused-vars, , @typescript-eslint/no-unused-vars
-        // const deleteMessage = await tx.message.deleteMany({
-        //   where: { sendById: id },
-        // });
-        // // eslint-disable-next-line no-unused-vars, , @typescript-eslint/no-unused-vars
-        // const deleteSeen = await tx.seenMessage.deleteMany({
-        //   where: { seenById: id },
-        // });
-        // // eslint-disable-next-line no-unused-vars, , @typescript-eslint/no-unused-vars
-        // const deleteVerification = await tx.verificationOtp.deleteMany({
-        //   where: { ownById: id },
-        // });
-        // // eslint-disable-next-line no-unused-vars, , @typescript-eslint/no-unused-vars
-        // const deleteOrder = await tx.orders.deleteMany({
-        //   where: { orderById: id },
-        // });
-        // // eslint-disable-next-line no-unused-vars, , @typescript-eslint/no-unused-vars
-        // const deleteCarts = await tx.cart.deleteMany({
-        //   where: { ownById: id },
-        // });
-        // // eslint-disable-next-line no-unused-vars, , @typescript-eslint/no-unused-vars
-        // const deleteAccount = await tx.account.deleteMany({
-        //   where: { ownById: id },
-        // });
-        // // eslint-disable-next-line no-unused-vars, , @typescript-eslint/no-unused-vars
-        // const deleteCurrency = await tx.currency.deleteMany({
-        //   where: { ownById: id },
-        // });
-        // // eslint-disable-next-line no-unused-vars, , @typescript-eslint/no-unused-vars
-        // const deleteCurrencyRequest = await tx.currencyRequest.deleteMany({
-        //   where: { ownById: id },
-        // });
-        // // eslint-disable-next-line no-unused-vars, , @typescript-eslint/no-unused-vars
-        // const deleteWithdrawalRequest = await tx.withdrawalRequest.deleteMany({
-        //   where: { ownById: id },
-        // });
         const deleteUser = yield tx.user.delete({ where: { id } });
         return deleteUser;
     }));
@@ -345,6 +308,54 @@ const sellerOverview = (id) => __awaiter(void 0, void 0, void 0, function* () {
         pastYearData: pastYearData || [],
     };
 });
+const sellerProfileInfo = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const isSellerExist = yield prisma_1.default.user.findUnique({
+        where: { id },
+        select: {
+            name: true,
+            id: true,
+            profileImg: true,
+            isVerifiedByAdmin: true,
+            country: true,
+            createdAt: true,
+        },
+    });
+    if (!isSellerExist) {
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, "Seller doesn't");
+    }
+    const totalAccountApprove = yield prisma_1.default.account.count({
+        where: { ownById: id, approvedForSale: 'approved' },
+    });
+    const totalSoldAccount = yield prisma_1.default.account.count({
+        where: { isSold: true, ownById: id },
+    });
+    const totalCancelOrder = yield prisma_1.default.orders.count({
+        where: {
+            account: {
+                ownById: id,
+            },
+            status: client_1.EOrderStatus.cancelled,
+        },
+    });
+    const totalOrder = yield prisma_1.default.orders.count({ where: { orderById: id } });
+    const totalReviews = yield prisma_1.default.review.count({ where: { sellerId: id } });
+    const totalPositiveReviews = yield prisma_1.default.review.count({
+        where: { sellerId: id, reviewStatus: client_1.EReviewStatus.positive },
+    });
+    const totalNegativeReviews = yield prisma_1.default.review.count({
+        where: { sellerId: id, reviewStatus: client_1.EReviewStatus.positive },
+    });
+    return {
+        totalSoldAccount,
+        totalOrder,
+        totalAccountApprove,
+        totalCancelOrder: totalCancelOrder,
+        totalPositiveReviews,
+        totalNegativeReviews,
+        totalReviews,
+        sellerInfo: Object.assign({}, isSellerExist),
+    };
+});
 const userOverview = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const totalOrder = yield prisma_1.default.orders.count({ where: { orderById: id } });
     const totalAccountOnCart = yield prisma_1.default.cart.count({
@@ -416,4 +427,5 @@ exports.UserService = {
     adminOverview,
     sellerOverview,
     userOverview,
+    sellerProfileInfo,
 };
