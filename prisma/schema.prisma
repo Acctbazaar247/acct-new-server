@@ -57,6 +57,8 @@ model User {
   Plan                Plan?
   Referral            Referral?           @relation(name: "Referral_OwnBy")
   ReferredByMe        Referral[]          @relation(name: "Referral_By")
+  Review              Review[]            @relation(name: "Review_By")
+  ReviewSeller        Review[]            @relation(name: "Review_Seller_Info")
 }
 
 enum EPayWith {
@@ -441,4 +443,22 @@ enum EReferralStatus {
   pending
   completed
   cancel
+}
+
+model Review {
+  id           String        @id @unique @default(uuid())
+  ownById      String
+  ownBy        User          @relation(name: "Review_By", fields: [ownById], references: [id], onDelete: Cascade)
+  sellerId     String
+  seller       User          @relation(name: "Review_Seller_Info", fields: [sellerId], references: [id], onDelete: Cascade)
+  reviewStatus EReviewStatus
+  reviewText   String
+  isAnonymous  Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+enum EReviewStatus {
+  positive
+  negative
 }

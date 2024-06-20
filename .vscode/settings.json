@@ -4,5 +4,6 @@
     "source.fixAll.tslint": "explicit",
     "source.organizeImports": "explicit"
   },
-  "cSpell.words": ["flutterwave"]
+  "cSpell.words": ["flutterwave"],
+  "prisma.fileWatcher": false
 }
