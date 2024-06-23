@@ -362,7 +362,7 @@ const sellerProfileInfo = async (
     },
   });
   if (!isSellerExist) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Seller doesn't");
+    throw new ApiError(httpStatus.BAD_REQUEST, "Seller doesn't exist");
   }
   const totalAccountApprove = await prisma.account.count({
     where: { ownById: id, approvedForSale: 'approved' },

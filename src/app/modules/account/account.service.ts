@@ -163,6 +163,7 @@ const getAllAccount = async (
           id: true,
           isVerified: true,
           isVerifiedByAdmin: true,
+          role: true,
         },
       },
     },

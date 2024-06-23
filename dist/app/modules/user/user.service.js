@@ -321,7 +321,7 @@ const sellerProfileInfo = (id) => __awaiter(void 0, void 0, void 0, function* ()
         },
     });
     if (!isSellerExist) {
-        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, "Seller doesn't");
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, "Seller doesn't exist");
     }
     const totalAccountApprove = yield prisma_1.default.account.count({
         where: { ownById: id, approvedForSale: 'approved' },

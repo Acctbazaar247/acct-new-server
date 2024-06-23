@@ -5,6 +5,7 @@ const createValidation = z.object({
   body: z.array(
     z.object({
       sellerId: z.string({ required_error: 'Seller id is required!' }),
+      accountId: z.string({ required_error: 'accountId   is required!' }),
       reviewText: z.string({ required_error: 'reviewText is required!' }),
       isAnonymous: z.boolean({ required_error: 'isAnonymous is required!' }),
       reviewStatus: z.enum([...Object.values(EReferralStatus)] as [
