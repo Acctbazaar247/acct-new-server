@@ -1,4 +1,4 @@
-import { EReferralStatus } from '@prisma/client';
+import { EReviewStatus } from '@prisma/client';
 import { z } from 'zod';
 
 const createValidation = z.object({
@@ -8,7 +8,7 @@ const createValidation = z.object({
       accountId: z.string({ required_error: 'accountId   is required!' }),
       reviewText: z.string({ required_error: 'reviewText is required!' }),
       isAnonymous: z.boolean({ required_error: 'isAnonymous is required!' }),
-      reviewStatus: z.enum([...Object.values(EReferralStatus)] as [
+      reviewStatus: z.enum([...Object.values(EReviewStatus)] as [
         string,
         ...string[]
       ]),

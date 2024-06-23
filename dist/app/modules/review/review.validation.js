@@ -9,7 +9,7 @@ const createValidation = zod_1.z.object({
         accountId: zod_1.z.string({ required_error: 'accountId   is required!' }),
         reviewText: zod_1.z.string({ required_error: 'reviewText is required!' }),
         isAnonymous: zod_1.z.boolean({ required_error: 'isAnonymous is required!' }),
-        reviewStatus: zod_1.z.enum([...Object.values(client_1.EReferralStatus)]),
+        reviewStatus: zod_1.z.enum([...Object.values(client_1.EReviewStatus)]),
     })),
 });
 const updateValidation = zod_1.z.object({
