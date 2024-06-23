@@ -100,6 +100,14 @@ const getAllOrders = async (
       account: {
         include: {
           Review: true,
+          ownBy: {
+            select: {
+              name: true,
+              id: true,
+              email: true,
+              profileImg: true,
+            },
+          },
         },
       },
       orderBy: {
@@ -108,6 +116,7 @@ const getAllOrders = async (
           name: true,
           id: true,
           isVerifiedByAdmin: true,
+          email: true,
         },
       },
     },

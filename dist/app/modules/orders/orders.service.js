@@ -104,6 +104,14 @@ const getAllOrders = (filters, paginationOptions) => __awaiter(void 0, void 0, v
             account: {
                 include: {
                     Review: true,
+                    ownBy: {
+                        select: {
+                            name: true,
+                            id: true,
+                            email: true,
+                            profileImg: true,
+                        },
+                    },
                 },
             },
             orderBy: {
@@ -112,6 +120,7 @@ const getAllOrders = (filters, paginationOptions) => __awaiter(void 0, void 0, v
                     name: true,
                     id: true,
                     isVerifiedByAdmin: true,
+                    email: true,
                 },
             },
         },
