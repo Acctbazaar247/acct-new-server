@@ -384,7 +384,7 @@ const sellerProfileInfo = async (
     where: { sellerId: id, reviewStatus: EReviewStatus.positive },
   });
   const totalNegativeReviews = await prisma.review.count({
-    where: { sellerId: id, reviewStatus: EReviewStatus.positive },
+    where: { sellerId: id, reviewStatus: EReviewStatus.negative },
   });
 
   return {

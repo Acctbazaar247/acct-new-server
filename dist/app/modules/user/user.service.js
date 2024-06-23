@@ -343,7 +343,7 @@ const sellerProfileInfo = (id) => __awaiter(void 0, void 0, void 0, function* ()
         where: { sellerId: id, reviewStatus: client_1.EReviewStatus.positive },
     });
     const totalNegativeReviews = yield prisma_1.default.review.count({
-        where: { sellerId: id, reviewStatus: client_1.EReviewStatus.positive },
+        where: { sellerId: id, reviewStatus: client_1.EReviewStatus.negative },
     });
     return {
         totalSoldAccount,

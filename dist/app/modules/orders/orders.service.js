@@ -356,7 +356,15 @@ const getMyOrders = (id) => __awaiter(void 0, void 0, void 0, function* () {
         include: {
             account: {
                 include: {
-                    ownBy: true,
+                    ownBy: {
+                        select: {
+                            name: true,
+                            id: true,
+                            profileImg: true,
+                            email: true,
+                        },
+                    },
+                    Review: true,
                 },
             },
         },

@@ -59,6 +59,23 @@ const getAllReview = async (
         : {
             createdAt: 'desc',
           },
+    select: {
+      id: true,
+      accountId: true,
+      sellerId: true,
+      seller: {
+        select: { id: true, name: true, profileImg: true },
+      },
+      ownById: true,
+      createdAt: true,
+      updatedAt: true,
+      reviewText: true,
+      reviewStatus: true,
+      isAnonymous: true,
+      ownBy: {
+        select: { id: true, email: true, profileImg: true, name: true },
+      },
+    },
   });
   const total = await prisma.review.count();
   const output = {

@@ -402,7 +402,15 @@ const getMyOrders = async (id: string): Promise<Orders[] | null> => {
     include: {
       account: {
         include: {
-          ownBy: true,
+          ownBy: {
+            select: {
+              name: true,
+              id: true,
+              profileImg: true,
+              email: true,
+            },
+          },
+          Review: true,
         },
       },
     },
