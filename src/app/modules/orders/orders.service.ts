@@ -363,6 +363,7 @@ const getSingleOrders = async (
               isVerifiedByAdmin: true,
             },
           },
+          Review: true,
         },
       },
       orderBy: {
@@ -408,6 +409,8 @@ const getMyOrders = async (id: string): Promise<Orders[] | null> => {
               id: true,
               profileImg: true,
               email: true,
+              role: true,
+              isVerifiedByAdmin: true,
             },
           },
           Review: true,
