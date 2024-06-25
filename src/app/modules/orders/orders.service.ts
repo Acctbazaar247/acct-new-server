@@ -19,7 +19,6 @@ import EmailTemplates from '../../../shared/EmailTemplates';
 import prisma from '../../../shared/prisma';
 import { ordersSearchableFields } from './orders.constant';
 import { IOrdersFilters } from './orders.interface';
-
 const getAllOrders = async (
   filters: IOrdersFilters,
   paginationOptions: IPaginationOptions
