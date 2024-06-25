@@ -98,6 +98,17 @@ enum accountCategory {
   Discord
   Pof
   Hinge
+  // new social media
+  Grindr
+  Viber
+  GMX
+  Quora
+  Match
+  Ourtime
+  Hellotalk
+  Zoosk
+  Okcupid
+  SMSmode
 
   // Gaming accounts
   Playstation
@@ -131,6 +142,8 @@ enum accountCategory {
   CyberGhost
   Private
   Total
+  //new vpn
+  Surfshark
 
   //E commerse 
   Aliexpress
@@ -165,6 +178,21 @@ enum accountCategory {
   SephoraGiftCard
   SteamGiftCard
 
+  // websites
+  Website
+  CryptoWebsite
+  OnlyFans
+
+  // Tools and Resources
+  Tickets
+  Tutorials
+  Formats
+  Accounts
+  CreditCards
+  Software
+  Logs
+  Tools
+  Delivery
   // Other types of accounts
   Other
   //previous
@@ -227,6 +255,8 @@ enum accountType {
   GiftCard
   ECommerce
   AccountsSubscriptions
+  Websites
+  ToolsAndResources
   Other
 }
 
