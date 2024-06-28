@@ -167,6 +167,7 @@ enum accountCategory {
   Canva
   ChatGPT
   Office365
+  Paypal
   // Gift card accounts
   AmazonGiftCard
   AmexGiftCard
