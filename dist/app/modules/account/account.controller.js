@@ -51,9 +51,7 @@ const createAccountMultiple = (0, catchAsync_1.default)((req, res) => __awaiter(
     const AccountDatas = req.body;
     const user = req.user;
     // const accountType = accountCategoryToType(AccountData.category);
-    const withUserIdAndAccountType = AccountDatas.map(single => (Object.assign(Object.assign({}, single), { accountType: (0, getAccountCategoryToType_1.accountCategoryToType)(single.category), ownById: user.userId, approvedForSale: client_1.UserRole.seller === user.role
-            ? client_1.EApprovedForSale.pending
-            : client_1.EApprovedForSale.approved })));
+    const withUserIdAndAccountType = AccountDatas.map(single => (Object.assign(Object.assign({}, single), { accountType: (0, getAccountCategoryToType_1.accountCategoryToType)(single.category), ownById: user.userId, approvedForSale: client_1.EApprovedForSale.pending })));
     const result = yield account_service_1.AccountService.createAccountMultiple(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     withUserIdAndAccountType);

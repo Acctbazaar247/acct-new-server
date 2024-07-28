@@ -61,10 +61,7 @@ const createAccountMultiple: RequestHandler = catchAsync(
       ...single,
       accountType: accountCategoryToType(single.category),
       ownById: user.userId,
-      approvedForSale:
-        UserRole.seller === user.role
-          ? EApprovedForSale.pending
-          : EApprovedForSale.approved,
+      approvedForSale: EApprovedForSale.pending,
     }));
     const result = await AccountService.createAccountMultiple(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
