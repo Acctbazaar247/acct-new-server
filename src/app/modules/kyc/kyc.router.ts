@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.get(
   '/',
-  auth(UserRole.admin, UserRole.superAdmin),
+  // auth(UserRole.admin, UserRole.superAdmin),
   KycController.getAllKyc
 );
 router.get(

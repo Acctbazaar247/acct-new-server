@@ -64,4 +64,7 @@ export default {
   referralFirstPayAmount: parseInt(
     process.env.REFERRAL_FIRST_PAY_AMOUNT as string
   ),
+
+  oneSignalID: process.env.ONESIGNAL_ID as string,
+  oneSignalApi: process.env.ONESIGNAL_API as string,
 };

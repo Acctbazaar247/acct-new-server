@@ -39,6 +39,12 @@ router.post(
   auth(UserRole.seller, UserRole.user),
   ReviewController.createReview
 );
+router.post(
+  '/add-reply',
+  validateRequest(ReviewValidation.createReplyValidation),
+  auth(UserRole.seller, UserRole.user),
+  ReviewController.createReviewReply
+);
 
 // router.patch(
 //   '/:id',

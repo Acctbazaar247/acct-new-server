@@ -1,4 +1,4 @@
-import { Prisma, Review } from '@prisma/client';
+import { Prisma, Review, ReviewReply } from '@prisma/client';
 import httpStatus from 'http-status';
 import ApiError from '../../../errors/ApiError';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
@@ -93,6 +93,31 @@ const createReview = async (
   });
   return newReview;
 };
+const createReviewReply = async (
+  payload: ReviewReply
+): Promise<ReviewReply | null> => {
+  const isReviewExits = await prisma.review.findUnique({
+    where: { id: payload.reviewId },
+  });
+  if (!isReviewExits) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Review not found to reply');
+  }
+
+  // check the person is he relative to the conversation
+  const isNotSeller = isReviewExits.sellerId !== payload.ownById;
+  const isNotBuyer = isReviewExits.ownById !== payload.ownById;
+  if (isNotBuyer && isNotSeller) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'You are not allowed to reply on this conversation'
+    );
+  }
+
+  const newReview = await prisma.reviewReply.create({
+    data: payload,
+  });
+  return newReview;
+};
 
 const getSingleReview = async (id: string): Promise<Review | null> => {
   const result = await prisma.review.findUnique({
@@ -132,4 +157,5 @@ export const ReviewService = {
   updateReview,
   getSingleReview,
   deleteReview,
+  createReviewReply,
 };
