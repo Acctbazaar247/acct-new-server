@@ -82,6 +82,7 @@ const getAllReview = (filters, paginationOptions) => __awaiter(void 0, void 0, v
             reviewText: true,
             reviewStatus: true,
             isAnonymous: true,
+            ReviewReply: true,
             ownBy: {
                 select: { id: true, email: true, profileImg: true, name: true },
             },
