@@ -495,12 +495,13 @@ model Review {
 }
 
 model ReviewReply {
-  id       String @id @unique @default(uuid())
-  reviewId String
-  review   Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
-  ownById  String
-  ownBy    User   @relation(fields: [ownById], references: [id], onDelete: Cascade)
-  reply    String
+  id        String   @id @unique @default(uuid())
+  reviewId  String
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  ownById   String
+  ownBy     User     @relation(fields: [ownById], references: [id], onDelete: Cascade)
+  reply     String
+  createdAt DateTime @default(now())
 }
 
 enum EReviewStatus {

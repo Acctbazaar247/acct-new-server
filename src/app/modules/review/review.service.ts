@@ -72,7 +72,21 @@ const getAllReview = async (
       reviewText: true,
       reviewStatus: true,
       isAnonymous: true,
-      ReviewReply: true,
+      ReviewReply: {
+        select: {
+          id: true,
+          reply: true,
+          ownById: true,
+          createdAt: true,
+          ownBy: {
+            select: {
+              name: true,
+              id: true,
+              profileImg: true,
+            },
+          },
+        },
+      },
       ownBy: {
         select: { id: true, email: true, profileImg: true, name: true },
       },
