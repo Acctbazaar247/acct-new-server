@@ -17,12 +17,10 @@ const createValidation = z.object({
 });
 
 const createReplyValidation = z.object({
-  body: z.array(
-    z.object({
-      reviewId: z.string({ required_error: 'Review id is required!' }),
-      reply: z.string({ required_error: 'reviewText is required!' }),
-    })
-  ),
+  body: z.object({
+    reviewId: z.string({ required_error: 'Review id is required!' }),
+    reply: z.string({ required_error: 'reviewText is required!' }),
+  }),
 });
 const updateValidation = z.object({
   body: z.object({}),
