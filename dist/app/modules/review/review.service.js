@@ -100,6 +100,24 @@ const createReview = (payload) => __awaiter(void 0, void 0, void 0, function* ()
     });
     return newReview;
 });
+const createReviewReply = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const isReviewExits = yield prisma_1.default.review.findUnique({
+        where: { id: payload.reviewId },
+    });
+    if (!isReviewExits) {
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Review not found to reply');
+    }
+    // check the person is he relative to the conversation
+    const isNotSeller = isReviewExits.sellerId !== payload.ownById;
+    const isNotBuyer = isReviewExits.ownById !== payload.ownById;
+    if (isNotBuyer && isNotSeller) {
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'You are not allowed to reply on this conversation');
+    }
+    const newReview = yield prisma_1.default.reviewReply.create({
+        data: payload,
+    });
+    return newReview;
+});
 const getSingleReview = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.default.review.findUnique({
         where: {
@@ -132,4 +150,5 @@ exports.ReviewService = {
     updateReview,
     getSingleReview,
     deleteReview,
+    createReviewReply,
 };

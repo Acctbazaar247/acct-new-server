@@ -32,6 +32,17 @@ const createReview = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
         data: result,
     });
 }));
+const createReviewReply = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const ReviewData = req.body;
+    const user = req.user;
+    const result = yield review_service_1.ReviewService.createReviewReply(Object.assign(Object.assign({}, ReviewData), { ownById: user.userId }));
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: 'Review Created successfully!',
+        data: result,
+    });
+}));
 const getAllReview = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const filters = (0, pick_1.default)(req.query, ['searchTerm', ...review_constant_1.reviewFilterAbleFields]);
     const paginationOptions = (0, pick_1.default)(req.query, pagination_1.paginationFields);
@@ -81,4 +92,5 @@ exports.ReviewController = {
     updateReview,
     getSingleReview,
     deleteReview,
+    createReviewReply,
 };

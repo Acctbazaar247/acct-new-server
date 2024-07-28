@@ -12,10 +12,17 @@ const createValidation = zod_1.z.object({
         reviewStatus: zod_1.z.enum([...Object.values(client_1.EReviewStatus)]),
     })),
 });
+const createReplyValidation = zod_1.z.object({
+    body: zod_1.z.array(zod_1.z.object({
+        reviewId: zod_1.z.string({ required_error: 'Review id is required!' }),
+        reply: zod_1.z.string({ required_error: 'reviewText is required!' }),
+    })),
+});
 const updateValidation = zod_1.z.object({
     body: zod_1.z.object({}),
 });
 exports.ReviewValidation = {
     createValidation,
+    createReplyValidation,
     updateValidation,
 };

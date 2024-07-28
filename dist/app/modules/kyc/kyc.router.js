@@ -11,7 +11,9 @@ const validateRequest_1 = __importDefault(require("../../middlewares/validateReq
 const kyc_controller_1 = require("./kyc.controller");
 const kyc_validation_1 = require("./kyc.validation");
 const router = express_1.default.Router();
-router.get('/', (0, auth_1.default)(client_1.UserRole.admin, client_1.UserRole.superAdmin), kyc_controller_1.KycController.getAllKyc);
+router.get('/', 
+// auth(UserRole.admin, UserRole.superAdmin),
+kyc_controller_1.KycController.getAllKyc);
 router.get('/single-user-kyc', (0, auth_1.default)(client_1.UserRole.seller), kyc_controller_1.KycController.getSingleKycOfUser);
 router.get('/:id', (0, auth_1.default)(client_1.UserRole.admin, client_1.UserRole.superAdmin, client_1.UserRole.seller), kyc_controller_1.KycController.getSingleKyc);
 router.post('/', (0, auth_1.default)(client_1.UserRole.seller), (0, validateRequest_1.default)(kyc_validation_1.KycValidation.createValidation), kyc_controller_1.KycController.createKyc);

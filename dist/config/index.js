@@ -53,4 +53,6 @@ exports.default = {
     proPlusPlanDays: parseInt(process.env.PRO_PLUS_PLAN_DAYS),
     referralAmount: parseInt(process.env.REFERRAL_AMOUNT),
     referralFirstPayAmount: parseInt(process.env.REFERRAL_FIRST_PAY_AMOUNT),
+    oneSignalID: process.env.ONESIGNAL_ID,
+    oneSignalApi: process.env.ONESIGNAL_API,
 };
