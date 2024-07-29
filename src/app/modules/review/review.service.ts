@@ -92,7 +92,7 @@ const getAllReview = async (
       },
     },
   });
-  const total = await prisma.review.count();
+  const total = await prisma.review.count({ where: whereConditions });
   const output = {
     data: result,
     meta: { page, limit, total },

@@ -102,7 +102,7 @@ const getAllReview = (filters, paginationOptions) => __awaiter(void 0, void 0, v
             },
         },
     });
-    const total = yield prisma_1.default.review.count();
+    const total = yield prisma_1.default.review.count({ where: whereConditions });
     const output = {
         data: result,
         meta: { page, limit, total },
