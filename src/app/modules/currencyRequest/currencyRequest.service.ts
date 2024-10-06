@@ -59,7 +59,6 @@ const getAllCurrencyRequest = async (
 
   const whereConditions: Prisma.CurrencyRequestWhereInput =
     andCondition.length > 0 ? { AND: andCondition } : {};
-  console.log(JSON.stringify(andCondition), paginationOptions);
   const result = await prisma.currencyRequest.findMany({
     where: whereConditions,
     skip,

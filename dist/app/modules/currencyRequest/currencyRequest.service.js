@@ -67,7 +67,6 @@ const getAllCurrencyRequest = (filters, paginationOptions) => __awaiter(void 0, 
         });
     }
     const whereConditions = andCondition.length > 0 ? { AND: andCondition } : {};
-    console.log(JSON.stringify(andCondition), paginationOptions);
     const result = yield prisma_1.default.currencyRequest.findMany({
         where: whereConditions,
         skip,

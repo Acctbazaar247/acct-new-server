@@ -1,4 +1,4 @@
-import { CurrencyRequest } from '@prisma/client';
+import { CurrencyRequest, EStatusOfWithdrawalRequest } from '@prisma/client';
 import { Request, Response } from 'express';
 import { RequestHandler } from 'express-serve-static-core';
 import httpStatus from 'http-status';
@@ -14,6 +14,7 @@ import catchAsyncSemaphore from '../../../shared/catchAsyncSemaphore';
 import pick from '../../../shared/pick';
 import prisma from '../../../shared/prisma';
 import sendResponse from '../../../shared/sendResponse';
+import { WithdrawalRequestService } from '../withdrawalRequest/withdrawalRequest.service';
 import { currencyRequestFilterAbleFields } from './currencyRequest.constant';
 import { CurrencyRequestService } from './currencyRequest.service';
 const createCurrencyRequest: RequestHandler = catchAsync(
@@ -127,12 +128,27 @@ const getAllCurrencyRequest = catchAsync(
 const payStackWebHook: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const ipnData = req.body;
-    if (ipnData.status === 'successful') {
+    console.log({ ipnData }, 'webhook');
+    if (ipnData.event === 'transfer.completed') {
+      console.log('transfer.completed');
+      if (ipnData.data.status === 'SUCCESSFUL') {
+        console.log('withdraw completed');
+        WithdrawalRequestService.updateWithdrawalRequest(
+          ipnData.data.reference,
+          { status: EStatusOfWithdrawalRequest.approved }
+        );
+      } else {
+        console.log('withdraw failed');
+        WithdrawalRequestService.updateWithdrawalRequest(
+          ipnData.data.reference,
+          { status: EStatusOfWithdrawalRequest.denied }
+        );
+      }
+    } else if (ipnData.status === 'successful') {
       // const paymentReference = ipnData.data.reference;
 
       // Perform additional actions, such as updating your database, sending emails, etc.
       const paymentType = ipnData?.txRef.split('_$_')[0];
-      console.log({ paymentType });
       if (paymentType === EPaymentType.addFunds) {
         await CurrencyRequestService.payStackWebHook({
           data: ipnData,
@@ -146,7 +162,7 @@ const payStackWebHook: RequestHandler = catchAsync(
       }
     }
     // eslint-disable-next-line no-console
-    console.log(ipnData);
+    console.log({ ipnData }, 'webhook');
     // eslint-disable-next-line no-unused-vars
 
     sendResponse<string>(res, {

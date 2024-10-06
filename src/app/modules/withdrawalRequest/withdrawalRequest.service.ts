@@ -3,7 +3,6 @@ import {
   Prisma,
   WithdrawalRequest,
 } from '@prisma/client';
-import axios from 'axios';
 import bcryptjs from 'bcryptjs';
 import httpStatus from 'http-status';
 import { JwtPayload } from 'jsonwebtoken';
@@ -16,6 +15,7 @@ import { IPaginationOptions } from '../../../interfaces/pagination';
 import prisma from '../../../shared/prisma';
 import { withdrawalRequestSearchableFields } from './withdrawalRequest.constant';
 import { IWithdrawalRequestFilters } from './withdrawalRequest.interface';
+import { fetchBankCodes, initiateWithdrawal } from './withdrawalRequest.utils';
 const getAllWithdrawalRequest = async (
   filters: IWithdrawalRequestFilters,
   paginationOptions: IPaginationOptions
@@ -80,7 +80,6 @@ const getAllWithdrawalRequest = async (
   const total = await prisma.withdrawalRequest.count({
     where: whereConditions,
   });
-  console.log(whereConditions, await prisma.withdrawalRequest.count());
   const output = {
     data: result,
     meta: { page, limit, total },
@@ -180,6 +179,16 @@ const createWithdrawalRequest = async (
         data: { ...payload, status: EStatusOfWithdrawalRequest.pending },
       });
     });
+    // make a transaction for auto withdraw
+    if (newWithdrawalRequest.bankName && newWithdrawalRequest.accountNumber) {
+      await initiateWithdrawal({
+        tx: newWithdrawalRequest.id,
+        account_bank: newWithdrawalRequest.bankName,
+        account_number: newWithdrawalRequest.accountNumber,
+        amount: payload.amount,
+        narration: 'Auto withdrawal transaction',
+      });
+    }
     return newWithdrawalRequest;
   }
 };
@@ -349,8 +358,12 @@ const deleteWithdrawalRequest = async (
   return result;
 };
 const getWithdrawalBank = async (): Promise<unknown | null> => {
-  const response = await axios.get('https://api.paystack.co/bank');
-  return response.data;
+  // const response = await axios.get('https://api.paystack.co/bank');
+
+  // return response.data;
+  const data = await fetchBankCodes();
+  // console.log(data);
+  return data;
 };
 
 export const WithdrawalRequestService = {

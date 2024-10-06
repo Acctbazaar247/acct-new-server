@@ -19,14 +19,11 @@ const message_validation_1 = require("./app/modules/message/message.validation")
 const socketServer = http_1.default.createServer(app_1.default);
 const io = new socket_io_1.Server(socketServer);
 io.on('connection', (socket) => {
-    console.log('A user connected');
     // Handle join room event
     socket.on('join-room', (groupId) => __awaiter(void 0, void 0, void 0, function* () {
         // Join the specified chat group room
-        console.log(groupId);
         if (groupId) {
             socket.join(groupId);
-            console.log(`User joined room ${groupId}`);
         }
         // Fetch and send previous messages in the room
     }));
@@ -36,7 +33,6 @@ io.on('connection', (socket) => {
         // Save the message to the database
         // Send the new message to all users in the chat group room
         try {
-            console.log(message);
             yield message_validation_1.MessageValidation.createValidation.parseAsync({
                 body: message,
             });
@@ -51,13 +47,10 @@ io.on('connection', (socket) => {
         // Join the specified chat group room
         if (orderId) {
             socket.leave(orderId);
-            console.log(`User leave room ${orderId}`);
         }
         // Fetch and send previous messages in the room
     }));
     // Handle disconnect event
-    socket.on('disconnect', () => {
-        console.log('User disconnected');
-    });
+    socket.on('disconnect', () => { });
 });
 exports.default = socketServer;

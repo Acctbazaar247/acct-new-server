@@ -25,7 +25,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WithdrawalRequestService = void 0;
 const client_1 = require("@prisma/client");
-const axios_1 = __importDefault(require("axios"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const http_status_1 = __importDefault(require("http-status"));
 const lodash_1 = require("lodash");
@@ -34,6 +33,7 @@ const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const paginationHelper_1 = require("../../../helpers/paginationHelper");
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
 const withdrawalRequest_constant_1 = require("./withdrawalRequest.constant");
+const withdrawalRequest_utils_1 = require("./withdrawalRequest.utils");
 const getAllWithdrawalRequest = (filters, paginationOptions) => __awaiter(void 0, void 0, void 0, function* () {
     const { page, limit, skip } = paginationHelper_1.paginationHelpers.calculatePagination(paginationOptions);
     const { searchTerm } = filters, filterData = __rest(filters, ["searchTerm"]);
@@ -89,7 +89,6 @@ const getAllWithdrawalRequest = (filters, paginationOptions) => __awaiter(void 0
     const total = yield prisma_1.default.withdrawalRequest.count({
         where: whereConditions,
     });
-    console.log(whereConditions, yield prisma_1.default.withdrawalRequest.count());
     const output = {
         data: result,
         meta: { page, limit, total },
@@ -161,6 +160,16 @@ const createWithdrawalRequest = (payload, requestBy, withdrawalPin) => __awaiter
                 data: Object.assign(Object.assign({}, payload), { status: client_1.EStatusOfWithdrawalRequest.pending }),
             });
         }));
+        // make a transaction for auto withdraw
+        if (newWithdrawalRequest.bankName && newWithdrawalRequest.accountNumber) {
+            yield (0, withdrawalRequest_utils_1.initiateWithdrawal)({
+                tx: newWithdrawalRequest.id,
+                account_bank: newWithdrawalRequest.bankName,
+                account_number: newWithdrawalRequest.accountNumber,
+                amount: payload.amount,
+                narration: 'Auto withdrawal transaction',
+            });
+        }
         return newWithdrawalRequest;
     }
 });
@@ -293,8 +302,11 @@ const deleteWithdrawalRequest = (id) => __awaiter(void 0, void 0, void 0, functi
     return result;
 });
 const getWithdrawalBank = () => __awaiter(void 0, void 0, void 0, function* () {
-    const response = yield axios_1.default.get('https://api.paystack.co/bank');
-    return response.data;
+    // const response = await axios.get('https://api.paystack.co/bank');
+    // return response.data;
+    const data = yield (0, withdrawalRequest_utils_1.fetchBankCodes)();
+    // console.log(data);
+    return data;
 });
 exports.WithdrawalRequestService = {
     getAllWithdrawalRequest,

@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CurrencyRequestController = void 0;
+const client_1 = require("@prisma/client");
 const http_status_1 = __importDefault(require("http-status"));
 const config_1 = __importDefault(require("../../../config"));
 const pagination_1 = require("../../../constants/pagination");
@@ -25,6 +26,7 @@ const catchAsyncSemaphore_1 = __importDefault(require("../../../shared/catchAsyn
 const pick_1 = __importDefault(require("../../../shared/pick"));
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
 const sendResponse_1 = __importDefault(require("../../../shared/sendResponse"));
+const withdrawalRequest_service_1 = require("../withdrawalRequest/withdrawalRequest.service");
 const currencyRequest_constant_1 = require("./currencyRequest.constant");
 const currencyRequest_service_1 = require("./currencyRequest.service");
 const createCurrencyRequest = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -104,11 +106,22 @@ const getAllCurrencyRequest = (0, catchAsync_1.default)((req, res) => __awaiter(
 }));
 const payStackWebHook = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const ipnData = req.body;
-    if (ipnData.status === 'successful') {
+    console.log({ ipnData }, 'webhook');
+    if (ipnData.event === 'transfer.completed') {
+        console.log('transfer.completed');
+        if (ipnData.data.status === 'SUCCESSFUL') {
+            console.log('withdraw completed');
+            withdrawalRequest_service_1.WithdrawalRequestService.updateWithdrawalRequest(ipnData.data.reference, { status: client_1.EStatusOfWithdrawalRequest.approved });
+        }
+        else {
+            console.log('withdraw failed');
+            withdrawalRequest_service_1.WithdrawalRequestService.updateWithdrawalRequest(ipnData.data.reference, { status: client_1.EStatusOfWithdrawalRequest.denied });
+        }
+    }
+    else if (ipnData.status === 'successful') {
         // const paymentReference = ipnData.data.reference;
         // Perform additional actions, such as updating your database, sending emails, etc.
         const paymentType = ipnData === null || ipnData === void 0 ? void 0 : ipnData.txRef.split('_$_')[0];
-        console.log({ paymentType });
         if (paymentType === common_1.EPaymentType.addFunds) {
             yield currencyRequest_service_1.CurrencyRequestService.payStackWebHook({
                 data: ipnData,
@@ -123,7 +136,7 @@ const payStackWebHook = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
         }
     }
     // eslint-disable-next-line no-console
-    console.log(ipnData);
+    console.log({ ipnData }, 'webhook');
     // eslint-disable-next-line no-unused-vars
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,

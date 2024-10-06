@@ -45,7 +45,7 @@ const UpdateSellerAfterPay = async (data: {
         },
       });
     } catch (err) {
-      console.log('something went wrong to ');
+      console.error('something went wrong to ', err);
     }
     // send verification token
     // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
