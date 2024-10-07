@@ -10,7 +10,24 @@ type WithdrawalParams = {
   narration?: string; // Optional field
 };
 const FLUTTERWAVE_BASE_URL = 'https://api.flutterwave.com/v3';
+// Function to fetch bank codes
+export const fetchBankCodes = async (): Promise<{
+  data: { name: string; code: string }[];
+}> => {
+  try {
+    const response = await axios.get(`${FLUTTERWAVE_BASE_URL}/banks/NG`, {
+      headers: {
+        Authorization: `Bearer ${config.flutterwave_public_key}`,
+        'Content-Type': 'application/json',
+      },
+    });
 
+    return response.data; // Adjust according to the actual response structure
+  } catch (error) {
+    console.error('Error fetching bank codes:', error);
+    throw new Error('Unable to fetch bank codes');
+  }
+};
 // Function to initiate the withdrawal
 export const initiateWithdrawal = async ({
   tx,
@@ -22,19 +39,23 @@ export const initiateWithdrawal = async ({
 WithdrawalParams): Promise<any> => {
   try {
     const allBanks = await fetchBankCodes();
-    const account_bank_code = allBanks.find(
-      bank =>
-        bank.bank_name.toLocaleLowerCase() === account_bank.toLocaleLowerCase()
-    )?.bank_code;
+    console.log(allBanks);
+    const account_bank_code = allBanks.data.find(
+      bank => bank.name.toLocaleLowerCase() === account_bank.toLocaleLowerCase()
+    )?.code;
+    if (!account_bank_code) {
+      throw new Error('No banks found in the system.');
+    }
     // Prepare the payout request payload
     const payload = {
       account_bank: account_bank_code, // Bank code or bank identifier (e.g., 044 for Access Bank)
       account_number, // Bank account number
-      amount, // Amount to withdraw
+      amount: amount * config.dollarRate, // Amount to withdraw
       currency: 'NGN', // Currency code (e.g., NGN, USD)
       narration, // A note about the withdrawal
       reference: tx, // Unique transaction reference
       callback_url: `${config.baseServerUrl}/currency-request/webhook`, // Optional: callback URL
+      debit_currency: 'NGN',
     };
     console.log(payload);
     // Make a POST request to the Flutterwave Payout API
@@ -57,23 +78,5 @@ WithdrawalParams): Promise<any> => {
   } catch (error: any) {
     // Handle any errors that occurred during the request
     console.error('Error initiating withdrawal:', error);
-  }
-};
-// Function to fetch bank codes
-export const fetchBankCodes = async (): Promise<
-  { bank_name: string; bank_code: string }[]
-> => {
-  try {
-    const response = await axios.get(`${FLUTTERWAVE_BASE_URL}/banks/NG`, {
-      headers: {
-        Authorization: `Bearer ${config.flutterwave_public_key}`,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    return response.data; // Adjust according to the actual response structure
-  } catch (error) {
-    console.error('Error fetching bank codes:', error);
-    throw new Error('Unable to fetch bank codes');
   }
 };
