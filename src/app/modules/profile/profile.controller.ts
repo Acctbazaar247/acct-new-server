@@ -17,6 +17,8 @@ const getProfile: RequestHandler = catchAsync(
     if (!result) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'user not found');
     }
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+    const { password, ...output } = result;
     const accessToken = jwtHelpers.createToken(
       { userId: result.id, role: result?.role },
       config.jwt.secret as Secret,
@@ -28,7 +30,7 @@ const getProfile: RequestHandler = catchAsync(
       message: 'User fetched   successfully',
       data: {
         accessToken: accessToken,
-        user: result,
+        user: output,
       },
     });
   }

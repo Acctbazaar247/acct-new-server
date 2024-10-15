@@ -184,7 +184,15 @@ const loginUser = async (payload: ILogin): Promise<ILoginResponse> => {
   });
   //create access token & refresh token
 
-  const { email, id, role, name, ...others } = isUserExist;
+  const {
+    email,
+    id,
+    role,
+    name,
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+    password: mainPassword,
+    ...others
+  } = isUserExist;
 
   const accessToken = jwtHelpers.createToken(
     { userId: id, role },

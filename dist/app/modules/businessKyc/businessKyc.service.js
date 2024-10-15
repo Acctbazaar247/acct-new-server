@@ -163,7 +163,12 @@ const updateBusinessKyc = (id, payload, requestedUserId) => __awaiter(void 0, vo
         const result = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
             yield tx.user.update({
                 where: { id: isKycExits.ownById },
-                data: { isVerifiedByAdmin: true, userName: isKycExits.businessName },
+                data: {
+                    isVerifiedByAdmin: true,
+                    isBusinessVerified: true,
+                    badge: client_1.EBadge.blue,
+                    userName: isKycExits.businessName,
+                },
             });
             const updatedKyc = yield tx.businessKyc.update({
                 where: { id },

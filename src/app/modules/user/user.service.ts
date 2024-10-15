@@ -110,6 +110,8 @@ const getAllUser = async (
       address: true,
       dateOfBirth: true,
       userName: true,
+      isBusinessVerified: true,
+      badge: true,
       Currency: {
         select: {
           amount: true,

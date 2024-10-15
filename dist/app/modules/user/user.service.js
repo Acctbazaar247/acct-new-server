@@ -104,6 +104,8 @@ const getAllUser = (filters, paginationOptions) => __awaiter(void 0, void 0, voi
             address: true,
             dateOfBirth: true,
             userName: true,
+            isBusinessVerified: true,
+            badge: true,
             Currency: {
                 select: {
                     amount: true,

@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -27,6 +38,8 @@ const getProfile = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
     if (!result) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'user not found');
     }
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+    const { password } = result, output = __rest(result, ["password"]);
     const accessToken = jwtHelpers_1.jwtHelpers.createToken({ userId: result.id, role: result === null || result === void 0 ? void 0 : result.role }, config_1.default.jwt.secret, config_1.default.jwt.expires_in);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
@@ -34,7 +47,7 @@ const getProfile = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
         message: 'User fetched   successfully',
         data: {
             accessToken: accessToken,
-            user: result,
+            user: output,
         },
     });
 }));

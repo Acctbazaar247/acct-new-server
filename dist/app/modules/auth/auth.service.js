@@ -168,7 +168,9 @@ const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
         data: { failedLoginAttempt: 0 },
     });
     //create access token & refresh token
-    const { email, id, role, name } = isUserExist, others = __rest(isUserExist, ["email", "id", "role", "name"]);
+    const { email, id, role, name, 
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+    password: mainPassword } = isUserExist, others = __rest(isUserExist, ["email", "id", "role", "name", "password"]);
     const accessToken = jwtHelpers_1.jwtHelpers.createToken({ userId: id, role }, config_1.default.jwt.secret, config_1.default.jwt.expires_in);
     const refreshToken = jwtHelpers_1.jwtHelpers.createToken({ userId: id, role }, config_1.default.jwt.refresh_secret, config_1.default.jwt.refresh_expires_in);
     return {

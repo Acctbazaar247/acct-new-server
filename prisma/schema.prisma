@@ -17,6 +17,11 @@ enum UserRole {
   financeAdmin
 }
 
+enum EBadge {
+  blue
+  gold
+}
+
 model User {
   id                  String              @id @default(uuid())
   name                String
@@ -33,6 +38,8 @@ model User {
   isVerified          Boolean             @default(false)
   isApprovedForSeller Boolean             @default(false)
   isVerifiedByAdmin   Boolean?
+  isBusinessVerified  Boolean?            @default(false)
+  badge               EBadge?             @default(blue)
   isBlocked           Boolean?
   isPaidForSeller     Boolean?
   withdrawalPin       String?
@@ -415,7 +422,7 @@ model BusinessKyc {
   businessType         EBusinessType
   industry             String
   businessAddress      String
-  busniessWebsite      String?
+  businessWebsite      String?
 
   // contact
 

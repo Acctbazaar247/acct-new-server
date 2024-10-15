@@ -1,4 +1,10 @@
-import { BusinessKyc, EStatusOfKyc, Prisma, UserRole } from '@prisma/client';
+import {
+  BusinessKyc,
+  EBadge,
+  EStatusOfKyc,
+  Prisma,
+  UserRole,
+} from '@prisma/client';
 import httpStatus from 'http-status';
 import ApiError from '../../../errors/ApiError';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
@@ -171,7 +177,12 @@ const updateBusinessKyc = async (
     const result = await prisma.$transaction(async tx => {
       await tx.user.update({
         where: { id: isKycExits.ownById },
-        data: { isVerifiedByAdmin: true, userName: isKycExits.businessName },
+        data: {
+          isVerifiedByAdmin: true,
+          isBusinessVerified: true,
+          badge: EBadge.blue,
+          userName: isKycExits.businessName,
+        },
       });
       const updatedKyc = await tx.businessKyc.update({
         where: { id },

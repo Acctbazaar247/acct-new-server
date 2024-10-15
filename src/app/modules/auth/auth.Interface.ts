@@ -12,7 +12,7 @@ export type ILogin = {
 };
 export type ILoginResponse = {
   accessToken: string;
-  user: Omit<User, 'password'>;
+  user: Omit<User, 'password' | 'withdrawalPin'>;
   refreshToken?: string;
   otp?: number;
 };
