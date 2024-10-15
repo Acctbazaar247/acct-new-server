@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const account_router_1 = require("../modules/account/account.router");
 const auth_route_1 = require("../modules/auth/auth.route");
+const businessKyc_router_1 = require("../modules/businessKyc/businessKyc.router");
 const cart_router_1 = require("../modules/cart/cart.router");
 const currency_router_1 = require("../modules/currency/currency.router");
 const currencyRequest_router_1 = require("../modules/currencyRequest/currencyRequest.router");
@@ -79,6 +80,10 @@ const moduleRoutes = [
     {
         path: '/kyc',
         route: kyc_router_1.KycRoutes,
+    },
+    {
+        path: '/business-kyc',
+        route: businessKyc_router_1.BusinessKycRoutes,
     },
     {
         path: '/referral',

@@ -1,6 +1,7 @@
 import express from 'express';
 import { AccountRoutes } from '../modules/account/account.router';
 import { AuthRoutes } from '../modules/auth/auth.route';
+import { BusinessKycRoutes } from '../modules/businessKyc/businessKyc.router';
 import { CartRoutes } from '../modules/cart/cart.router';
 import { CurrencyRoutes } from '../modules/currency/currency.router';
 import { CurrencyRequestRoutes } from '../modules/currencyRequest/currencyRequest.router';
@@ -77,6 +78,10 @@ const moduleRoutes = [
   {
     path: '/kyc',
     route: KycRoutes,
+  },
+  {
+    path: '/business-kyc',
+    route: BusinessKycRoutes,
   },
   {
     path: '/referral',

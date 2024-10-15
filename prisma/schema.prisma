@@ -60,6 +60,7 @@ model User {
   Review              Review[]            @relation(name: "Review_By")
   ReviewSeller        Review[]            @relation(name: "Review_Seller_Info")
   ReviewReply         ReviewReply[]
+  BusinessKyc         BusinessKyc?
 }
 
 enum EPayWith {
@@ -197,56 +198,6 @@ enum accountCategory {
   Delivery
   // Other types of accounts
   Other
-  //previous
-  //   // social
-  //   Facebook
-  //   Twitter
-  //   Instagram
-  //   LinkedIn
-  //   Pinterest
-  //   Snapchat
-  //   TikTok
-  //   YouTube
-  //   GoogleVoice
-  //   Threads
-  //   Telegram
-  //   Whatsapp
-  //   Tinder
-  //   Bumble
-  //   Reddit
-  //   Discord
-  // // gaming
-  //   Playstation
-  //   CallOfDuty
-  //   Pubg
-  //   Steam
-  //   Gta
-  //   Fortnite
-  //   Epic
-  //   // gmail and messing
-  //   Gmail
-  //   Ymail
-  //   Hotmail
-  //   MailRu
-  //   Outlook
-  //   Windscribe
-  //   Nord
-  //   Vpn911
-  //   Other
-  //   Netflix
-  //   Apple
-  //   TrustWallet
-  //   AmazonPrimeVideos
-  //   // gift cards
-  //   AmazonGiftCard
-  //   AmexGiftCard
-  //   EbayGiftCard
-  //   GooglePlayGiftCard
-  //   NikeGiftCard
-  //   NordStromGiftCard
-  //   PlaystationGiftCard
-  //   SephoraGiftCard
-  //   SteamGiftCard
 }
 
 enum accountType {
@@ -437,6 +388,71 @@ enum EStatusOfKyc {
   pending
   approved
   denied
+}
+
+enum EStatusOfBusinessKyc {
+  pending
+  approved
+  denied
+}
+
+enum EBusinessType {
+  soleProprietorship
+  partnership
+  corporation
+  llc
+  others
+}
+
+// new updated content!
+model BusinessKyc {
+  id      String @id @unique @default(uuid())
+  ownById String @unique
+  ownBy   User   @relation(fields: [ownById], references: [id], onDelete: Cascade)
+
+  businessName         String
+  businessRegistration String
+  businessType         EBusinessType
+  industry             String
+  businessAddress      String
+  busniessWebsite      String?
+
+  // contact
+
+  primaryContactPerson String
+  positionOrTitle      String
+  emailAddress         String
+  phoneNumber          String
+
+  // ownership information
+  beneficialOwner         singleBeneficialOwners[]
+  // financil infor mation
+  bankAccountNumber       String
+  bankName                String
+  taxIdentificationNumber String
+
+  // document
+
+  businessRegistrationDocument String
+  CertificateOfIncorporation   String
+  proofOfAddress               String
+  financialStatements          String?
+
+  status    EStatusOfKyc @default(pending)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+model singleBeneficialOwners {
+  id            String @id @unique @default(uuid())
+  fullName      String
+  businessKycId String
+
+  ownershipPercentage    String
+  address                String
+  dateOfBirth            DateTime
+  identificationDocument String
+  BusinessKyc            BusinessKyc @relation(fields: [businessKycId], references: [id])
 }
 
 model Plan {
