@@ -28,6 +28,7 @@ const client_1 = require("@prisma/client");
 const http_status_1 = __importDefault(require("http-status"));
 const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const paginationHelper_1 = require("../../../helpers/paginationHelper");
+const GenericEmailTemplates_1 = __importDefault(require("../../../shared/GenericEmailTemplates"));
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
 const businessKyc_constant_1 = require("./businessKyc.constant");
 const getAllBusinessKyc = (filters, paginationOptions) => __awaiter(void 0, void 0, void 0, function* () {
@@ -141,7 +142,12 @@ const updateBusinessKyc = (id, payload, requestedUserId) => __awaiter(void 0, vo
     }
     const isKycExits = yield prisma_1.default.businessKyc.findUnique({
         where: { id },
-        select: { id: true, ownById: true, businessName: true },
+        select: {
+            id: true,
+            ownById: true,
+            businessName: true,
+            ownBy: { select: { name: true, email: true } },
+        },
     });
     if (!isKycExits) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Kyc not found!');
@@ -176,7 +182,25 @@ const updateBusinessKyc = (id, payload, requestedUserId) => __awaiter(void 0, vo
             });
             return updatedKyc;
         }));
+        (0, GenericEmailTemplates_1.default)({
+            subject: `KYC Verification Approved`,
+            title: `Hey ${isKycExits.ownBy.name}`,
+            email: isKycExits.ownBy.email,
+            description: `
+       Congratulations! Your Business KYC verification has been approved.
+        `,
+        });
         return result;
+    }
+    if (byAdmin && payload.status === client_1.EStatusOfKyc.denied) {
+        (0, GenericEmailTemplates_1.default)({
+            subject: `KYC Verification Denied`,
+            title: `Hey ${isKycExits.ownBy.name}`,
+            email: isKycExits.ownBy.email,
+            description: `
+       We regret to inform you that your KYC verification has been denied. Please review the submission requirements and try again.
+        `,
+        });
     }
     // if (statusIsApprove) {
     //   throw new ApiError(httpStatus.BAD_REQUEST, 'You cannot update status');

@@ -10,6 +10,7 @@ import ApiError from '../../../errors/ApiError';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
+import genericEmailTemplate from '../../../shared/GenericEmailTemplates';
 import prisma from '../../../shared/prisma';
 import { businessKycSearchableFields } from './businessKyc.constant';
 import { IBusinessKycFilters } from './businessKyc.interface';
@@ -149,7 +150,12 @@ const updateBusinessKyc = async (
   }
   const isKycExits = await prisma.businessKyc.findUnique({
     where: { id },
-    select: { id: true, ownById: true, businessName: true },
+    select: {
+      id: true,
+      ownById: true,
+      businessName: true,
+      ownBy: { select: { name: true, email: true } },
+    },
   });
   if (!isKycExits) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Kyc not found!');
@@ -190,7 +196,25 @@ const updateBusinessKyc = async (
       });
       return updatedKyc;
     });
+    genericEmailTemplate({
+      subject: `KYC Verification Approved`,
+      title: `Hey ${isKycExits.ownBy.name}`,
+      email: isKycExits.ownBy.email,
+      description: `
+       Congratulations! Your Business KYC verification has been approved.
+        `,
+    });
     return result;
+  }
+  if (byAdmin && payload.status === EStatusOfKyc.denied) {
+    genericEmailTemplate({
+      subject: `KYC Verification Denied`,
+      title: `Hey ${isKycExits.ownBy.name}`,
+      email: isKycExits.ownBy.email,
+      description: `
+       We regret to inform you that your KYC verification has been denied. Please review the submission requirements and try again.
+        `,
+    });
   }
   // if (statusIsApprove) {
   //   throw new ApiError(httpStatus.BAD_REQUEST, 'You cannot update status');
