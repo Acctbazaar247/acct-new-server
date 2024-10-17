@@ -106,6 +106,7 @@ const getAllUser = (filters, paginationOptions) => __awaiter(void 0, void 0, voi
             userName: true,
             isBusinessVerified: true,
             badge: true,
+            badgeTitle: true,
             Currency: {
                 select: {
                     amount: true,
@@ -172,6 +173,13 @@ const updateUser = (id, payload, requestedUser) => __awaiter(void 0, void 0, voi
     }
     if (isUserExist.role !== client_1.UserRole.superAdmin &&
         isUserExist.role !== client_1.UserRole.admin) {
+        // check if user is want to change badge
+        if (payload.badge ||
+            payload.badgeTitle ||
+            payload.isVerifiedByAdmin ||
+            payload.isBusinessVerified) {
+            throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'only admin(ccAdmin,financeAdmin) can update user badge, badgeTitle, isVerifiedByAdmin, isBusinessVerified');
+        }
         if (isUserExist.id === requestedUser.userId) {
             if (payload.name) {
                 (0, checkUserUpdateTime_1.default)(isUserExist.updatedAt);

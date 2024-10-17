@@ -112,6 +112,7 @@ const getAllUser = async (
       userName: true,
       isBusinessVerified: true,
       badge: true,
+      badgeTitle: true,
       Currency: {
         select: {
           amount: true,
@@ -200,6 +201,19 @@ const updateUser = async (
     isUserExist.role !== UserRole.superAdmin &&
     isUserExist.role !== UserRole.admin
   ) {
+    // check if user is want to change badge
+    if (
+      payload.badge ||
+      payload.badgeTitle ||
+      payload.isVerifiedByAdmin ||
+      payload.isBusinessVerified
+    ) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        'only admin(ccAdmin,financeAdmin) can update user badge, badgeTitle, isVerifiedByAdmin, isBusinessVerified'
+      );
+    }
+
     if (isUserExist.id === requestedUser.userId) {
       if (payload.name) {
         checkUserUpdateTime(isUserExist.updatedAt);

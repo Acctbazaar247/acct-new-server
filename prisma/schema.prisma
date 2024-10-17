@@ -20,6 +20,13 @@ enum UserRole {
 enum EBadge {
   blue
   gold
+  noBadge
+}
+
+enum EBadgeTitle {
+  verifiedMerchant
+  verifiedBusiness
+  noBadgeTitle
 }
 
 model User {
@@ -39,7 +46,8 @@ model User {
   isApprovedForSeller Boolean             @default(false)
   isVerifiedByAdmin   Boolean?
   isBusinessVerified  Boolean?            @default(false)
-  badge               EBadge?             @default(blue)
+  badge               EBadge?
+  badgeTitle          EBadgeTitle?
   isBlocked           Boolean?
   isPaidForSeller     Boolean?
   withdrawalPin       String?
