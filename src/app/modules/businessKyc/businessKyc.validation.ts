@@ -4,7 +4,6 @@ const EStatusOfKyc = z.enum(['pending', 'approved', 'denied']);
 
 // Beneficial owner schema
 const singleBeneficialOwnersSchema = z.object({
-  id: z.string().uuid(),
   fullName: z.string().min(1),
   businessKycId: z.string().uuid(),
   ownershipPercentage: z

@@ -6,7 +6,6 @@ const zod_1 = require("zod");
 const EStatusOfKyc = zod_1.z.enum(['pending', 'approved', 'denied']);
 // Beneficial owner schema
 const singleBeneficialOwnersSchema = zod_1.z.object({
-    id: zod_1.z.string().uuid(),
     fullName: zod_1.z.string().min(1),
     businessKycId: zod_1.z.string().uuid(),
     ownershipPercentage: zod_1.z
