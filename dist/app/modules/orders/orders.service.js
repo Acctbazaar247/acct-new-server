@@ -33,6 +33,7 @@ const paginationHelper_1 = require("../../../helpers/paginationHelper");
 const sendEmail_1 = __importDefault(require("../../../helpers/sendEmail"));
 const sendNotification_1 = __importDefault(require("../../../helpers/sendNotification"));
 const EmailTemplates_1 = __importDefault(require("../../../shared/EmailTemplates"));
+const GenericEmailTemplates_1 = __importDefault(require("../../../shared/GenericEmailTemplates"));
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
 const orders_constant_1 = require("./orders.constant");
 const getAllOrders = (filters, paginationOptions) => __awaiter(void 0, void 0, void 0, function* () {
@@ -168,6 +169,7 @@ const createOrders = (payload) => __awaiter(void 0, void 0, void 0, function* ()
         where: { id: isAccountExits.ownById },
         select: {
             id: true,
+            name: true,
             email: true,
             role: true,
             isBlocked: true,
@@ -281,29 +283,42 @@ const createOrders = (payload) => __awaiter(void 0, void 0, void 0, function* ()
         }
         return newOrders;
     }));
-    yield (0, sendEmail_1.default)({ to: isUserExist.email }, {
-        subject: EmailTemplates_1.default.orderSuccessful.subject,
-        html: EmailTemplates_1.default.orderSuccessful.html({
-            accountName: isAccountExits.name,
-            accountPassword: isAccountExits.password,
-            accountUserName: isAccountExits.username,
-        }),
-    });
-    yield prisma_1.default.cart.deleteMany({
-        where: {
-            AND: [
-                { accountId: isAccountExits.id },
-                { ownById: isUserExist.id },
-                // Add more conditions if needed
-            ],
-        },
-    });
-    yield (0, sendNotification_1.default)({
-        title: 'Order Completed',
-        message: `You order for "${isAccountExits.name}" is Completed `,
-        ownById: payload.orderById,
-        link: `/order`,
-    });
+    try {
+        (0, sendEmail_1.default)({ to: isUserExist.email }, {
+            subject: EmailTemplates_1.default.orderSuccessful.subject,
+            html: EmailTemplates_1.default.orderSuccessful.html({
+                accountName: isAccountExits.name,
+                accountPassword: isAccountExits.password,
+                accountUserName: isAccountExits.username,
+            }),
+        });
+        (0, GenericEmailTemplates_1.default)({
+            subject: `You've Made a Sale!`,
+            title: `Hey ${isSellerExist.name}`,
+            email: isSellerExist.email,
+            description: `
+        Congratulations! You’ve made a new sale. Check your dashboard for more details about the order.
+        `,
+        });
+        yield prisma_1.default.cart.deleteMany({
+            where: {
+                AND: [
+                    { accountId: isAccountExits.id },
+                    { ownById: isUserExist.id },
+                    // Add more conditions if needed
+                ],
+            },
+        });
+        yield (0, sendNotification_1.default)({
+            title: 'Order Completed',
+            message: `You order for "${isAccountExits.name}" is Completed `,
+            ownById: payload.orderById,
+            link: `/order`,
+        });
+    }
+    catch (error) {
+        console.error('Error sending email or notification', error);
+    }
     return data;
 });
 const getSingleOrders = (id, requestedUer) => __awaiter(void 0, void 0, void 0, function* () {
@@ -384,6 +399,8 @@ const updateOrders = (id, payload) => __awaiter(void 0, void 0, void 0, function
             orderBy: {
                 select: {
                     id: true,
+                    name: true,
+                    email: true,
                 },
             },
             account: {
@@ -393,6 +410,8 @@ const updateOrders = (id, payload) => __awaiter(void 0, void 0, void 0, function
                     ownBy: {
                         select: {
                             id: true,
+                            name: true,
+                            email: true,
                         },
                     },
                 },
@@ -448,6 +467,22 @@ const updateOrders = (id, payload) => __awaiter(void 0, void 0, void 0, function
                 data: payload,
             });
         }));
+        (0, GenericEmailTemplates_1.default)({
+            subject: `Order Canceled`,
+            title: `Hey ${isOrderExits.orderBy.name}`,
+            email: isOrderExits.orderBy.email,
+            description: `
+       Your order has been canceled. If you have any questions or need further assistance, please contact support.
+        `,
+        });
+        (0, GenericEmailTemplates_1.default)({
+            subject: `Order Canceled`,
+            title: `Hey ${isOrderExits.account.ownBy.name}`,
+            email: isOrderExits.account.ownBy.email,
+            description: `
+       Your order has been canceled. If you have any questions or need further assistance, please contact support.
+        `,
+        });
         return outPut;
     }
     const result = yield prisma_1.default.orders.update({

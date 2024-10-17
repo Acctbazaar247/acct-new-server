@@ -18,6 +18,7 @@ import sendEmail from '../../../helpers/sendEmail';
 import { EPaymentType } from '../../../interfaces/common';
 import EmailTemplates from '../../../shared/EmailTemplates';
 import { checkTimeOfOTP, generateOtp } from '../../../shared/generateOTP';
+import genericEmailTemplate from '../../../shared/GenericEmailTemplates';
 import prisma from '../../../shared/prisma';
 import { UserService } from '../user/user.service';
 import {
@@ -691,7 +692,14 @@ const changePassword = async ({
     config.jwt.refresh_secret as Secret,
     config.jwt.refresh_expires_in as string
   );
-
+  genericEmailTemplate({
+    subject: `Password Change Confirmation`,
+    title: `Hey ${isUserExist.name}`,
+    email: isUserExist.email,
+    description: `
+     Your password has been successfully changed. If this was not you, please contact support immediately.
+      `,
+  });
   return {
     user: result,
     accessToken,

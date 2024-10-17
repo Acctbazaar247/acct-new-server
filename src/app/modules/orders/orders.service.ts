@@ -16,6 +16,7 @@ import sendNotification from '../../../helpers/sendNotification';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
 import EmailTemplates from '../../../shared/EmailTemplates';
+import genericEmailTemplate from '../../../shared/GenericEmailTemplates';
 import prisma from '../../../shared/prisma';
 import { ordersSearchableFields } from './orders.constant';
 import { IOrdersFilters } from './orders.interface';
@@ -171,6 +172,7 @@ const createOrders = async (payload: Orders): Promise<Orders | null> => {
     where: { id: isAccountExits.ownById },
     select: {
       id: true,
+      name: true,
       email: true,
       role: true,
       isBlocked: true,
@@ -313,32 +315,44 @@ const createOrders = async (payload: Orders): Promise<Orders | null> => {
     }
     return newOrders;
   });
-  await sendEmail(
-    { to: isUserExist.email },
-    {
-      subject: EmailTemplates.orderSuccessful.subject,
-      html: EmailTemplates.orderSuccessful.html({
-        accountName: isAccountExits.name,
-        accountPassword: isAccountExits.password,
-        accountUserName: isAccountExits.username,
-      }),
-    }
-  );
-  await prisma.cart.deleteMany({
-    where: {
-      AND: [
-        { accountId: isAccountExits.id },
-        { ownById: isUserExist.id },
-        // Add more conditions if needed
-      ],
-    },
-  });
-  await sendNotification({
-    title: 'Order Completed',
-    message: `You order for "${isAccountExits.name}" is Completed `,
-    ownById: payload.orderById,
-    link: `/order`,
-  });
+  try {
+    sendEmail(
+      { to: isUserExist.email },
+      {
+        subject: EmailTemplates.orderSuccessful.subject,
+        html: EmailTemplates.orderSuccessful.html({
+          accountName: isAccountExits.name,
+          accountPassword: isAccountExits.password,
+          accountUserName: isAccountExits.username,
+        }),
+      }
+    );
+    genericEmailTemplate({
+      subject: `You've Made a Sale!`,
+      title: `Hey ${isSellerExist.name}`,
+      email: isSellerExist.email,
+      description: `
+        Congratulations! You’ve made a new sale. Check your dashboard for more details about the order.
+        `,
+    });
+    await prisma.cart.deleteMany({
+      where: {
+        AND: [
+          { accountId: isAccountExits.id },
+          { ownById: isUserExist.id },
+          // Add more conditions if needed
+        ],
+      },
+    });
+    await sendNotification({
+      title: 'Order Completed',
+      message: `You order for "${isAccountExits.name}" is Completed `,
+      ownById: payload.orderById,
+      link: `/order`,
+    });
+  } catch (error) {
+    console.error('Error sending email or notification', error);
+  }
   return data;
 };
 
@@ -433,6 +447,8 @@ const updateOrders = async (
       orderBy: {
         select: {
           id: true,
+          name: true,
+          email: true,
         },
       },
       account: {
@@ -442,6 +458,8 @@ const updateOrders = async (
           ownBy: {
             select: {
               id: true,
+              name: true,
+              email: true,
             },
           },
         },
@@ -509,6 +527,22 @@ const updateOrders = async (
         },
         data: payload,
       });
+    });
+    genericEmailTemplate({
+      subject: `Order Canceled`,
+      title: `Hey ${isOrderExits.orderBy.name}`,
+      email: isOrderExits.orderBy.email,
+      description: `
+       Your order has been canceled. If you have any questions or need further assistance, please contact support.
+        `,
+    });
+    genericEmailTemplate({
+      subject: `Order Canceled`,
+      title: `Hey ${isOrderExits.account.ownBy.name}`,
+      email: isOrderExits.account.ownBy.email,
+      description: `
+       Your order has been canceled. If you have any questions or need further assistance, please contact support.
+        `,
     });
     return outPut;
   }

@@ -5,6 +5,7 @@ import ApiError from '../../../errors/ApiError';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
+import genericEmailTemplate from '../../../shared/GenericEmailTemplates';
 import prisma from '../../../shared/prisma';
 import { planSearchableFields } from './plan.constant';
 import { IBasicPlan, IPlanFilters, IPlanUploadCount } from './plan.interface';
@@ -130,6 +131,7 @@ const createPlan = async (
   // check wallet of user
   const isCurrencyExits = await prisma.currency.findUnique({
     where: { ownById: userId },
+    include: { ownBy: { select: { name: true, email: true } } },
   });
 
   if (!isCurrencyExits) {
@@ -218,6 +220,14 @@ const createPlan = async (
       },
     });
     return result;
+  });
+  genericEmailTemplate({
+    subject: `Your Plan Has Been Upgraded`,
+    title: `Hey ${isCurrencyExits.ownBy.name}`,
+    email: isCurrencyExits.ownBy.email,
+    description: `
+     Your subscription plan has been upgraded. Enjoy the new features and benefits that come with your upgraded plan.
+      `,
   });
   return newPlan;
 };

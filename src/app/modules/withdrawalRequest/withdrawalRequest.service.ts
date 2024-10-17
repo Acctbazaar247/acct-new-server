@@ -12,6 +12,7 @@ import ApiError from '../../../errors/ApiError';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
+import genericEmailTemplate from '../../../shared/GenericEmailTemplates';
 import prisma from '../../../shared/prisma';
 import { withdrawalRequestSearchableFields } from './withdrawalRequest.constant';
 import { IWithdrawalRequestFilters } from './withdrawalRequest.interface';
@@ -179,6 +180,13 @@ const createWithdrawalRequest = async (
         data: { ...payload, status: EStatusOfWithdrawalRequest.pending },
       });
     });
+    genericEmailTemplate({
+      subject: 'Withdrawal Request Submitted',
+      title: `Hey ${isUserExist.name}`,
+      email: isUserExist.email,
+      description:
+        'We have received your withdrawal request. It is currently being processed and will be completed soon.',
+    });
     // make a transaction for auto withdraw
     if (newWithdrawalRequest.bankName && newWithdrawalRequest.accountNumber) {
       await initiateWithdrawal({
@@ -221,6 +229,7 @@ const updateWithdrawalRequest = async (
 ): Promise<WithdrawalRequest | null> => {
   const isWithdrawalRequestExits = await prisma.withdrawalRequest.findFirst({
     where: { id },
+    include: { ownBy: { select: { email: true, name: true } } },
   });
   if (!isWithdrawalRequestExits) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Not found!');
@@ -246,7 +255,7 @@ const updateWithdrawalRequest = async (
   // if update to approved
   if (payload.status === EStatusOfWithdrawalRequest.approved) {
     // now update admin currency only and withdrawal request to updated'
-    return await prisma.$transaction(async tx => {
+    const output = await prisma.$transaction(async tx => {
       const isAdminExits = await tx.user.findFirst({
         where: { email: config.mainAdminEmail },
         include: { Currency: true },
@@ -283,6 +292,14 @@ const updateWithdrawalRequest = async (
         data: payload,
       });
     });
+    genericEmailTemplate({
+      subject: 'Your Withdrawal Was Successful',
+      title: `Hey ${isWithdrawalRequestExits.ownBy.name}`,
+      email: isWithdrawalRequestExits.ownBy.email,
+      description:
+        'Your withdrawal request has been successfully processed. The funds should appear in your account shortly.',
+    });
+    return output;
   } else if (payload.status === EStatusOfWithdrawalRequest.denied) {
     // if update to denied
     // get back money

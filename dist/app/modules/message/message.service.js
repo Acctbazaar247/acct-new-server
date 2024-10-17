@@ -27,7 +27,9 @@ exports.MessageService = void 0;
 const http_status_1 = __importDefault(require("http-status"));
 const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const paginationHelper_1 = require("../../../helpers/paginationHelper");
+const sendEmail_1 = __importDefault(require("../../../helpers/sendEmail"));
 const sendNotification_1 = __importDefault(require("../../../helpers/sendNotification"));
+const EmailTemplates_1 = __importDefault(require("../../../shared/EmailTemplates"));
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
 const currentTime_1 = __importDefault(require("../../../utils/currentTime"));
 const message_constant_1 = require("./message.constant");
@@ -189,25 +191,20 @@ const createMessage = (payload) => __awaiter(void 0, void 0, void 0, function* (
         ownById,
         link: `/order-details/${isOrderExits.id}`,
     });
-    // const senderInfo =
-    //   payload.sendById === isOrderExits.orderById
-    //     ? isOrderExits.orderBy
-    //     : isOrderExits.account.ownBy;
-    // const recInfo =
-    //   payload.sendById !== isOrderExits.orderById
-    //     ? isOrderExits.orderBy
-    //     : isOrderExits.account.ownBy;
-    //sent email
-    // sendEmail(
-    //   { to: recInfo.email },
-    //   {
-    //     html: EmailTemplates.sendAMessage.html({
-    //       from: senderInfo.name,
-    //       productName: isOrderExits.account.name,
-    //     }),
-    //     subject: EmailTemplates.sendAMessage.subject,
-    //   }
-    // );
+    const senderInfo = payload.sendById === isOrderExits.orderById
+        ? isOrderExits.orderBy
+        : isOrderExits.account.ownBy;
+    const recInfo = payload.sendById !== isOrderExits.orderById
+        ? isOrderExits.orderBy
+        : isOrderExits.account.ownBy;
+    // sent email
+    (0, sendEmail_1.default)({ to: recInfo.email }, {
+        html: EmailTemplates_1.default.sendAMessage.html({
+            from: senderInfo.name,
+            productName: isOrderExits.account.name,
+        }),
+        subject: EmailTemplates_1.default.sendAMessage.subject,
+    });
     return newMessage;
 });
 const getSingleMessage = (id) => __awaiter(void 0, void 0, void 0, function* () {

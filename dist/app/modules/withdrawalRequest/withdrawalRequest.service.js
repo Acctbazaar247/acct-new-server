@@ -31,6 +31,7 @@ const lodash_1 = require("lodash");
 const config_1 = __importDefault(require("../../../config"));
 const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const paginationHelper_1 = require("../../../helpers/paginationHelper");
+const GenericEmailTemplates_1 = __importDefault(require("../../../shared/GenericEmailTemplates"));
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
 const withdrawalRequest_constant_1 = require("./withdrawalRequest.constant");
 const withdrawalRequest_utils_1 = require("./withdrawalRequest.utils");
@@ -160,6 +161,12 @@ const createWithdrawalRequest = (payload, requestBy, withdrawalPin) => __awaiter
                 data: Object.assign(Object.assign({}, payload), { status: client_1.EStatusOfWithdrawalRequest.pending }),
             });
         }));
+        (0, GenericEmailTemplates_1.default)({
+            subject: 'Withdrawal Request Submitted',
+            title: `Hey ${isUserExist.name}`,
+            email: isUserExist.email,
+            description: 'We have received your withdrawal request. It is currently being processed and will be completed soon.',
+        });
         // make a transaction for auto withdraw
         if (newWithdrawalRequest.bankName && newWithdrawalRequest.accountNumber) {
             yield (0, withdrawalRequest_utils_1.initiateWithdrawal)({
@@ -192,6 +199,7 @@ const getSingleUserWithdrawalRequest = (id) => __awaiter(void 0, void 0, void 0,
 const updateWithdrawalRequest = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
     const isWithdrawalRequestExits = yield prisma_1.default.withdrawalRequest.findFirst({
         where: { id },
+        include: { ownBy: { select: { email: true, name: true } } },
     });
     if (!isWithdrawalRequestExits) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Not found!');
@@ -208,7 +216,7 @@ const updateWithdrawalRequest = (id, payload) => __awaiter(void 0, void 0, void 
     // if update to approved
     if (payload.status === client_1.EStatusOfWithdrawalRequest.approved) {
         // now update admin currency only and withdrawal request to updated'
-        return yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        const output = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
             const isAdminExits = yield tx.user.findFirst({
                 where: { email: config_1.default.mainAdminEmail },
                 include: { Currency: true },
@@ -236,6 +244,13 @@ const updateWithdrawalRequest = (id, payload) => __awaiter(void 0, void 0, void 
                 data: payload,
             });
         }));
+        (0, GenericEmailTemplates_1.default)({
+            subject: 'Your Withdrawal Was Successful',
+            title: `Hey ${isWithdrawalRequestExits.ownBy.name}`,
+            email: isWithdrawalRequestExits.ownBy.email,
+            description: 'Your withdrawal request has been successfully processed. The funds should appear in your account shortly.',
+        });
+        return output;
     }
     else if (payload.status === client_1.EStatusOfWithdrawalRequest.denied) {
         // if update to denied

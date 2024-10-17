@@ -36,6 +36,7 @@ const nowPaymentChecker_1 = __importDefault(require("../../../helpers/nowPayment
 const paginationHelper_1 = require("../../../helpers/paginationHelper");
 const sendEmail_1 = __importDefault(require("../../../helpers/sendEmail"));
 const EmailTemplates_1 = __importDefault(require("../../../shared/EmailTemplates"));
+const GenericEmailTemplates_1 = __importDefault(require("../../../shared/GenericEmailTemplates"));
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
 const user_constant_1 = require("./user.constant");
 const getAllUser = (filters, paginationOptions) => __awaiter(void 0, void 0, void 0, function* () {
@@ -200,7 +201,27 @@ const updateUser = (id, payload, requestedUser) => __awaiter(void 0, void 0, voi
             html: EmailTemplates_1.default.sellerRequestAccepted.html(),
         });
     }
-    console.log(payload);
+    // check is account active or deactivated
+    if (payload.isBlocked === true) {
+        (0, GenericEmailTemplates_1.default)({
+            subject: `Your Account Has Been Blocked`,
+            title: `Hey ${isUserExist.name}`,
+            email: isUserExist.email,
+            description: `
+       Your account has been blocked due to suspicious activity. Please contact support to resolve the issue.
+        `,
+        });
+    }
+    if (payload.isBlocked === false) {
+        (0, GenericEmailTemplates_1.default)({
+            subject: `Your Account Has Been Re-Activated`,
+            title: `Hey ${isUserExist.name}`,
+            email: isUserExist.email,
+            description: `
+       Your account has been activated! You can now log in and access all services.
+        `,
+        });
+    }
     return result;
 });
 const deleteUser = (id) => __awaiter(void 0, void 0, void 0, function* () {

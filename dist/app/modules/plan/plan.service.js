@@ -52,6 +52,7 @@ const http_status_1 = __importDefault(require("http-status"));
 const config_1 = __importDefault(require("../../../config"));
 const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const paginationHelper_1 = require("../../../helpers/paginationHelper");
+const GenericEmailTemplates_1 = __importDefault(require("../../../shared/GenericEmailTemplates"));
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
 const plan_constant_1 = require("./plan.constant");
 const plan_utils_1 = __importStar(require("./plan.utils"));
@@ -152,6 +153,7 @@ const createPlan = (payload, userId) => __awaiter(void 0, void 0, void 0, functi
     // check wallet of user
     const isCurrencyExits = yield prisma_1.default.currency.findUnique({
         where: { ownById: userId },
+        include: { ownBy: { select: { name: true, email: true } } },
     });
     if (!isCurrencyExits) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'User wallet not found');
@@ -223,6 +225,14 @@ const createPlan = (payload, userId) => __awaiter(void 0, void 0, void 0, functi
         });
         return result;
     }));
+    (0, GenericEmailTemplates_1.default)({
+        subject: `Your Plan Has Been Upgraded`,
+        title: `Hey ${isCurrencyExits.ownBy.name}`,
+        email: isCurrencyExits.ownBy.email,
+        description: `
+     Your subscription plan has been upgraded. Enjoy the new features and benefits that come with your upgraded plan.
+      `,
+    });
     return newPlan;
 });
 const getSinglePlan = (id) => __awaiter(void 0, void 0, void 0, function* () {

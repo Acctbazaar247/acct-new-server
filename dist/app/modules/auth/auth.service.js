@@ -37,6 +37,7 @@ const sendEmail_1 = __importDefault(require("../../../helpers/sendEmail"));
 const common_1 = require("../../../interfaces/common");
 const EmailTemplates_1 = __importDefault(require("../../../shared/EmailTemplates"));
 const generateOTP_1 = require("../../../shared/generateOTP");
+const GenericEmailTemplates_1 = __importDefault(require("../../../shared/GenericEmailTemplates"));
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
 const user_service_1 = require("../user/user.service");
 const createUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
@@ -560,6 +561,14 @@ const changePassword = ({ password, email, prePassword, otp, }) => __awaiter(voi
     //create access token & refresh token
     const accessToken = jwtHelpers_1.jwtHelpers.createToken({ userId: isUserExist.id, role: isUserExist.role }, config_1.default.jwt.secret, config_1.default.jwt.expires_in);
     const refreshToken = jwtHelpers_1.jwtHelpers.createToken({ userId: isUserExist.id, role: isUserExist.role }, config_1.default.jwt.refresh_secret, config_1.default.jwt.refresh_expires_in);
+    (0, GenericEmailTemplates_1.default)({
+        subject: `Password Change Confirmation`,
+        title: `Hey ${isUserExist.name}`,
+        email: isUserExist.email,
+        description: `
+     Your password has been successfully changed. If this was not you, please contact support immediately.
+      `,
+    });
     return {
         user: result,
         accessToken,

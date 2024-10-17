@@ -24,6 +24,7 @@ import {
 } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
 import EmailTemplates from '../../../shared/EmailTemplates';
+import genericEmailTemplate from '../../../shared/GenericEmailTemplates';
 import prisma from '../../../shared/prisma';
 import { userSearchableFields } from './user.constant';
 import { IUserFilters, TSellerProfileInfo } from './user.interface';
@@ -238,7 +239,27 @@ const updateUser = async (
       }
     );
   }
-  console.log(payload);
+  // check is account active or deactivated
+  if (payload.isBlocked === true) {
+    genericEmailTemplate({
+      subject: `Your Account Has Been Blocked`,
+      title: `Hey ${isUserExist.name}`,
+      email: isUserExist.email,
+      description: `
+       Your account has been blocked due to suspicious activity. Please contact support to resolve the issue.
+        `,
+    });
+  }
+  if (payload.isBlocked === false) {
+    genericEmailTemplate({
+      subject: `Your Account Has Been Re-Activated`,
+      title: `Hey ${isUserExist.name}`,
+      email: isUserExist.email,
+      description: `
+       Your account has been activated! You can now log in and access all services.
+        `,
+    });
+  }
   return result;
 };
 

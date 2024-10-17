@@ -28,6 +28,7 @@ const client_1 = require("@prisma/client");
 const http_status_1 = __importDefault(require("http-status"));
 const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const paginationHelper_1 = require("../../../helpers/paginationHelper");
+const GenericEmailTemplates_1 = __importDefault(require("../../../shared/GenericEmailTemplates"));
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
 const kyc_constant_1 = require("./kyc.constant");
 const getAllKyc = (filters, paginationOptions) => __awaiter(void 0, void 0, void 0, function* () {
@@ -146,7 +147,13 @@ const updateKyc = (id, payload, requestedUserId) => __awaiter(void 0, void 0, vo
     }
     const isKycExits = yield prisma_1.default.kyc.findUnique({
         where: { id },
-        select: { id: true, ownById: true, userName: true, name: true },
+        select: {
+            id: true,
+            ownById: true,
+            userName: true,
+            name: true,
+            ownBy: { select: { email: true, name: true } },
+        },
     });
     if (!isKycExits) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Kyc not found!');
@@ -173,7 +180,25 @@ const updateKyc = (id, payload, requestedUserId) => __awaiter(void 0, void 0, vo
             const updatedKyc = yield tx.kyc.update({ where: { id }, data: payload });
             return updatedKyc;
         }));
+        (0, GenericEmailTemplates_1.default)({
+            subject: `KYC Verification Approved`,
+            title: `Hey ${isKycExits.ownBy.name}`,
+            email: isKycExits.ownBy.email,
+            description: `
+       Congratulations! Your KYC verification has been approved.
+        `,
+        });
         return result;
+    }
+    if (byAdmin && payload.status === client_1.EStatusOfKyc.denied) {
+        (0, GenericEmailTemplates_1.default)({
+            subject: `KYC Verification Denied`,
+            title: `Hey ${isKycExits.ownBy.name}`,
+            email: isKycExits.ownBy.email,
+            description: `
+       We regret to inform you that your KYC verification has been denied. Please review the submission requirements and try again.
+        `,
+        });
     }
     // if (statusIsApprove) {
     //   throw new ApiError(httpStatus.BAD_REQUEST, 'You cannot update status');
