@@ -7,7 +7,6 @@ const EStatusOfKyc = zod_1.z.enum(['pending', 'approved', 'denied']);
 // Beneficial owner schema
 const singleBeneficialOwnersSchema = zod_1.z.object({
     fullName: zod_1.z.string().min(1),
-    businessKycId: zod_1.z.string().uuid(),
     ownershipPercentage: zod_1.z
         .string()
         .regex(/^\d{1,3}%$/, 'Ownership percentage should be between 0% and 100%'),
