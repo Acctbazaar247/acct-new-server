@@ -7,9 +7,7 @@ const EStatusOfKyc = zod_1.z.enum(['pending', 'approved', 'denied']);
 // Beneficial owner schema
 const singleBeneficialOwnersSchema = zod_1.z.object({
     fullName: zod_1.z.string().min(1),
-    ownershipPercentage: zod_1.z
-        .string()
-        .regex(/^\d{1,3}%$/, 'Ownership percentage should be between 0% and 100%'),
+    ownershipPercentage: zod_1.z.string(),
     address: zod_1.z.string().min(1),
     dateOfBirth: zod_1.z.date(),
     identificationDocument: zod_1.z.string().min(1), // Assuming it's a file name or link
