@@ -36,10 +36,10 @@ const createValidation = zod_1.z.object({
         CertificateOfIncorporation: zod_1.z.string().min(1),
         proofOfAddress: zod_1.z.string().min(1),
         financialStatements: zod_1.z.string().optional().nullable(),
-        // Status and timestamps
-        status: zod_1.z
-            .enum(Object.keys(EStatusOfKyc))
-            .default('pending'),
+        // // Status and timestamps
+        // status: z
+        //   .enum(Object.keys(EStatusOfKyc) as [string, ...string[]])
+        //   .default('pending'),
     }),
 });
 const updateValidation = zod_1.z.object({

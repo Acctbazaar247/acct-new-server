@@ -467,7 +467,7 @@ model singleBeneficialOwners {
   address                String
   dateOfBirth            DateTime
   identificationDocument String
-  BusinessKyc            BusinessKyc @relation(fields: [businessKycId], references: [id])
+  BusinessKyc            BusinessKyc @relation(fields: [businessKycId], references: [id], onDelete: Cascade)
 }
 
 model Plan {

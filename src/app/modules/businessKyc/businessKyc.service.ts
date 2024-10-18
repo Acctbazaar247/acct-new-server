@@ -13,7 +13,7 @@ import { IPaginationOptions } from '../../../interfaces/pagination';
 import genericEmailTemplate from '../../../shared/GenericEmailTemplates';
 import prisma from '../../../shared/prisma';
 import { businessKycSearchableFields } from './businessKyc.constant';
-import { IBusinessKycFilters } from './businessKyc.interface';
+import { FullBusinessKyc, IBusinessKycFilters } from './businessKyc.interface';
 
 const getAllBusinessKyc = async (
   filters: IBusinessKycFilters,
@@ -97,7 +97,7 @@ const getAllBusinessKyc = async (
 };
 
 const createBusinessKyc = async (
-  payload: BusinessKyc
+  payload: FullBusinessKyc
 ): Promise<BusinessKyc | null> => {
   const isExits = await prisma.businessKyc.findUnique({
     where: { ownById: payload.ownById },
@@ -106,8 +106,25 @@ const createBusinessKyc = async (
   if (isExits) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Business Kyc Already exits');
   }
+  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+  // const {beneficialOwner,...rest}=payload
+  // const result= await prisma.$transaction(async (tx)=>{
+  //   const businessKyc= await tx.businessKyc.create({data:{}})
+  // })
+  // payload.beneficialOwner>>
+  const beneficialOwner = payload.beneficialOwner;
+  const data = {
+    ...payload,
+    beneficialOwner: {
+      create: beneficialOwner,
+    },
+  };
+
   const newKyc = await prisma.businessKyc.create({
-    data: payload,
+    data,
+    include: {
+      beneficialOwner: true,
+    },
   });
   return newKyc;
 };

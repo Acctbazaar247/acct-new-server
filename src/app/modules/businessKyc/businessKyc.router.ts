@@ -37,7 +37,7 @@ router.patch(
 );
 router.delete(
   '/:id',
-  auth(UserRole.admin, UserRole.superAdmin, UserRole.seller),
+  // auth(UserRole.admin, UserRole.superAdmin, UserRole.seller),
   BusinessKycController.deleteBusinessKyc
 );
 

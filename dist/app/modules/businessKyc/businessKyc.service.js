@@ -108,8 +108,21 @@ const createBusinessKyc = (payload) => __awaiter(void 0, void 0, void 0, functio
     if (isExits) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Business Kyc Already exits');
     }
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+    // const {beneficialOwner,...rest}=payload
+    // const result= await prisma.$transaction(async (tx)=>{
+    //   const businessKyc= await tx.businessKyc.create({data:{}})
+    // })
+    // payload.beneficialOwner>>
+    const beneficialOwner = payload.beneficialOwner;
+    const data = Object.assign(Object.assign({}, payload), { beneficialOwner: {
+            create: beneficialOwner,
+        } });
     const newKyc = yield prisma_1.default.businessKyc.create({
-        data: payload,
+        data,
+        include: {
+            beneficialOwner: true,
+        },
     });
     return newKyc;
 });

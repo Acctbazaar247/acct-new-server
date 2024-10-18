@@ -16,5 +16,7 @@ router.get('/single-user-business-kyc', (0, auth_1.default)(client_1.UserRole.se
 router.get('/:id', (0, auth_1.default)(client_1.UserRole.admin, client_1.UserRole.superAdmin, client_1.UserRole.seller), businessKyc_controller_1.BusinessKycController.getSingleBusinessKyc);
 router.post('/', (0, auth_1.default)(client_1.UserRole.seller), (0, validateRequest_1.default)(businessKyc_validation_1.KycValidation.createValidation), businessKyc_controller_1.BusinessKycController.createBusinessKyc);
 router.patch('/:id', (0, auth_1.default)(client_1.UserRole.seller, client_1.UserRole.admin, client_1.UserRole.superAdmin), (0, validateRequest_1.default)(businessKyc_validation_1.KycValidation.updateValidation), businessKyc_controller_1.BusinessKycController.updateBusinessKyc);
-router.delete('/:id', (0, auth_1.default)(client_1.UserRole.admin, client_1.UserRole.superAdmin, client_1.UserRole.seller), businessKyc_controller_1.BusinessKycController.deleteBusinessKyc);
+router.delete('/:id', 
+// auth(UserRole.admin, UserRole.superAdmin, UserRole.seller),
+businessKyc_controller_1.BusinessKycController.deleteBusinessKyc);
 exports.BusinessKycRoutes = router;
