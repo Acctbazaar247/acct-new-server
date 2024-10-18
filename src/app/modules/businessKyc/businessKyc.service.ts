@@ -86,6 +86,7 @@ const getAllBusinessKyc = async (
           phoneNumber: true,
         },
       },
+      beneficialOwner: true,
     },
   });
   const total = await prisma.businessKyc.count({ where: whereConditions });
@@ -136,6 +137,9 @@ const getSingleBusinessKyc = async (
     where: {
       id,
     },
+    include: {
+      beneficialOwner: true,
+    },
   });
   return result;
 };
@@ -145,6 +149,9 @@ const getSingleBusinessKycOfUser = async (
   const result = await prisma.businessKyc.findUnique({
     where: {
       ownById: id,
+    },
+    include: {
+      beneficialOwner: true,
     },
   });
   return result;

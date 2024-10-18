@@ -91,6 +91,7 @@ const getAllBusinessKyc = (filters, paginationOptions) => __awaiter(void 0, void
                     phoneNumber: true,
                 },
             },
+            beneficialOwner: true,
         },
     });
     const total = yield prisma_1.default.businessKyc.count({ where: whereConditions });
@@ -131,6 +132,9 @@ const getSingleBusinessKyc = (id) => __awaiter(void 0, void 0, void 0, function*
         where: {
             id,
         },
+        include: {
+            beneficialOwner: true,
+        },
     });
     return result;
 });
@@ -138,6 +142,9 @@ const getSingleBusinessKycOfUser = (id) => __awaiter(void 0, void 0, void 0, fun
     const result = yield prisma_1.default.businessKyc.findUnique({
         where: {
             ownById: id,
+        },
+        include: {
+            beneficialOwner: true,
         },
     });
     return result;
