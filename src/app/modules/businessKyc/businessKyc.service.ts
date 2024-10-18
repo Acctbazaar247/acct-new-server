@@ -84,6 +84,8 @@ const getAllBusinessKyc = async (
           email: true,
           profileImg: true,
           phoneNumber: true,
+          badge: true,
+          badgeTitle: true,
         },
       },
       beneficialOwner: true,
@@ -139,6 +141,17 @@ const getSingleBusinessKyc = async (
     },
     include: {
       beneficialOwner: true,
+      ownBy: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          profileImg: true,
+          phoneNumber: true,
+          badge: true,
+          badgeTitle: true,
+        },
+      },
     },
   });
   return result;
@@ -152,6 +165,17 @@ const getSingleBusinessKycOfUser = async (
     },
     include: {
       beneficialOwner: true,
+      ownBy: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          profileImg: true,
+          phoneNumber: true,
+          badge: true,
+          badgeTitle: true,
+        },
+      },
     },
   });
   return result;

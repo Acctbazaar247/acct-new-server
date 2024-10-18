@@ -89,6 +89,8 @@ const getAllBusinessKyc = (filters, paginationOptions) => __awaiter(void 0, void
                     email: true,
                     profileImg: true,
                     phoneNumber: true,
+                    badge: true,
+                    badgeTitle: true,
                 },
             },
             beneficialOwner: true,
@@ -134,6 +136,17 @@ const getSingleBusinessKyc = (id) => __awaiter(void 0, void 0, void 0, function*
         },
         include: {
             beneficialOwner: true,
+            ownBy: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    profileImg: true,
+                    phoneNumber: true,
+                    badge: true,
+                    badgeTitle: true,
+                },
+            },
         },
     });
     return result;
@@ -145,6 +158,17 @@ const getSingleBusinessKycOfUser = (id) => __awaiter(void 0, void 0, void 0, fun
         },
         include: {
             beneficialOwner: true,
+            ownBy: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    profileImg: true,
+                    phoneNumber: true,
+                    badge: true,
+                    badgeTitle: true,
+                },
+            },
         },
     });
     return result;
