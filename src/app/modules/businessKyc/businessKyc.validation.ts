@@ -7,7 +7,7 @@ const singleBeneficialOwnersSchema = z.object({
   fullName: z.string().min(1),
   ownershipPercentage: z.string(),
   address: z.string().min(1),
-  dateOfBirth: z.date(),
+  dateOfBirth: z.string(),
   identificationDocument: z.string().min(1), // Assuming it's a file name or link
 });
 const createValidation = z.object({
