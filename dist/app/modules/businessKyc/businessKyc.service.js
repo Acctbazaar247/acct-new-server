@@ -218,6 +218,23 @@ const updateBusinessKyc = (id, payload, requestedUserId) => __awaiter(void 0, vo
     // if (statusIsApprove) {
     //   throw new ApiError(httpStatus.BAD_REQUEST, 'You cannot update status');
     // }
+    if (payload.beneficialOwner) {
+        const result = prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+            // delete previous all <br />
+            yield tx.singleBeneficialOwners.deleteMany({
+                where: { businessKycId: payload.id },
+            });
+            return yield tx.businessKyc.update({
+                where: {
+                    id,
+                },
+                data: Object.assign(Object.assign({}, payload), { beneficialOwner: {
+                        create: payload.beneficialOwner,
+                    } }),
+            });
+        }));
+        return result;
+    }
     const result = yield prisma_1.default.businessKyc.update({
         where: {
             id,

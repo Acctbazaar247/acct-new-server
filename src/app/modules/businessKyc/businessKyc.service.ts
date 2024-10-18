@@ -152,7 +152,7 @@ const getSingleBusinessKycOfUser = async (
 
 const updateBusinessKyc = async (
   id: string,
-  payload: Partial<BusinessKyc>,
+  payload: Partial<FullBusinessKyc>,
   requestedUserId: string
 ): Promise<BusinessKyc | null> => {
   const requestedUser = await prisma.user.findUnique({
@@ -209,7 +209,7 @@ const updateBusinessKyc = async (
       });
       const updatedKyc = await tx.businessKyc.update({
         where: { id },
-        data: payload,
+        data: payload as BusinessKyc,
       });
       return updatedKyc;
     });
@@ -236,11 +236,32 @@ const updateBusinessKyc = async (
   // if (statusIsApprove) {
   //   throw new ApiError(httpStatus.BAD_REQUEST, 'You cannot update status');
   // }
+  if (payload.beneficialOwner) {
+    const result = prisma.$transaction(async tx => {
+      // delete previous all <br />
+      await tx.singleBeneficialOwners.deleteMany({
+        where: { businessKycId: payload.id },
+      });
+
+      return await tx.businessKyc.update({
+        where: {
+          id,
+        },
+        data: {
+          ...payload,
+          beneficialOwner: {
+            create: payload.beneficialOwner,
+          },
+        },
+      });
+    });
+    return result;
+  }
   const result = await prisma.businessKyc.update({
     where: {
       id,
     },
-    data: payload,
+    data: payload as BusinessKyc,
   });
   return result;
 };
