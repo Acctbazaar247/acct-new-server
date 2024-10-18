@@ -78,6 +78,8 @@ const getAllKyc = async (
           email: true,
           profileImg: true,
           phoneNumber: true,
+          badge: true,
+          badgeTitle: true,
         },
       },
     },
@@ -117,6 +119,19 @@ const getSingleKyc = async (id: string): Promise<Kyc | null> => {
     where: {
       id,
     },
+    include: {
+      ownBy: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          profileImg: true,
+          phoneNumber: true,
+          badge: true,
+          badgeTitle: true,
+        },
+      },
+    },
   });
   return result;
 };
@@ -124,6 +139,19 @@ const getSingleKycOfUser = async (id: string): Promise<Kyc | null> => {
   const result = await prisma.kyc.findUnique({
     where: {
       ownById: id,
+    },
+    include: {
+      ownBy: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          profileImg: true,
+          phoneNumber: true,
+          badge: true,
+          badgeTitle: true,
+        },
+      },
     },
   });
   return result;

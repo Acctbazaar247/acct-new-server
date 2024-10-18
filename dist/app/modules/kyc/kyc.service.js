@@ -89,6 +89,8 @@ const getAllKyc = (filters, paginationOptions) => __awaiter(void 0, void 0, void
                     email: true,
                     profileImg: true,
                     phoneNumber: true,
+                    badge: true,
+                    badgeTitle: true,
                 },
             },
         },
@@ -123,6 +125,19 @@ const getSingleKyc = (id) => __awaiter(void 0, void 0, void 0, function* () {
         where: {
             id,
         },
+        include: {
+            ownBy: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    profileImg: true,
+                    phoneNumber: true,
+                    badge: true,
+                    badgeTitle: true,
+                },
+            },
+        },
     });
     return result;
 });
@@ -130,6 +145,19 @@ const getSingleKycOfUser = (id) => __awaiter(void 0, void 0, void 0, function* (
     const result = yield prisma_1.default.kyc.findUnique({
         where: {
             ownById: id,
+        },
+        include: {
+            ownBy: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    profileImg: true,
+                    phoneNumber: true,
+                    badge: true,
+                    badgeTitle: true,
+                },
+            },
         },
     });
     return result;
