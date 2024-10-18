@@ -42,7 +42,9 @@ const createValidation = z.object({
     financialStatements: z.string().optional().nullable(),
 
     // Status and timestamps
-    status: z.enum(Object.keys(EStatusOfKyc) as [string, ...string[]]),
+    status: z
+      .enum(Object.keys(EStatusOfKyc) as [string, ...string[]])
+      .default('pending'),
   }),
 });
 const updateValidation = z.object({
@@ -63,7 +65,7 @@ const updateValidation = z.object({
     phoneNumber: z.string().min(1).optional(), // Optionally more specific regex for phone validation
 
     // Ownership info
-    beneficialOwner: z.array(singleBeneficialOwnersSchema),
+    beneficialOwner: z.array(singleBeneficialOwnersSchema).optional(),
 
     // Financial information
     bankAccountNumber: z.string().min(1).optional(),

@@ -39,7 +39,9 @@ const createValidation = zod_1.z.object({
         proofOfAddress: zod_1.z.string().min(1),
         financialStatements: zod_1.z.string().optional().nullable(),
         // Status and timestamps
-        status: zod_1.z.enum(Object.keys(EStatusOfKyc)),
+        status: zod_1.z
+            .enum(Object.keys(EStatusOfKyc))
+            .default('pending'),
     }),
 });
 const updateValidation = zod_1.z.object({
@@ -58,7 +60,7 @@ const updateValidation = zod_1.z.object({
         emailAddress: zod_1.z.string().email().optional(),
         phoneNumber: zod_1.z.string().min(1).optional(), // Optionally more specific regex for phone validation
         // Ownership info
-        beneficialOwner: zod_1.z.array(singleBeneficialOwnersSchema),
+        beneficialOwner: zod_1.z.array(singleBeneficialOwnersSchema).optional(),
         // Financial information
         bankAccountNumber: zod_1.z.string().min(1).optional(),
         bankName: zod_1.z.string().min(1).optional(),
