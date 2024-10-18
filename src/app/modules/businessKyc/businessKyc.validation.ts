@@ -1,7 +1,5 @@
 import { EBusinessType } from '@prisma/client';
 import { z } from 'zod';
-const EStatusOfKyc = z.enum(['pending', 'approved', 'denied']);
-
 // Beneficial owner schema
 const singleBeneficialOwnersSchema = z.object({
   fullName: z.string().min(1),
@@ -77,9 +75,6 @@ const updateValidation = z.object({
     financialStatements: z.string().optional().nullable(),
 
     // Status and timestamps
-    status: z
-      .enum(Object.keys(EStatusOfKyc) as [string, ...string[]])
-      .optional(),
   }),
 });
 export const KycValidation = {

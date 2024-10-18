@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.KycValidation = void 0;
 const client_1 = require("@prisma/client");
 const zod_1 = require("zod");
-const EStatusOfKyc = zod_1.z.enum(['pending', 'approved', 'denied']);
 // Beneficial owner schema
 const singleBeneficialOwnersSchema = zod_1.z.object({
     fullName: zod_1.z.string().min(1),
@@ -69,9 +68,6 @@ const updateValidation = zod_1.z.object({
         proofOfAddress: zod_1.z.string().min(1).optional(),
         financialStatements: zod_1.z.string().optional().nullable(),
         // Status and timestamps
-        status: zod_1.z
-            .enum(Object.keys(EStatusOfKyc))
-            .optional(),
     }),
 });
 exports.KycValidation = {
