@@ -5,9 +5,7 @@ const EStatusOfKyc = z.enum(['pending', 'approved', 'denied']);
 // Beneficial owner schema
 const singleBeneficialOwnersSchema = z.object({
   fullName: z.string().min(1),
-  ownershipPercentage: z
-    .string()
-    .regex(/^\d{1,3}%$/, 'Ownership percentage should be between 0% and 100%'),
+  ownershipPercentage: z.string(),
   address: z.string().min(1),
   dateOfBirth: z.date(),
   identificationDocument: z.string().min(1), // Assuming it's a file name or link
