@@ -169,7 +169,8 @@ const updateUser = (id, payload, requestedUser) => __awaiter(void 0, void 0, voi
     }
     const isUser = requestedUser.role !== client_1.UserRole.user;
     const isSeller = requestedUser.role !== client_1.UserRole.seller;
-    if (isUser && isSeller) {
+    console.log({ isUser, isSeller, requestedUser });
+    if (!isUser && !isSeller) {
         if (payload.badge ||
             payload.badgeTitle ||
             payload.isVerifiedByAdmin ||

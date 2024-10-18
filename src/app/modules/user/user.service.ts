@@ -192,7 +192,8 @@ const updateUser = async (
 
   const isUser = requestedUser.role !== UserRole.user;
   const isSeller = requestedUser.role !== UserRole.seller;
-  if (isUser && isSeller) {
+  console.log({ isUser, isSeller, requestedUser });
+  if (!isUser && !isSeller) {
     if (
       payload.badge ||
       payload.badgeTitle ||
