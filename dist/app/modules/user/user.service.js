@@ -169,18 +169,20 @@ const updateUser = (id, payload, requestedUser) => __awaiter(void 0, void 0, voi
     }
     const isUser = requestedUser.role !== client_1.UserRole.user;
     const isSeller = requestedUser.role !== client_1.UserRole.seller;
-    if ((isUser || isSeller) && payload.isApprovedForSeller) {
-        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'only admin(ccAdmin,financeAdmin) can verify seller ');
-    }
-    if (isUserExist.role !== client_1.UserRole.superAdmin &&
-        isUserExist.role !== client_1.UserRole.admin) {
-        // check if user is want to change badge
+    if (isUser && isSeller) {
         if (payload.badge ||
             payload.badgeTitle ||
             payload.isVerifiedByAdmin ||
             payload.isBusinessVerified) {
             throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'only admin(ccAdmin,financeAdmin) can update user badge, badgeTitle, isVerifiedByAdmin, isBusinessVerified');
         }
+    }
+    if ((isUser || isSeller) && payload.isApprovedForSeller) {
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'only admin(ccAdmin,financeAdmin) can verify seller ');
+    }
+    if (isUserExist.role !== client_1.UserRole.superAdmin &&
+        isUserExist.role !== client_1.UserRole.admin) {
+        // check if user is want to change badge
         if (isUserExist.id === requestedUser.userId) {
             if (payload.name) {
                 (0, checkUserUpdateTime_1.default)(isUserExist.updatedAt);

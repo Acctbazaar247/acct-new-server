@@ -189,8 +189,22 @@ const updateUser = async (
       'User role can only be changed by super admin'
     );
   }
+
   const isUser = requestedUser.role !== UserRole.user;
   const isSeller = requestedUser.role !== UserRole.seller;
+  if (isUser && isSeller) {
+    if (
+      payload.badge ||
+      payload.badgeTitle ||
+      payload.isVerifiedByAdmin ||
+      payload.isBusinessVerified
+    ) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        'only admin(ccAdmin,financeAdmin) can update user badge, badgeTitle, isVerifiedByAdmin, isBusinessVerified'
+      );
+    }
+  }
   if ((isUser || isSeller) && payload.isApprovedForSeller) {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
@@ -203,17 +217,6 @@ const updateUser = async (
     isUserExist.role !== UserRole.admin
   ) {
     // check if user is want to change badge
-    if (
-      payload.badge ||
-      payload.badgeTitle ||
-      payload.isVerifiedByAdmin ||
-      payload.isBusinessVerified
-    ) {
-      throw new ApiError(
-        httpStatus.BAD_REQUEST,
-        'only admin(ccAdmin,financeAdmin) can update user badge, badgeTitle, isVerifiedByAdmin, isBusinessVerified'
-      );
-    }
 
     if (isUserExist.id === requestedUser.userId) {
       if (payload.name) {
