@@ -251,6 +251,7 @@ const updateBusinessKyc = (id, payload, requestedUserId) => __awaiter(void 0, vo
     // }
     if (payload.beneficialOwner) {
         const result = prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+            var _a;
             // delete previous all <br />
             yield tx.singleBeneficialOwners.deleteMany({
                 where: { businessKycId: payload.id },
@@ -260,7 +261,11 @@ const updateBusinessKyc = (id, payload, requestedUserId) => __awaiter(void 0, vo
                     id,
                 },
                 data: Object.assign(Object.assign({}, payload), { beneficialOwner: {
-                        create: payload.beneficialOwner,
+                        create: (_a = payload.beneficialOwner) === null || _a === void 0 ? void 0 : _a.map(single => {
+                            // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+                            const { businessKycId } = single, rest = __rest(single, ["businessKycId"]);
+                            return rest;
+                        }),
                     } }),
             });
         }));

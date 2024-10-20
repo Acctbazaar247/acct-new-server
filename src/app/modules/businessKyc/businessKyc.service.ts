@@ -281,7 +281,11 @@ const updateBusinessKyc = async (
         data: {
           ...payload,
           beneficialOwner: {
-            create: payload.beneficialOwner,
+            create: payload.beneficialOwner?.map(single => {
+              // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+              const { businessKycId, ...rest } = single;
+              return rest;
+            }),
           },
         },
       });
