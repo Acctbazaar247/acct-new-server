@@ -352,6 +352,8 @@ const sellerProfileInfo = (id) => __awaiter(void 0, void 0, void 0, function* ()
             isVerifiedByAdmin: true,
             country: true,
             createdAt: true,
+            badge: true,
+            badgeTitle: true,
         },
     });
     if (!isSellerExist) {

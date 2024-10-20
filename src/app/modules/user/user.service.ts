@@ -400,6 +400,8 @@ const sellerProfileInfo = async (
       isVerifiedByAdmin: true,
       country: true,
       createdAt: true,
+      badge: true,
+      badgeTitle: true,
     },
   });
   if (!isSellerExist) {
