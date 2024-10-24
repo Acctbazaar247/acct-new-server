@@ -17,6 +17,7 @@ const client_1 = require("@prisma/client");
 const http_status_1 = __importDefault(require("http-status"));
 const config_1 = __importDefault(require("../../../config"));
 const pagination_1 = require("../../../constants/pagination");
+const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const UpdateSellerAfterPay_1 = __importDefault(require("../../../helpers/UpdateSellerAfterPay"));
 const sendEmail_1 = __importDefault(require("../../../helpers/sendEmail"));
 const common_1 = require("../../../interfaces/common");
@@ -105,6 +106,12 @@ const getAllCurrencyRequest = (0, catchAsync_1.default)((req, res) => __awaiter(
     });
 }));
 const payStackWebHook = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const secretHash = config_1.default.flutterwave_hash;
+    const signature = req.headers['verif-hash'];
+    if (!signature || signature !== secretHash) {
+        // This request isn't from Flutterwave; discard
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Only allowed from flutterwave');
+    }
     const ipnData = req.body;
     console.log({ ipnData }, 'webhook');
     if (ipnData.event === 'transfer.completed') {

@@ -33,6 +33,7 @@ const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const paginationHelper_1 = require("../../../helpers/paginationHelper");
 const GenericEmailTemplates_1 = __importDefault(require("../../../shared/GenericEmailTemplates"));
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
+const calculation_1 = require("../../../utils/calculation");
 const withdrawalRequest_constant_1 = require("./withdrawalRequest.constant");
 const withdrawalRequest_utils_1 = require("./withdrawalRequest.utils");
 const getAllWithdrawalRequest = (filters, paginationOptions) => __awaiter(void 0, void 0, void 0, function* () {
@@ -112,29 +113,39 @@ const createWithdrawalRequest = (payload, requestBy, withdrawalPin) => __awaiter
     }
     if (isUserExist.email === MAIN_ADMIN_EMAIL) {
         // check does this request is made from main admin
-        const newWithdrawalRequest = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
-            // get previous currency
-            const preCurrency = yield tx.currency.findFirst({
-                where: { ownById: isUserExist.id },
-            });
-            if (!preCurrency) {
-                throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Currency not found for this admin');
-            }
-            if (preCurrency.amount < payload.amount) {
-                throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, "That much amount doesn't exist");
-            }
-            // delete same monkey from the admin
-            yield tx.currency.update({
-                where: { ownById: isUserExist.id },
-                data: {
-                    amount: (0, lodash_1.round)(preCurrency.amount - payload.amount, config_1.default.calculationMoneyRound),
-                },
-            });
-            return yield tx.withdrawalRequest.create({
-                data: Object.assign(Object.assign({}, payload), { status: client_1.EStatusOfWithdrawalRequest.approved }),
-            });
-        }));
-        return newWithdrawalRequest;
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Admin cannot able to withdraw money');
+        // const newWithdrawalRequest = await prisma.$transaction(async tx => {
+        //   // get previous currency
+        //   const preCurrency = await tx.currency.findFirst({
+        //     where: { ownById: isUserExist.id },
+        //   });
+        //   if (!preCurrency) {
+        //     throw new ApiError(
+        //       httpStatus.BAD_REQUEST,
+        //       'Currency not found for this admin'
+        //     );
+        //   }
+        //   if (preCurrency.amount < payload.amount) {
+        //     throw new ApiError(
+        //       httpStatus.BAD_REQUEST,
+        //       "That much amount doesn't exist"
+        //     );
+        //   }
+        //   // delete same monkey from the admin
+        //   await tx.currency.update({
+        //     where: { ownById: isUserExist.id },
+        //     data: {
+        //       amount: round(
+        //         preCurrency.amount - payload.amount,
+        //         config.calculationMoneyRound
+        //       ),
+        //     },
+        //   });
+        //   return await tx.withdrawalRequest.create({
+        //     data: { ...payload, status: EStatusOfWithdrawalRequest.approved },
+        //   });
+        // });
+        // return newWithdrawalRequest;
     }
     else {
         // for normal user seller and not main admin
@@ -146,14 +157,17 @@ const createWithdrawalRequest = (payload, requestBy, withdrawalPin) => __awaiter
             if (!preCurrency) {
                 throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Currency not found');
             }
-            if (preCurrency.amount < payload.amount) {
+            const amountToCut = (0, calculation_1.incrementByPercentage)(payload.amount, config_1.default.withdrawalPercentage);
+            if (preCurrency.amount < amountToCut) {
                 throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, "That much amount doesn't exist");
             }
             // cut monkey
             yield tx.currency.update({
                 where: { ownById: isUserExist.id },
                 data: {
-                    amount: (0, lodash_1.round)(preCurrency.amount - payload.amount, config_1.default.calculationMoneyRound),
+                    amount: {
+                        decrement: amountToCut,
+                    },
                 },
             });
             // create withdrawal request
@@ -217,6 +231,7 @@ const updateWithdrawalRequest = (id, payload) => __awaiter(void 0, void 0, void 
     if (payload.status === client_1.EStatusOfWithdrawalRequest.approved) {
         // now update admin currency only and withdrawal request to updated'
         const output = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+            // const amountToWithDraw = isWithdrawalRequestExits.amount;
             const isAdminExits = yield tx.user.findFirst({
                 where: { email: config_1.default.mainAdminEmail },
                 include: { Currency: true },
@@ -267,7 +282,7 @@ const updateWithdrawalRequest = (id, payload) => __awaiter(void 0, void 0, void 
                 where: { ownById: isUserCurrencyExist.ownById },
                 data: {
                     amount: {
-                        increment: isWithdrawalRequestExits.amount,
+                        increment: (0, calculation_1.incrementByPercentage)(isWithdrawalRequestExits.amount, config_1.default.withdrawalPercentage),
                     },
                 },
             });

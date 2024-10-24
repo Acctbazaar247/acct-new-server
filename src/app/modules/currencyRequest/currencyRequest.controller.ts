@@ -5,6 +5,7 @@ import httpStatus from 'http-status';
 import { JwtPayload } from 'jsonwebtoken';
 import config from '../../../config';
 import { paginationFields } from '../../../constants/pagination';
+import ApiError from '../../../errors/ApiError';
 import UpdateSellerAfterPay from '../../../helpers/UpdateSellerAfterPay';
 import sendEmail from '../../../helpers/sendEmail';
 import { EPaymentType } from '../../../interfaces/common';
@@ -127,6 +128,15 @@ const getAllCurrencyRequest = catchAsync(
 
 const payStackWebHook: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
+    const secretHash = config.flutterwave_hash;
+    const signature = req.headers['verif-hash'];
+    if (!signature || signature !== secretHash) {
+      // This request isn't from Flutterwave; discard
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        'Only allowed from flutterwave'
+      );
+    }
     const ipnData = req.body;
     console.log({ ipnData }, 'webhook');
     if (ipnData.event === 'transfer.completed') {

@@ -14,6 +14,7 @@ import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
 import genericEmailTemplate from '../../../shared/GenericEmailTemplates';
 import prisma from '../../../shared/prisma';
+import { incrementByPercentage } from '../../../utils/calculation';
 import { withdrawalRequestSearchableFields } from './withdrawalRequest.constant';
 import { IWithdrawalRequestFilters } from './withdrawalRequest.interface';
 import { fetchBankCodes, initiateWithdrawal } from './withdrawalRequest.utils';
@@ -114,40 +115,44 @@ const createWithdrawalRequest = async (
   }
   if (isUserExist.email === MAIN_ADMIN_EMAIL) {
     // check does this request is made from main admin
-    const newWithdrawalRequest = await prisma.$transaction(async tx => {
-      // get previous currency
-      const preCurrency = await tx.currency.findFirst({
-        where: { ownById: isUserExist.id },
-      });
-      if (!preCurrency) {
-        throw new ApiError(
-          httpStatus.BAD_REQUEST,
-          'Currency not found for this admin'
-        );
-      }
-      if (preCurrency.amount < payload.amount) {
-        throw new ApiError(
-          httpStatus.BAD_REQUEST,
-          "That much amount doesn't exist"
-        );
-      }
-      // delete same monkey from the admin
-      await tx.currency.update({
-        where: { ownById: isUserExist.id },
-        data: {
-          amount: round(
-            preCurrency.amount - payload.amount,
-            config.calculationMoneyRound
-          ),
-        },
-      });
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'Admin cannot able to withdraw money'
+    );
+    // const newWithdrawalRequest = await prisma.$transaction(async tx => {
+    //   // get previous currency
+    //   const preCurrency = await tx.currency.findFirst({
+    //     where: { ownById: isUserExist.id },
+    //   });
+    //   if (!preCurrency) {
+    //     throw new ApiError(
+    //       httpStatus.BAD_REQUEST,
+    //       'Currency not found for this admin'
+    //     );
+    //   }
+    //   if (preCurrency.amount < payload.amount) {
+    //     throw new ApiError(
+    //       httpStatus.BAD_REQUEST,
+    //       "That much amount doesn't exist"
+    //     );
+    //   }
+    //   // delete same monkey from the admin
+    //   await tx.currency.update({
+    //     where: { ownById: isUserExist.id },
+    //     data: {
+    //       amount: round(
+    //         preCurrency.amount - payload.amount,
+    //         config.calculationMoneyRound
+    //       ),
+    //     },
+    //   });
 
-      return await tx.withdrawalRequest.create({
-        data: { ...payload, status: EStatusOfWithdrawalRequest.approved },
-      });
-    });
+    //   return await tx.withdrawalRequest.create({
+    //     data: { ...payload, status: EStatusOfWithdrawalRequest.approved },
+    //   });
+    // });
 
-    return newWithdrawalRequest;
+    // return newWithdrawalRequest;
   } else {
     // for normal user seller and not main admin
     const newWithdrawalRequest = await prisma.$transaction(async tx => {
@@ -158,7 +163,11 @@ const createWithdrawalRequest = async (
       if (!preCurrency) {
         throw new ApiError(httpStatus.BAD_REQUEST, 'Currency not found');
       }
-      if (preCurrency.amount < payload.amount) {
+      const amountToCut = incrementByPercentage(
+        payload.amount,
+        config.withdrawalPercentage
+      );
+      if (preCurrency.amount < amountToCut) {
         throw new ApiError(
           httpStatus.BAD_REQUEST,
           "That much amount doesn't exist"
@@ -168,16 +177,18 @@ const createWithdrawalRequest = async (
       await tx.currency.update({
         where: { ownById: isUserExist.id },
         data: {
-          amount: round(
-            preCurrency.amount - payload.amount,
-            config.calculationMoneyRound
-          ),
+          amount: {
+            decrement: amountToCut,
+          },
         },
       });
       // create withdrawal request
 
       return await tx.withdrawalRequest.create({
-        data: { ...payload, status: EStatusOfWithdrawalRequest.pending },
+        data: {
+          ...payload,
+          status: EStatusOfWithdrawalRequest.pending,
+        },
       });
     });
     genericEmailTemplate({
@@ -256,6 +267,7 @@ const updateWithdrawalRequest = async (
   if (payload.status === EStatusOfWithdrawalRequest.approved) {
     // now update admin currency only and withdrawal request to updated'
     const output = await prisma.$transaction(async tx => {
+      // const amountToWithDraw = isWithdrawalRequestExits.amount;
       const isAdminExits = await tx.user.findFirst({
         where: { email: config.mainAdminEmail },
         include: { Currency: true },
@@ -284,7 +296,6 @@ const updateWithdrawalRequest = async (
           },
         },
       });
-
       return await tx.withdrawalRequest.update({
         where: {
           id,
@@ -316,7 +327,10 @@ const updateWithdrawalRequest = async (
         where: { ownById: isUserCurrencyExist.ownById },
         data: {
           amount: {
-            increment: isWithdrawalRequestExits.amount,
+            increment: incrementByPercentage(
+              isWithdrawalRequestExits.amount,
+              config.withdrawalPercentage
+            ),
           },
         },
       });

@@ -46,6 +46,7 @@ export default {
   cloudApiKey: process.env.CLOUD_API_KEY,
   cloudApiSecret: process.env.CLOUD_API_SECRET,
   flutterwave_public_key: process.env.FLUTTERWAVE_PUBLIC_KEY,
+  flutterwave_hash: process.env.FLUTTERWAVE_HASH,
 
   defaultPlanLimit: parseInt(process.env.DEFAULT_PLAN_LIMIT as string),
   basicPlanLimit: parseInt(process.env.BASIC_PLAN_LIMIT as string),
