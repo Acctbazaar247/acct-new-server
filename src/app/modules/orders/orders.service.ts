@@ -424,6 +424,8 @@ const getMyOrders = async (id: string): Promise<Orders[] | null> => {
               email: true,
               role: true,
               isVerifiedByAdmin: true,
+              badge: true,
+              badgeTitle: true,
             },
           },
           Review: true,

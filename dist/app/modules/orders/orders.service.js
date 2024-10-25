@@ -380,6 +380,8 @@ const getMyOrders = (id) => __awaiter(void 0, void 0, void 0, function* () {
                             email: true,
                             role: true,
                             isVerifiedByAdmin: true,
+                            badge: true,
+                            badgeTitle: true,
                         },
                     },
                     Review: true,
