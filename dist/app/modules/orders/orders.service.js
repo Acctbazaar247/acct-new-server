@@ -111,6 +111,8 @@ const getAllOrders = (filters, paginationOptions) => __awaiter(void 0, void 0, v
                             id: true,
                             email: true,
                             profileImg: true,
+                            badge: true,
+                            badgeTitle: true,
                         },
                     },
                 },

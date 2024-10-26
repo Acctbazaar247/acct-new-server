@@ -106,6 +106,8 @@ const getAllOrders = async (
               id: true,
               email: true,
               profileImg: true,
+              badge: true,
+              badgeTitle: true,
             },
           },
         },

@@ -354,6 +354,8 @@ const sellerProfileInfo = (id) => __awaiter(void 0, void 0, void 0, function* ()
             createdAt: true,
             badge: true,
             badgeTitle: true,
+            isBusinessVerified: true,
+            userName: true,
         },
     });
     if (!isSellerExist) {

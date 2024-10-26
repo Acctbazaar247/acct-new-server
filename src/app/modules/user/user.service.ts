@@ -402,6 +402,8 @@ const sellerProfileInfo = async (
       createdAt: true,
       badge: true,
       badgeTitle: true,
+      isBusinessVerified: true,
+      userName: true,
     },
   });
   if (!isSellerExist) {
