@@ -167,6 +167,7 @@ const getAllAccount = async (
           badge: true,
           isBusinessVerified: true,
           badgeTitle: true,
+          userName: true,
         },
       },
     },
