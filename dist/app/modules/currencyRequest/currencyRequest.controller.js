@@ -116,7 +116,8 @@ const payStackWebHook = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
     console.log({ ipnData }, 'webhook');
     if (ipnData.event === 'transfer.completed') {
         console.log('transfer.completed');
-        if (ipnData.data.status === 'SUCCESSFUL') {
+        if (ipnData.data.status === 'SUCCESSFUL' ||
+            ipnData.data.status === 'successful') {
             console.log('withdraw completed');
             withdrawalRequest_service_1.WithdrawalRequestService.updateWithdrawalRequest(ipnData.data.reference, { status: client_1.EStatusOfWithdrawalRequest.approved });
         }
