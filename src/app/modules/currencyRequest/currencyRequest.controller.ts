@@ -161,14 +161,14 @@ const payStackWebHook: RequestHandler = catchAsync(
       // const paymentReference = ipnData.data.reference;
 
       // Perform additional actions, such as updating your database, sending emails, etc.
-      const paymentType = ipnData?.txRef.split('_$_')[0];
+      const paymentType = ipnData?.data.tx_ref.split('_$_')[0];
       if (paymentType === EPaymentType.addFunds) {
         await CurrencyRequestService.payStackWebHook({
           data: ipnData,
         });
       } else if (paymentType === EPaymentType.seller) {
         await UpdateSellerAfterPay({
-          order_id: ipnData?.txRef.split('_$_')[1],
+          order_id: ipnData?.data.tx_ref.split('_$_')[1],
           payment_status: 'finished',
           price_amount: config.sellerOneTimePayment,
         });

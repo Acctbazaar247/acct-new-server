@@ -129,7 +129,7 @@ const payStackWebHook = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
     else if (ipnData.data.status === 'successful') {
         // const paymentReference = ipnData.data.reference;
         // Perform additional actions, such as updating your database, sending emails, etc.
-        const paymentType = ipnData === null || ipnData === void 0 ? void 0 : ipnData.txRef.split('_$_')[0];
+        const paymentType = ipnData === null || ipnData === void 0 ? void 0 : ipnData.data.tx_ref.split('_$_')[0];
         if (paymentType === common_1.EPaymentType.addFunds) {
             yield currencyRequest_service_1.CurrencyRequestService.payStackWebHook({
                 data: ipnData,
@@ -137,7 +137,7 @@ const payStackWebHook = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
         }
         else if (paymentType === common_1.EPaymentType.seller) {
             yield (0, UpdateSellerAfterPay_1.default)({
-                order_id: ipnData === null || ipnData === void 0 ? void 0 : ipnData.txRef.split('_$_')[1],
+                order_id: ipnData === null || ipnData === void 0 ? void 0 : ipnData.data.tx_ref.split('_$_')[1],
                 payment_status: 'finished',
                 price_amount: config_1.default.sellerOneTimePayment,
             });
