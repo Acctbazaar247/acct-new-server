@@ -126,7 +126,7 @@ const payStackWebHook = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
             withdrawalRequest_service_1.WithdrawalRequestService.updateWithdrawalRequest(ipnData.data.reference, { status: client_1.EStatusOfWithdrawalRequest.denied });
         }
     }
-    else if (ipnData.status === 'successful') {
+    else if (ipnData.data.status === 'successful') {
         // const paymentReference = ipnData.data.reference;
         // Perform additional actions, such as updating your database, sending emails, etc.
         const paymentType = ipnData === null || ipnData === void 0 ? void 0 : ipnData.txRef.split('_$_')[0];

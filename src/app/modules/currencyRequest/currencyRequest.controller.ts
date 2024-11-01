@@ -157,7 +157,7 @@ const payStackWebHook: RequestHandler = catchAsync(
           { status: EStatusOfWithdrawalRequest.denied }
         );
       }
-    } else if (ipnData.status === 'successful') {
+    } else if (ipnData.data.status === 'successful') {
       // const paymentReference = ipnData.data.reference;
 
       // Perform additional actions, such as updating your database, sending emails, etc.
