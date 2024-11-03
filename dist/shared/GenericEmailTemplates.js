@@ -135,7 +135,7 @@ const genericEmailTemplate = ({ email, subject, title, description, }) => __awai
                 <a href="${config_1.default.frontendUrl}" class="btn">View</a>
                 <p class="end">
                     This is an automatically generated email please do not reply to this email. 
-                    If you face any issues, please contact us at support@acctbazaar.com
+                    If you face any issues, please contact us at help@acctbazaar.com
                 </p>
                 <hr>
                 <div class="social-icons">
