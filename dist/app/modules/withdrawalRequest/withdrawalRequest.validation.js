@@ -14,7 +14,7 @@ const createValidation = zod_1.z.object({
             .min(config_1.default.withdrawalMinMoney)
             .max(config_1.default.withdrawalMaxMoney),
         fullName: zod_1.z.string().optional(),
-        accountNumber: zod_1.z.string().optional(),
+        accountNumber: zod_1.z.number().optional(),
         bankName: zod_1.z.string().optional(),
         walletAddress: zod_1.z.string().optional(),
     }),
