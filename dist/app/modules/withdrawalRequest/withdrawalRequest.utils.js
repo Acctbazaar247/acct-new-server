@@ -48,7 +48,7 @@ const initiateWithdrawal = ({ tx, account_bank, account_number, amount, narratio
         const payload = {
             account_bank: account_bank_code, // Bank code or bank identifier (e.g., 044 for Access Bank)
             account_number, // Bank account number
-            amount: amount * config_1.default.dollarRate, // Amount to withdraw
+            amount: amount * config_1.default.withdrawDollarRate, // Amount to withdraw
             currency: 'NGN', // Currency code (e.g., NGN, USD)
             narration, // A note about the withdrawal
             reference: tx, // Unique transaction reference
