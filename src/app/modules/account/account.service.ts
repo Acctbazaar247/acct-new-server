@@ -240,7 +240,6 @@ const updateAccount = async (
   payload: Partial<Account>,
   { id: reqUserId, role }: { id: string; role: UserRole }
 ): Promise<Omit<Account, 'username' | 'password'> | null> => {
-  console.log(payload);
   const isAccountExits = await prisma.account.findUnique({
     where: { id },
     include: { ownBy: { select: { email: true } } },

@@ -39,7 +39,6 @@ export const initiateWithdrawal = async ({
 WithdrawalParams): Promise<any> => {
   try {
     const allBanks = await fetchBankCodes();
-    console.log(allBanks);
     const account_bank_code = allBanks.data.find(
       bank => bank.name.toLocaleLowerCase() === account_bank.toLocaleLowerCase()
     )?.code;

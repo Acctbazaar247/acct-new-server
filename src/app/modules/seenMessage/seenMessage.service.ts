@@ -102,7 +102,6 @@ const updateSeenMessage = async (
   payload: SeenMessage
 ): Promise<SeenMessage | null> => {
   let result: SeenMessage | null = null;
-  console.log('going to update seen message');
   const isSeenMessageExits = await prisma.seenMessage.findFirst({
     where: {
       orderId: payload.orderId,

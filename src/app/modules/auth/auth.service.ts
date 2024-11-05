@@ -338,7 +338,6 @@ const becomeSeller = async (
   id: string,
   payType: EPayWith
 ): Promise<{ txId: string }> => {
-  console.log(payType);
   const isUserExist = await prisma.user.findUnique({
     where: { id },
   });
@@ -368,7 +367,6 @@ const becomeSeller = async (
       tx_ref: isUserExist.id,
       paymentType: EPaymentType.seller,
     });
-    console.log({ fluterWave });
     txId = fluterWave;
   } else {
     const data = await createNowPayInvoice({
@@ -382,7 +380,6 @@ const becomeSeller = async (
     txId = data.invoice_url;
   }
   await prisma.user.update({ where: { id }, data: { txId, payWith: payType } });
-  console.log(txId);
   return {
     txId,
   };
@@ -391,7 +388,6 @@ const becomeSellerWithWallet = async (
   id: string,
   payType: EPayWith
 ): Promise<{ isSeller: boolean }> => {
-  console.log(payType);
   const isUserExist = await prisma.user.findUnique({
     where: { id },
     include: {

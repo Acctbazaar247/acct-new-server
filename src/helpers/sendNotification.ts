@@ -16,6 +16,5 @@ const sendNotification = async ({
   await prisma.notifications.create({
     data,
   });
-  console.log('created');
 };
 export default sendNotification;

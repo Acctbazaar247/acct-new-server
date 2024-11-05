@@ -192,7 +192,6 @@ const updateUser = async (
 
   const isUser = requestedUser.role !== UserRole.user;
   const isSeller = requestedUser.role !== UserRole.seller;
-  console.log({ isUser, isSeller, requestedUser });
   if (!isUser && !isSeller) {
     if (
       payload.badge ||
@@ -350,7 +349,6 @@ const sellerOverview = async (id: string): Promise<TSellerOverview | null> => {
       amount: true,
     },
   });
-  console.log(totalWithdraw);
   const today = new Date();
   const pastYearDate = new Date(
     today.getFullYear() - 1,
@@ -503,7 +501,6 @@ const sendUserQuery = async (
   };
   try {
     await transport.sendMail({ ...mailOptions });
-    console.log(' success');
   } catch (err) {
     throw new ApiError(
       httpStatus.BAD_REQUEST,

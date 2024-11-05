@@ -277,7 +277,6 @@ const sendWithdrawalTokenEmail = (id) => __awaiter(void 0, void 0, void 0, funct
     };
 });
 const becomeSeller = (id, payType) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(payType);
     const isUserExist = yield prisma_1.default.user.findUnique({
         where: { id },
     });
@@ -307,7 +306,6 @@ const becomeSeller = (id, payType) => __awaiter(void 0, void 0, void 0, function
             tx_ref: isUserExist.id,
             paymentType: common_1.EPaymentType.seller,
         });
-        console.log({ fluterWave });
         txId = fluterWave;
     }
     else {
@@ -322,13 +320,11 @@ const becomeSeller = (id, payType) => __awaiter(void 0, void 0, void 0, function
         txId = data.invoice_url;
     }
     yield prisma_1.default.user.update({ where: { id }, data: { txId, payWith: payType } });
-    console.log(txId);
     return {
         txId,
     };
 });
 const becomeSellerWithWallet = (id, payType) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(payType);
     const isUserExist = yield prisma_1.default.user.findUnique({
         where: { id },
         include: {

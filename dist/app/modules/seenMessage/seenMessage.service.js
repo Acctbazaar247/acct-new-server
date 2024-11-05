@@ -103,7 +103,6 @@ const getSingleSeenMessage = (id) => __awaiter(void 0, void 0, void 0, function*
 });
 const updateSeenMessage = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     let result = null;
-    console.log('going to update seen message');
     const isSeenMessageExits = yield prisma_1.default.seenMessage.findFirst({
         where: {
             orderId: payload.orderId,

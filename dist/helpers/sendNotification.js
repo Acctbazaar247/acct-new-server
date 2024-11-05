@@ -18,6 +18,5 @@ const sendNotification = ({ title, message, link, ownById, }) => __awaiter(void 
     yield prisma_1.default.notifications.create({
         data,
     });
-    console.log('created');
 });
 exports.default = sendNotification;

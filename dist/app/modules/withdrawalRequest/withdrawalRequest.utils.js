@@ -39,7 +39,6 @@ const initiateWithdrawal = ({ tx, account_bank, account_number, amount, narratio
     var _a;
     try {
         const allBanks = yield (0, exports.fetchBankCodes)();
-        console.log(allBanks);
         const account_bank_code = (_a = allBanks.data.find(bank => bank.name.toLocaleLowerCase() === account_bank.toLocaleLowerCase())) === null || _a === void 0 ? void 0 : _a.code;
         if (!account_bank_code) {
             throw new Error('No banks found in the system.');

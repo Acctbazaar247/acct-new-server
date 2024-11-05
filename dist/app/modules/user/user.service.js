@@ -169,7 +169,6 @@ const updateUser = (id, payload, requestedUser) => __awaiter(void 0, void 0, voi
     }
     const isUser = requestedUser.role !== client_1.UserRole.user;
     const isSeller = requestedUser.role !== client_1.UserRole.seller;
-    console.log({ isUser, isSeller, requestedUser });
     if (!isUser && !isSeller) {
         if (payload.badge ||
             payload.badgeTitle ||
@@ -310,7 +309,6 @@ const sellerOverview = (id) => __awaiter(void 0, void 0, void 0, function* () {
             amount: true,
         },
     });
-    console.log(totalWithdraw);
     const today = new Date();
     const pastYearDate = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
     const pastYearData = yield prisma_1.default.account.findMany({
@@ -448,7 +446,6 @@ const sendUserQuery = (id, description, queryType) => __awaiter(void 0, void 0, 
     };
     try {
         yield transport.sendMail(Object.assign({}, mailOptions));
-        console.log(' success');
     }
     catch (err) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Sorry try again after some time');

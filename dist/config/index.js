@@ -32,7 +32,7 @@ exports.default = {
     accountSellServiceCharge: parseFloat(process.env.ACCOUNT_SELL_SERVICE_CHARGE),
     accountSellPercentage: parseFloat(process.env.ACCOUNT_SELL_PERCENTAGE),
     dollarRate: parseFloat(process.env.DOLLAR_RATE),
-    withdrawDollarRate: parseFloat(process.env.WITHDRAWAL_DOLLaR_RATE),
+    withdrawDollarRate: parseFloat(process.env.WITHDRAWAL_DOLLAR_RATE),
     paystackPaymentApiKey: process.env.PAYSTACK_PAYMENT_API_KEY,
     nowPaymentApiKey: process.env.NOW_PAYMENT_API_KEY,
     nowPaymentInvoiceUrl: process.env.NOW_PAYMENT_INVOICE_URL,
