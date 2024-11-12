@@ -4,6 +4,7 @@ import { z } from 'zod';
 const createValidation = z.object({
   body: z.object({
     amount: z.number({ required_error: 'amount is required' }).min(0),
+    pay_currency_btc: z.boolean().optional().default(false),
     message: z.string({ required_error: 'message is required' }).optional(),
   }),
 });

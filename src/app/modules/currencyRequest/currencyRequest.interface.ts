@@ -12,3 +12,6 @@ export type ICurrencyRequestInvoice = {
 export type ICreateCurrencyRequestRes = {
   url: string;
 } & CurrencyRequest;
+export type CurrencyRequestPayload = {
+  pay_currency_btc: boolean | undefined;
+} & CurrencyRequest;

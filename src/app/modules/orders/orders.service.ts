@@ -55,8 +55,7 @@ const getAllOrders = async (
         },
       })),
     });
-  }
-  console.log({ sellerId, filters });
+  } 
   if (sellerId) {
     const sellers: Prisma.OrdersWhereInput = {
       AND: {

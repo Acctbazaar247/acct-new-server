@@ -18,6 +18,7 @@ import EmailTemplates from '../../../shared/EmailTemplates';
 import prisma from '../../../shared/prisma';
 import { currencyRequestSearchableFields } from './currencyRequest.constant';
 import {
+  CurrencyRequestPayload,
   ICreateCurrencyRequestRes,
   ICurrencyRequestFilters,
 } from './currencyRequest.interface';
@@ -91,13 +92,16 @@ const createCurrencyRequest = async (
   });
   return newCurrencyRequest;
 };
+
 const createCurrencyRequestInvoice = async (
-  payload: CurrencyRequest
+  payload: CurrencyRequestPayload
 ): Promise<ICreateCurrencyRequestRes | null> => {
   const newCurrencyRequest = prisma.$transaction(async tx => {
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+    const { pay_currency_btc, ...others } = payload;
     const result = await tx.currencyRequest.create({
       data: {
-        ...payload,
+        ...others,
         message: 'auto',
         status: EStatusOfCurrencyRequest.pending,
       },
@@ -117,6 +121,7 @@ const createCurrencyRequestInvoice = async (
       success_url: config.frontendUrl + 'account/wallet' || '',
       cancel_url: config.frontendUrl || '',
       // additionalInfo: 'its adidinlal ',
+      pay_currency_btc: payload.pay_currency_btc,
     });
     return { ...result, url: data.invoice_url };
   });

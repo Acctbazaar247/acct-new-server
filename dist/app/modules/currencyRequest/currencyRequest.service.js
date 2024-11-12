@@ -97,8 +97,10 @@ const createCurrencyRequest = (payload) => __awaiter(void 0, void 0, void 0, fun
 });
 const createCurrencyRequestInvoice = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const newCurrencyRequest = prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+        const { pay_currency_btc } = payload, others = __rest(payload, ["pay_currency_btc"]);
         const result = yield tx.currencyRequest.create({
-            data: Object.assign(Object.assign({}, payload), { message: 'auto', status: client_1.EStatusOfCurrencyRequest.pending }),
+            data: Object.assign(Object.assign({}, others), { message: 'auto', status: client_1.EStatusOfCurrencyRequest.pending }),
             include: {
                 ownBy: true,
             },
@@ -114,6 +116,7 @@ const createCurrencyRequestInvoice = (payload) => __awaiter(void 0, void 0, void
             success_url: config_1.default.frontendUrl + 'account/wallet' || '',
             cancel_url: config_1.default.frontendUrl || '',
             // additionalInfo: 'its adidinlal ',
+            pay_currency_btc: payload.pay_currency_btc,
         });
         return Object.assign(Object.assign({}, result), { url: data.invoice_url });
     }));

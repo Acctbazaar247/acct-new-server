@@ -6,6 +6,7 @@ const zod_1 = require("zod");
 const createValidation = zod_1.z.object({
     body: zod_1.z.object({
         amount: zod_1.z.number({ required_error: 'amount is required' }).min(0),
+        pay_currency_btc: zod_1.z.boolean().optional().default(false),
         message: zod_1.z.string({ required_error: 'message is required' }).optional(),
     }),
 });

@@ -4,13 +4,17 @@ import httpStatus from 'http-status';
 import config from '../config';
 import ApiError from '../errors/ApiError';
 
-const createNowPayInvoice = async (invoice: {
+const createNowPayInvoice = async ({
+  pay_currency_btc,
+  ...invoice
+}: {
   price_amount: number;
   ipn_callback_url: string;
   order_id: string;
   order_description?: string;
   success_url: string;
   cancel_url: string;
+  pay_currency_btc: boolean | undefined;
 }): Promise<InvoiceReturn> => {
   const nowPaymentsApiKey = config.nowPaymentApiKey || ''; // Use your sandbox API key
   // Use the sandbox API URL
@@ -26,7 +30,7 @@ const createNowPayInvoice = async (invoice: {
           ? config.baseServerUrl + invoice.ipn_callback_url
           : undefined,
         price_currency: 'USD',
-        // pay_currency: 'BTC',
+        pay_currency: pay_currency_btc ? 'BTC' : undefined,
       },
       {
         headers: {

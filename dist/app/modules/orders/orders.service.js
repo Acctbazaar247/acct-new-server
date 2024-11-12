@@ -64,7 +64,6 @@ const getAllOrders = (filters, paginationOptions) => __awaiter(void 0, void 0, v
             })),
         });
     }
-    console.log({ sellerId, filters });
     if (sellerId) {
         const sellers = {
             AND: {

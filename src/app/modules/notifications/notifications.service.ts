@@ -5,8 +5,7 @@ import prisma from '../../../shared/prisma';
 
 const getAllNotifications = async (
   userId: string
-): Promise<Notifications[]> => {
-  console.log({ userId });
+): Promise<Notifications[]> => { 
   const data = await prisma.notifications.findMany({
     where: {
       ownById: userId,

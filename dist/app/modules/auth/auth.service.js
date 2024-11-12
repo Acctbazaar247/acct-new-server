@@ -316,6 +316,7 @@ const becomeSeller = (id, payType) => __awaiter(void 0, void 0, void 0, function
             order_description: 'Creating Seller Account',
             success_url: config_1.default.frontendUrl + `/account/sell-your-account`,
             cancel_url: config_1.default.frontendUrl || '',
+            pay_currency_btc: false,
         });
         txId = data.invoice_url;
     }
@@ -324,7 +325,9 @@ const becomeSeller = (id, payType) => __awaiter(void 0, void 0, void 0, function
         txId,
     };
 });
-const becomeSellerWithWallet = (id, payType) => __awaiter(void 0, void 0, void 0, function* () {
+const becomeSellerWithWallet = (id, 
+// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+payType) => __awaiter(void 0, void 0, void 0, function* () {
     const isUserExist = yield prisma_1.default.user.findUnique({
         where: { id },
         include: {

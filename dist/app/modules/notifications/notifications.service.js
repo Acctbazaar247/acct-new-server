@@ -17,7 +17,6 @@ const http_status_1 = __importDefault(require("http-status"));
 const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
 const getAllNotifications = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log({ userId });
     const data = yield prisma_1.default.notifications.findMany({
         where: {
             ownById: userId,

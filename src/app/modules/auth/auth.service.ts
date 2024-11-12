@@ -376,6 +376,7 @@ const becomeSeller = async (
       order_description: 'Creating Seller Account',
       success_url: config.frontendUrl + `/account/sell-your-account`,
       cancel_url: config.frontendUrl || '',
+      pay_currency_btc: false,
     });
     txId = data.invoice_url;
   }
@@ -386,6 +387,7 @@ const becomeSeller = async (
 };
 const becomeSellerWithWallet = async (
   id: string,
+  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
   payType: EPayWith
 ): Promise<{ isSeller: boolean }> => {
   const isUserExist = await prisma.user.findUnique({
