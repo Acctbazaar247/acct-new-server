@@ -123,7 +123,7 @@ const genericEmailTemplate = async ({
             <table width="100%" border="0" cellspacing="0" cellpadding="0" style="table-layout: fixed;">
                 <tr>
                     <td style="text-align: center;">
-                        <img src="assets/img/logo.png" width="50" height="50" alt="" style="vertical-align: middle; margin-right: -15px;">
+                        <img src="${config.mainLogo}" width="50" height="50" alt="" style="vertical-align: middle; margin-right: -15px;">
                         <h3 style="display: inline; margin: 0; padding-left: 10px;">Acctbazaar</h3>
                     </td>
                 </tr>
