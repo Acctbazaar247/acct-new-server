@@ -78,6 +78,9 @@ const getAllCurrencyRequest = (filters, paginationOptions) => __awaiter(void 0, 
             : {
                 createdAt: 'desc',
             },
+        include: {
+            ownBy: true,
+        },
     });
     const total = yield prisma_1.default.currencyRequest.count({ where: whereConditions });
     const output = {
