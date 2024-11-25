@@ -40,6 +40,7 @@ const prisma_1 = __importDefault(require("../../../shared/prisma"));
 const currencyRequest_constant_1 = require("./currencyRequest.constant");
 const getAllCurrencyRequest = (filters, paginationOptions) => __awaiter(void 0, void 0, void 0, function* () {
     const { page, limit, skip } = paginationHelper_1.paginationHelpers.calculatePagination(paginationOptions);
+    console.log(skip, limit);
     const { searchTerm } = filters, filterData = __rest(filters, ["searchTerm"]);
     const andCondition = [];
     if (searchTerm) {
@@ -70,7 +71,7 @@ const getAllCurrencyRequest = (filters, paginationOptions) => __awaiter(void 0, 
     const result = yield prisma_1.default.currencyRequest.findMany({
         where: whereConditions,
         skip,
-        take: 12,
+        take: limit || 12,
         orderBy: paginationOptions.sortBy && paginationOptions.sortOrder
             ? {
                 [paginationOptions.sortBy]: paginationOptions.sortOrder,
