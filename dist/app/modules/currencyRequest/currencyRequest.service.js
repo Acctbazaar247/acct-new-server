@@ -175,7 +175,7 @@ const createCurrencyRequestWithKoraPay = (payload) => __awaiter(void 0, void 0, 
             currency: 'NGN',
             customerName: result.ownBy.name,
             customerEmail: result.ownBy.email,
-            reference: `${common_1.EPaymentType.addFunds}_$_${result.id}`,
+            reference: `${common_1.EPaymentType.addFunds}__${result.id}`,
             callbackUrl: config_1.default.frontendUrl + 'account/wallet',
         });
         console.log({ koraPay });
@@ -187,7 +187,7 @@ const createCurrencyRequestWithKoraPay = (payload) => __awaiter(void 0, void 0, 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const payStackWebHook = (data) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(data, 'from flutter wave');
-    const order_id = data.data.data.tx_ref.split('_$_')[1];
+    const order_id = data.data.data.tx_ref.split('__')[1];
     console.log({ order_id });
     const payment_status = 'finished';
     const isCurrencyRequestExits = yield prisma_1.default.currencyRequest.findUnique({
