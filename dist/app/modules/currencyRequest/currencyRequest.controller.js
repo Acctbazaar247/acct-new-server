@@ -179,22 +179,22 @@ const koraPayWebHook = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
     console.log({ ipnData }, 'webhook kora pay');
     if (ipnData.event === currencyRequest_interface_1.KoraPayEvent.PAYMENT_SUCCESS) {
         console.log('kora pay succss');
-    }
-    if (ipnData.data.status === 'success') {
-        // const paymentReference = ipnData.data.reference;
-        // Perform additional actions, such as updating your database, sending emails, etc.
-        const paymentType = ipnData === null || ipnData === void 0 ? void 0 : ipnData.data.reference.split('_$_')[0];
-        if (paymentType === common_1.EPaymentType.addFunds) {
-            yield currencyRequest_service_1.CurrencyRequestService.payStackWebHook({
-                data: ipnData,
-            });
-        }
-        else if (paymentType === common_1.EPaymentType.seller) {
-            yield (0, UpdateSellerAfterPay_1.default)({
-                order_id: ipnData === null || ipnData === void 0 ? void 0 : ipnData.data.reference.split('_$_')[1],
-                payment_status: 'finished',
-                price_amount: config_1.default.sellerOneTimePayment,
-            });
+        if (ipnData.data.status === 'success') {
+            // const paymentReference = ipnData.data.reference;
+            // Perform additional actions, such as updating your database, sending emails, etc.
+            const paymentType = ipnData === null || ipnData === void 0 ? void 0 : ipnData.data.reference.split('__')[0];
+            if (paymentType === common_1.EPaymentType.addFunds) {
+                yield currencyRequest_service_1.CurrencyRequestService.payStackWebHook({
+                    data: ipnData,
+                });
+            }
+            else if (paymentType === common_1.EPaymentType.seller) {
+                yield (0, UpdateSellerAfterPay_1.default)({
+                    order_id: ipnData === null || ipnData === void 0 ? void 0 : ipnData.data.reference.split('__')[1],
+                    payment_status: 'finished',
+                    price_amount: config_1.default.sellerOneTimePayment,
+                });
+            }
         }
     }
     // eslint-disable-next-line no-console

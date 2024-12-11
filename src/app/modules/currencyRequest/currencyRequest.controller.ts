@@ -223,22 +223,22 @@ const koraPayWebHook: RequestHandler = catchAsync(
     console.log({ ipnData }, 'webhook kora pay');
     if (ipnData.event === KoraPayEvent.PAYMENT_SUCCESS) {
       console.log('kora pay succss');
-    }
-    if (ipnData.data.status === 'success') {
-      // const paymentReference = ipnData.data.reference;
+      if (ipnData.data.status === 'success') {
+        // const paymentReference = ipnData.data.reference;
 
-      // Perform additional actions, such as updating your database, sending emails, etc.
-      const paymentType = ipnData?.data.reference.split('_$_')[0];
-      if (paymentType === EPaymentType.addFunds) {
-        await CurrencyRequestService.payStackWebHook({
-          data: ipnData,
-        });
-      } else if (paymentType === EPaymentType.seller) {
-        await UpdateSellerAfterPay({
-          order_id: ipnData?.data.reference.split('_$_')[1],
-          payment_status: 'finished',
-          price_amount: config.sellerOneTimePayment,
-        });
+        // Perform additional actions, such as updating your database, sending emails, etc.
+        const paymentType = ipnData?.data.reference.split('__')[0];
+        if (paymentType === EPaymentType.addFunds) {
+          await CurrencyRequestService.payStackWebHook({
+            data: ipnData,
+          });
+        } else if (paymentType === EPaymentType.seller) {
+          await UpdateSellerAfterPay({
+            order_id: ipnData?.data.reference.split('__')[1],
+            payment_status: 'finished',
+            price_amount: config.sellerOneTimePayment,
+          });
+        }
       }
     }
 

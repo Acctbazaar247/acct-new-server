@@ -50,7 +50,7 @@ export const createKoraPayCheckout = async (
       },
       { headers }
     );
-
+    //
     // Extract the checkout URL from the response
     console.log(response.data, 'response from kora pay');
     if (response.data && response.data.data?.checkout_url) {
