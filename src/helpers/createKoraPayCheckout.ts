@@ -38,7 +38,10 @@ export const createKoraPayCheckout = async (
     const response = await axios.post(
       endpoint,
       {
-        amount: request.amount * config.dollarRate,
+        amount:
+          request.currency === 'USD'
+            ? request.amount
+            : request.amount * config.dollarRate,
         currency: request.currency,
         customer: {
           name: request.customerName,

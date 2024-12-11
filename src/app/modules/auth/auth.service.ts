@@ -11,11 +11,10 @@ import { Secret } from 'jsonwebtoken';
 import config from '../../../config';
 import ApiError from '../../../errors/ApiError';
 import createBycryptPassword from '../../../helpers/createBycryptPassword';
-import generateFlutterWavePaymentURL from '../../../helpers/createFlutterWaveInvoice';
+import { createKoraPayCheckout } from '../../../helpers/createKoraPayCheckout';
 import createNowPayInvoice from '../../../helpers/creeateInvoice';
 import { jwtHelpers } from '../../../helpers/jwtHelpers';
 import sendEmail from '../../../helpers/sendEmail';
-import { EPaymentType } from '../../../interfaces/common';
 import EmailTemplates from '../../../shared/EmailTemplates';
 import { checkTimeOfOTP, generateOtp } from '../../../shared/generateOTP';
 import genericEmailTemplate from '../../../shared/GenericEmailTemplates';
@@ -360,14 +359,23 @@ const becomeSeller = async (
     //   isUserExist.id,
     //   config.frontendUrl + `/account/sell-your-account`
     // );
-    const fluterWave = await generateFlutterWavePaymentURL({
+    // user kora pay
+    // const fluterWave = await generateFlutterWavePaymentURL({
+    //   amount: config.sellerOneTimePayment,
+    //   customer_email: isUserExist.email,
+    //   redirect_url: config.frontendUrl + `/account/sell-your-account`,
+    //   tx_ref: isUserExist.id,
+    //   paymentType: EPaymentType.seller,
+    // });
+    const koraPayurl = await createKoraPayCheckout({
       amount: config.sellerOneTimePayment,
-      customer_email: isUserExist.email,
-      redirect_url: config.frontendUrl + `/account/sell-your-account`,
-      tx_ref: isUserExist.id,
-      paymentType: EPaymentType.seller,
+      customerEmail: isUserExist.email,
+      customerName: isUserExist.name,
+      callbackUrl: config.frontendUrl + `/account/sell-your-account`,
+      reference: isUserExist.id,
+      currency: 'USD',
     });
-    txId = fluterWave;
+    txId = koraPayurl.checkoutUrl;
   } else {
     const data = await createNowPayInvoice({
       price_amount: config.sellerOneTimePayment,

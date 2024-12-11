@@ -30,11 +30,10 @@ const http_status_1 = __importDefault(require("http-status"));
 const config_1 = __importDefault(require("../../../config"));
 const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const createBycryptPassword_1 = __importDefault(require("../../../helpers/createBycryptPassword"));
-const createFlutterWaveInvoice_1 = __importDefault(require("../../../helpers/createFlutterWaveInvoice"));
+const createKoraPayCheckout_1 = require("../../../helpers/createKoraPayCheckout");
 const creeateInvoice_1 = __importDefault(require("../../../helpers/creeateInvoice"));
 const jwtHelpers_1 = require("../../../helpers/jwtHelpers");
 const sendEmail_1 = __importDefault(require("../../../helpers/sendEmail"));
-const common_1 = require("../../../interfaces/common");
 const EmailTemplates_1 = __importDefault(require("../../../shared/EmailTemplates"));
 const generateOTP_1 = require("../../../shared/generateOTP");
 const GenericEmailTemplates_1 = __importDefault(require("../../../shared/GenericEmailTemplates"));
@@ -299,14 +298,23 @@ const becomeSeller = (id, payType) => __awaiter(void 0, void 0, void 0, function
         //   isUserExist.id,
         //   config.frontendUrl + `/account/sell-your-account`
         // );
-        const fluterWave = yield (0, createFlutterWaveInvoice_1.default)({
+        // user kora pay
+        // const fluterWave = await generateFlutterWavePaymentURL({
+        //   amount: config.sellerOneTimePayment,
+        //   customer_email: isUserExist.email,
+        //   redirect_url: config.frontendUrl + `/account/sell-your-account`,
+        //   tx_ref: isUserExist.id,
+        //   paymentType: EPaymentType.seller,
+        // });
+        const koraPayurl = yield (0, createKoraPayCheckout_1.createKoraPayCheckout)({
             amount: config_1.default.sellerOneTimePayment,
-            customer_email: isUserExist.email,
-            redirect_url: config_1.default.frontendUrl + `/account/sell-your-account`,
-            tx_ref: isUserExist.id,
-            paymentType: common_1.EPaymentType.seller,
+            customerEmail: isUserExist.email,
+            customerName: isUserExist.name,
+            callbackUrl: config_1.default.frontendUrl + `/account/sell-your-account`,
+            reference: isUserExist.id,
+            currency: 'USD',
         });
-        txId = fluterWave;
+        txId = koraPayurl.checkoutUrl;
     }
     else {
         const data = yield (0, creeateInvoice_1.default)({

@@ -32,7 +32,9 @@ const createKoraPayCheckout = (request) => __awaiter(void 0, void 0, void 0, fun
         };
         // Make the API request
         const response = yield axios_1.default.post(endpoint, {
-            amount: request.amount * config_1.default.dollarRate,
+            amount: request.currency === 'USD'
+                ? request.amount
+                : request.amount * config_1.default.dollarRate,
             currency: request.currency,
             customer: {
                 name: request.customerName,
