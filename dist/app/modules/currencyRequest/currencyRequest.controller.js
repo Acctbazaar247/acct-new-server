@@ -184,9 +184,7 @@ const koraPayWebHook = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
             // Perform additional actions, such as updating your database, sending emails, etc.
             const paymentType = ipnData === null || ipnData === void 0 ? void 0 : ipnData.data.reference.split('__')[0];
             if (paymentType === common_1.EPaymentType.addFunds) {
-                yield currencyRequest_service_1.CurrencyRequestService.payStackWebHook({
-                    data: ipnData,
-                });
+                yield currencyRequest_service_1.CurrencyRequestService.koraPayWebHook(Object.assign({}, ipnData));
             }
             else if (paymentType === common_1.EPaymentType.seller) {
                 yield (0, UpdateSellerAfterPay_1.default)({

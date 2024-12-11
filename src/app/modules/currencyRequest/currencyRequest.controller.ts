@@ -229,8 +229,8 @@ const koraPayWebHook: RequestHandler = catchAsync(
         // Perform additional actions, such as updating your database, sending emails, etc.
         const paymentType = ipnData?.data.reference.split('__')[0];
         if (paymentType === EPaymentType.addFunds) {
-          await CurrencyRequestService.payStackWebHook({
-            data: ipnData,
+          await CurrencyRequestService.koraPayWebHook({
+            ...ipnData,
           });
         } else if (paymentType === EPaymentType.seller) {
           await UpdateSellerAfterPay({

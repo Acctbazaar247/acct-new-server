@@ -235,7 +235,7 @@ const payStackWebHook = async (data: any): Promise<void> => {
 };
 const koraPayWebHook = async (data: TKoraPayWebhookResponse): Promise<void> => {
   console.log(data, 'from Kora pay wave');
-  const order_id = data.data.reference.split('_$_')[1];
+  const order_id = data.data.reference.split('__')[1];
   console.log({ order_id });
   const payment_status = 'finished';
   const isCurrencyRequestExits = await prisma.currencyRequest.findUnique({
