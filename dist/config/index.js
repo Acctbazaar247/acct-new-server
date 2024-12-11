@@ -57,4 +57,5 @@ exports.default = {
     referralFirstPayAmount: parseInt(process.env.REFERRAL_FIRST_PAY_AMOUNT),
     oneSignalID: process.env.ONESIGNAL_ID,
     oneSignalApi: process.env.ONESIGNAL_API,
+    koraApiSecretKey: process.env.KORA_API_SECRET_KEY,
 };

@@ -29,6 +29,7 @@ const prisma_1 = __importDefault(require("../../../shared/prisma"));
 const sendResponse_1 = __importDefault(require("../../../shared/sendResponse"));
 const withdrawalRequest_service_1 = require("../withdrawalRequest/withdrawalRequest.service");
 const currencyRequest_constant_1 = require("./currencyRequest.constant");
+const currencyRequest_interface_1 = require("./currencyRequest.interface");
 const currencyRequest_service_1 = require("./currencyRequest.service");
 const createCurrencyRequest = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const CurrencyRequestData = req.body;
@@ -83,6 +84,17 @@ const createCurrencyRequestWithPayStack = (0, catchAsync_1.default)((req, res) =
     const CurrencyRequestData = req.body;
     const user = req.user;
     const result = yield currencyRequest_service_1.CurrencyRequestService.createCurrencyRequestWithPayStack(Object.assign(Object.assign({}, CurrencyRequestData), { ownById: user.userId }));
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: 'CurrencyRequest Created successfully!',
+        data: result,
+    });
+}));
+const createCurrencyRequestWithKoraPay = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const CurrencyRequestData = req.body;
+    const user = req.user;
+    const result = yield currencyRequest_service_1.CurrencyRequestService.createCurrencyRequestWithKoraPay(Object.assign(Object.assign({}, CurrencyRequestData), { ownById: user.userId }));
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
@@ -153,6 +165,48 @@ const payStackWebHook = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
         data: 'success',
     });
 }));
+const koraPayWebHook = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // const secretHash = config.flutterwave_hash;
+    // const signature = req.headers['verif-hash'];
+    // if (!signature || signature !== secretHash) {
+    //   // This request isn't from Flutterwave; discard
+    //   throw new ApiError(
+    //     httpStatus.BAD_REQUEST,
+    //     'Only allowed from flutterwave'
+    //   );
+    // }
+    const ipnData = req.body;
+    console.log({ ipnData }, 'webhook kora pay');
+    if (ipnData.event === currencyRequest_interface_1.KoraPayEvent.PAYMENT_SUCCESS) {
+        console.log('kora pay succss');
+    }
+    if (ipnData.data.status === 'success') {
+        // const paymentReference = ipnData.data.reference;
+        // Perform additional actions, such as updating your database, sending emails, etc.
+        const paymentType = ipnData === null || ipnData === void 0 ? void 0 : ipnData.data.reference.split('_$_')[0];
+        if (paymentType === common_1.EPaymentType.addFunds) {
+            yield currencyRequest_service_1.CurrencyRequestService.payStackWebHook({
+                data: ipnData,
+            });
+        }
+        else if (paymentType === common_1.EPaymentType.seller) {
+            yield (0, UpdateSellerAfterPay_1.default)({
+                order_id: ipnData === null || ipnData === void 0 ? void 0 : ipnData.data.reference.split('_$_')[1],
+                payment_status: 'finished',
+                price_amount: config_1.default.sellerOneTimePayment,
+            });
+        }
+    }
+    // eslint-disable-next-line no-console
+    console.log({ ipnData }, 'webhook');
+    // eslint-disable-next-line no-unused-vars
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: 'CurrencyRequest retrieved  successfully!',
+        data: 'success',
+    });
+}));
 const getSingleCurrencyRequestIpn = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const ipnData = req.body;
     // eslint-disable-next-line no-unused-vars
@@ -205,4 +259,6 @@ exports.CurrencyRequestController = {
     getSingleCurrencyRequestIpn,
     createCurrencyRequestWithPayStack,
     payStackWebHook,
+    createCurrencyRequestWithKoraPay,
+    koraPayWebHook,
 };
