@@ -1,4 +1,5 @@
 import { CurrencyRequest, EStatusOfWithdrawalRequest } from '@prisma/client';
+import crypto from 'crypto';
 import { Request, Response } from 'express';
 import { RequestHandler } from 'express-serve-static-core';
 import httpStatus from 'http-status';
@@ -219,6 +220,14 @@ const koraPayWebHook: RequestHandler = catchAsync(
     //     'Only allowed from flutterwave'
     //   );
     // }
+    const hash = crypto
+      .createHmac('sha256', config.koraApiSecretKey)
+      .update(JSON.stringify(req.body.data))
+      .digest('hex');
+
+    if (hash !== req.headers['x-korapay-signature']) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Only allowed from kora pay');
+    }
     const ipnData = req.body as TKoraPayWebhookResponse;
     console.log({ ipnData }, 'webhook kora pay');
     if (ipnData.event === KoraPayEvent.PAYMENT_SUCCESS) {
