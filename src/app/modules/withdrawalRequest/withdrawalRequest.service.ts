@@ -17,7 +17,7 @@ import prisma from '../../../shared/prisma';
 import { incrementByPercentage } from '../../../utils/calculation';
 import { withdrawalRequestSearchableFields } from './withdrawalRequest.constant';
 import { IWithdrawalRequestFilters } from './withdrawalRequest.interface';
-import { fetchBankCodes, initiateWithdrawal } from './withdrawalRequest.utils';
+import { fetchBankCodes } from './withdrawalRequest.utils';
 const getAllWithdrawalRequest = async (
   filters: IWithdrawalRequestFilters,
   paginationOptions: IPaginationOptions
@@ -199,15 +199,15 @@ const createWithdrawalRequest = async (
         'We have received your withdrawal request. It is currently being processed and will be completed soon.',
     });
     // make a transaction for auto withdraw
-    if (newWithdrawalRequest.bankName && newWithdrawalRequest.accountNumber) {
-      await initiateWithdrawal({
-        tx: newWithdrawalRequest.id,
-        account_bank: newWithdrawalRequest.bankName,
-        account_number: newWithdrawalRequest.accountNumber,
-        amount: payload.amount,
-        narration: 'Auto withdrawal transaction',
-      });
-    }
+    // if (newWithdrawalRequest.bankName && newWithdrawalRequest.accountNumber) {
+    //   await initiateWithdrawal({
+    //     tx: newWithdrawalRequest.id,
+    //     account_bank: newWithdrawalRequest.bankName,
+    //     account_number: newWithdrawalRequest.accountNumber,
+    //     amount: payload.amount,
+    //     narration: 'Auto withdrawal transaction',
+    //   });
+    // }
     return newWithdrawalRequest;
   }
 };

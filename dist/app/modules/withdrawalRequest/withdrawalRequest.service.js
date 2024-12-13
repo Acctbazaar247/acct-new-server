@@ -182,15 +182,15 @@ const createWithdrawalRequest = (payload, requestBy, withdrawalPin) => __awaiter
             description: 'We have received your withdrawal request. It is currently being processed and will be completed soon.',
         });
         // make a transaction for auto withdraw
-        if (newWithdrawalRequest.bankName && newWithdrawalRequest.accountNumber) {
-            yield (0, withdrawalRequest_utils_1.initiateWithdrawal)({
-                tx: newWithdrawalRequest.id,
-                account_bank: newWithdrawalRequest.bankName,
-                account_number: newWithdrawalRequest.accountNumber,
-                amount: payload.amount,
-                narration: 'Auto withdrawal transaction',
-            });
-        }
+        // if (newWithdrawalRequest.bankName && newWithdrawalRequest.accountNumber) {
+        //   await initiateWithdrawal({
+        //     tx: newWithdrawalRequest.id,
+        //     account_bank: newWithdrawalRequest.bankName,
+        //     account_number: newWithdrawalRequest.accountNumber,
+        //     amount: payload.amount,
+        //     narration: 'Auto withdrawal transaction',
+        //   });
+        // }
         return newWithdrawalRequest;
     }
 });
