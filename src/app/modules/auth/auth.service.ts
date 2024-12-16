@@ -15,6 +15,7 @@ import { createKoraPayCheckout } from '../../../helpers/createKoraPayCheckout';
 import createNowPayInvoice from '../../../helpers/creeateInvoice';
 import { jwtHelpers } from '../../../helpers/jwtHelpers';
 import sendEmail from '../../../helpers/sendEmail';
+import { EPaymentType } from '../../../interfaces/common';
 import EmailTemplates from '../../../shared/EmailTemplates';
 import { checkTimeOfOTP, generateOtp } from '../../../shared/generateOTP';
 import genericEmailTemplate from '../../../shared/GenericEmailTemplates';
@@ -367,12 +368,16 @@ const becomeSeller = async (
     //   tx_ref: isUserExist.id,
     //   paymentType: EPaymentType.seller,
     // });
+    const reference = `${EPaymentType.seller}__${isUserExist.id}__${parseInt(
+      (Math.random() * 339).toString()
+    )}`;
+    console.log(reference);
     const koraPayurl = await createKoraPayCheckout({
       amount: config.sellerOneTimePayment,
       customerEmail: isUserExist.email,
       customerName: isUserExist.name,
       callbackUrl: config.frontendUrl + `/account/sell-your-account`,
-      reference: isUserExist.id,
+      reference,
       currency: 'USD',
     });
     txId = koraPayurl.checkoutUrl;

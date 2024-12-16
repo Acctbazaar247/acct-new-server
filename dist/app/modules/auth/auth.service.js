@@ -34,6 +34,7 @@ const createKoraPayCheckout_1 = require("../../../helpers/createKoraPayCheckout"
 const creeateInvoice_1 = __importDefault(require("../../../helpers/creeateInvoice"));
 const jwtHelpers_1 = require("../../../helpers/jwtHelpers");
 const sendEmail_1 = __importDefault(require("../../../helpers/sendEmail"));
+const common_1 = require("../../../interfaces/common");
 const EmailTemplates_1 = __importDefault(require("../../../shared/EmailTemplates"));
 const generateOTP_1 = require("../../../shared/generateOTP");
 const GenericEmailTemplates_1 = __importDefault(require("../../../shared/GenericEmailTemplates"));
@@ -306,12 +307,14 @@ const becomeSeller = (id, payType) => __awaiter(void 0, void 0, void 0, function
         //   tx_ref: isUserExist.id,
         //   paymentType: EPaymentType.seller,
         // });
+        const reference = `${common_1.EPaymentType.seller}__${isUserExist.id}__${parseInt((Math.random() * 339).toString())}`;
+        console.log(reference);
         const koraPayurl = yield (0, createKoraPayCheckout_1.createKoraPayCheckout)({
             amount: config_1.default.sellerOneTimePayment,
             customerEmail: isUserExist.email,
             customerName: isUserExist.name,
             callbackUrl: config_1.default.frontendUrl + `/account/sell-your-account`,
-            reference: isUserExist.id,
+            reference,
             currency: 'USD',
         });
         txId = koraPayurl.checkoutUrl;
