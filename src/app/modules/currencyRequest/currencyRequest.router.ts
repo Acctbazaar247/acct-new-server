@@ -35,19 +35,19 @@ router.get(
 //   validateRequest(CurrencyRequestValidation.createValidation),
 //   CurrencyRequestController.createCurrencyRequest
 // );
-// router.post(
-//   '/paystack',
-//   auth(UserRole.seller, UserRole.user),
-//   validateRequest(CurrencyRequestValidation.createValidation),
-//   CurrencyRequestController.createCurrencyRequestWithPayStack
-// );
-// please the name is not match with the kora pay. it is useing kora pay
 router.post(
   '/paystack',
   auth(UserRole.seller, UserRole.user),
   validateRequest(CurrencyRequestValidation.createValidation),
-  CurrencyRequestController.createCurrencyRequestWithKoraPay
+  CurrencyRequestController.createCurrencyRequestWithPayStack
 );
+// please the name is not match with the kora pay. it is useing kora pay
+// router.post(
+//   '/paystack',
+//   auth(UserRole.seller, UserRole.user),
+//   validateRequest(CurrencyRequestValidation.createValidation),
+//   CurrencyRequestController.createCurrencyRequestWithKoraPay
+// );
 router.post(
   '/kora-pay',
   auth(UserRole.seller, UserRole.user),

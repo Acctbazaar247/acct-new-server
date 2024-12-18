@@ -188,6 +188,7 @@ const createWithdrawalRequest = async (
         data: {
           ...payload,
           status: EStatusOfWithdrawalRequest.pending,
+          dollarRate: config.dollarRate,
         },
       });
     });

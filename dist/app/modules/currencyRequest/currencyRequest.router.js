@@ -19,14 +19,14 @@ router.get('/:id', (0, auth_1.default)(client_1.UserRole.admin, client_1.UserRol
 //   validateRequest(CurrencyRequestValidation.createValidation),
 //   CurrencyRequestController.createCurrencyRequest
 // );
+router.post('/paystack', (0, auth_1.default)(client_1.UserRole.seller, client_1.UserRole.user), (0, validateRequest_1.default)(currencyRequest_validation_1.CurrencyRequestValidation.createValidation), currencyRequest_controller_1.CurrencyRequestController.createCurrencyRequestWithPayStack);
+// please the name is not match with the kora pay. it is useing kora pay
 // router.post(
 //   '/paystack',
 //   auth(UserRole.seller, UserRole.user),
 //   validateRequest(CurrencyRequestValidation.createValidation),
-//   CurrencyRequestController.createCurrencyRequestWithPayStack
+//   CurrencyRequestController.createCurrencyRequestWithKoraPay
 // );
-// please the name is not match with the kora pay. it is useing kora pay
-router.post('/paystack', (0, auth_1.default)(client_1.UserRole.seller, client_1.UserRole.user), (0, validateRequest_1.default)(currencyRequest_validation_1.CurrencyRequestValidation.createValidation), currencyRequest_controller_1.CurrencyRequestController.createCurrencyRequestWithKoraPay);
 router.post('/kora-pay', (0, auth_1.default)(client_1.UserRole.seller, client_1.UserRole.user), (0, validateRequest_1.default)(currencyRequest_validation_1.CurrencyRequestValidation.createValidation), currencyRequest_controller_1.CurrencyRequestController.createCurrencyRequestWithKoraPay);
 router.post('/', (0, auth_1.default)(client_1.UserRole.seller, client_1.UserRole.user), (0, validateRequest_1.default)(currencyRequest_validation_1.CurrencyRequestValidation.createValidation), currencyRequest_controller_1.CurrencyRequestController.createCurrencyRequestInvoice);
 router.post('/webhook', currencyRequest_controller_1.CurrencyRequestController.payStackWebHook);

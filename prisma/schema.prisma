@@ -332,6 +332,7 @@ model WithdrawalRequest {
   accountNumber String?
   bankName      String?
   walletAddress String?
+  dollarRate    Float?
   isTrc         Boolean?
   ownBy         User                       @relation(fields: [ownById], references: [id], onDelete: Cascade)
   createdAt     DateTime                   @default(now())
