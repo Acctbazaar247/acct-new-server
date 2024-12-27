@@ -172,7 +172,7 @@ const createWithdrawalRequest = (payload, requestBy, withdrawalPin) => __awaiter
             });
             // create withdrawal request
             return yield tx.withdrawalRequest.create({
-                data: Object.assign(Object.assign({}, payload), { status: client_1.EStatusOfWithdrawalRequest.pending, dollarRate: config_1.default.dollarRate }),
+                data: Object.assign(Object.assign({}, payload), { status: client_1.EStatusOfWithdrawalRequest.pending, dollarRate: config_1.default.withdrawDollarRate }),
             });
         }));
         (0, GenericEmailTemplates_1.default)({
