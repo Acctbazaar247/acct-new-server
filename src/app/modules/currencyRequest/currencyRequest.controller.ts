@@ -151,6 +151,7 @@ const getAllCurrencyRequest = catchAsync(
 
 const payStackWebHook: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
+    console.log('revcive fluttwerbae webhook ---- and now checking');
     const secretHash = config.flutterwave_hash;
     const signature = req.headers['verif-hash'];
     if (!signature || signature !== secretHash) {
@@ -182,9 +183,10 @@ const payStackWebHook: RequestHandler = catchAsync(
       }
     } else if (ipnData.data.status === 'successful') {
       // const paymentReference = ipnData.data.reference;
-
+      console.log('i am in webhook inner', ipnData);
       // Perform additional actions, such as updating your database, sending emails, etc.
       const paymentType = ipnData?.data.tx_ref.split('_$_')[0];
+      console.log({ paymentType });
       if (paymentType === EPaymentType.addFunds) {
         await CurrencyRequestService.payStackWebHook({
           data: ipnData,
