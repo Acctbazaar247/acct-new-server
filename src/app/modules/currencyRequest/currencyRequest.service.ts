@@ -211,7 +211,7 @@ const createCurrencyRequestWithKoraPay = async (
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const payStackWebHook = async (data: any): Promise<void> => {
   console.log(data, 'from flutter wave');
-  const order_id = data.data.data.tx_ref.split('__')[1];
+  const order_id = data.data.data.tx_ref.split('_$_')[1];
   console.log({ order_id });
   const payment_status = 'finished';
   const isCurrencyRequestExits = await prisma.currencyRequest.findUnique({
