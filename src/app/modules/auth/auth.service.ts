@@ -368,8 +368,8 @@ const becomeSeller = async (
     //   tx_ref: isUserExist.id,
     //   paymentType: EPaymentType.seller,
     // });
-    const reference = `${EPaymentType.seller}__${isUserExist.id}__${parseInt(
-      (Math.random() * 339).toString()
+    const reference = `${EPaymentType.seller}__${isUserExist.id}__${Math.floor(
+      Math.random() * 339
     )}`;
     console.log(reference);
     const koraPayurl = await createKoraPayCheckout({
@@ -378,7 +378,7 @@ const becomeSeller = async (
       customerName: isUserExist.name,
       callbackUrl: config.frontendUrl + `/account/sell-your-account`,
       reference,
-      currency: 'USD',
+      currency: 'NGN',
     });
     txId = koraPayurl.checkoutUrl;
   } else {

@@ -307,7 +307,7 @@ const becomeSeller = (id, payType) => __awaiter(void 0, void 0, void 0, function
         //   tx_ref: isUserExist.id,
         //   paymentType: EPaymentType.seller,
         // });
-        const reference = `${common_1.EPaymentType.seller}__${isUserExist.id}__${parseInt((Math.random() * 339).toString())}`;
+        const reference = `${common_1.EPaymentType.seller}__${isUserExist.id}__${Math.floor(Math.random() * 339)}`;
         console.log(reference);
         const koraPayurl = yield (0, createKoraPayCheckout_1.createKoraPayCheckout)({
             amount: config_1.default.sellerOneTimePayment,
@@ -315,7 +315,7 @@ const becomeSeller = (id, payType) => __awaiter(void 0, void 0, void 0, function
             customerName: isUserExist.name,
             callbackUrl: config_1.default.frontendUrl + `/account/sell-your-account`,
             reference,
-            currency: 'USD',
+            currency: 'NGN',
         });
         txId = koraPayurl.checkoutUrl;
     }
