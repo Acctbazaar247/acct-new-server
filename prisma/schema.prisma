@@ -115,7 +115,7 @@ enum accountCategory {
   Discord
   Pof
   Hinge
-  // new social media
+
   Grindr
   Viber
   GMX
@@ -126,6 +126,18 @@ enum accountCategory {
   Zoosk
   Okcupid
   SMSmode
+  // new social media
+  Noplace
+  TenTen
+  BeReal
+  Airchat
+  YikYak
+  SubstackNotes
+  Coverstar
+  Jagat
+  Fizz
+  Lemon8
+  Lapse
 
   // Gaming accounts
   Playstation
@@ -168,6 +180,15 @@ enum accountCategory {
   Amazon
   Shopify
   Ebay
+  Shopee
+  OZON
+  RedBook
+  OLX
+  Vinted
+  YoulaRu
+  JDcom
+  Magicbricks
+  Wish
 
   //Accounts & Subscriptions Streaming and entertainment accounts
   Netflix
@@ -185,6 +206,23 @@ enum accountCategory {
   ChatGPT
   Office365
   Paypal
+  // new 
+  Bluesky
+  QQ
+  Kick
+  Damus
+  RTRO
+  Gowalla
+  Yandex
+  Uber
+  Grab
+  Bolt
+  BlaBlaCar
+  inDriver
+  Careem
+  OnTaxi
+  Gett
+
   // Gift card accounts
   AmazonGiftCard
   AmexGiftCard
