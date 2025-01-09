@@ -225,7 +225,11 @@ const createOrders = (payload) => __awaiter(void 0, void 0, void 0, function* ()
     //         config.calculationMoneyRound
     //       );
     const data = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        var _c;
         // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+        if (amountToCutFromTheBuyer < 0) {
+            throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Something went wrong try again latter ');
+        }
         const removeCurrencyFromUser = yield tx.currency.update({
             where: { ownById: isUserExist.id },
             data: {
@@ -236,6 +240,12 @@ const createOrders = (payload) => __awaiter(void 0, void 0, void 0, function* ()
         });
         if (removeCurrencyFromUser.amount < 0) {
             throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Something went wrong tray again latter ');
+        }
+        // if the about is bigger then before throw error
+        if (isUserExist.Currency) {
+            if (removeCurrencyFromUser.amount > ((_c = isUserExist === null || isUserExist === void 0 ? void 0 : isUserExist.Currency) === null || _c === void 0 ? void 0 : _c.amount)) {
+                throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Something went wrong try again latter ');
+            }
         }
         const isAdmin = isSellerExist.role === client_1.UserRole.admin;
         const isSuperAdmin = isSellerExist.role === client_1.UserRole.superAdmin;

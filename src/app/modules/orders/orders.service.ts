@@ -55,7 +55,7 @@ const getAllOrders = async (
         },
       })),
     });
-  } 
+  }
   if (sellerId) {
     const sellers: Prisma.OrdersWhereInput = {
       AND: {
@@ -248,6 +248,12 @@ const createOrders = async (payload: Orders): Promise<Orders | null> => {
   //       );
   const data = await prisma.$transaction(async tx => {
     // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+    if (amountToCutFromTheBuyer < 0) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        'Something went wrong try again latter '
+      );
+    }
     const removeCurrencyFromUser = await tx.currency.update({
       where: { ownById: isUserExist.id },
       data: {
@@ -265,7 +271,15 @@ const createOrders = async (payload: Orders): Promise<Orders | null> => {
         'Something went wrong tray again latter '
       );
     }
-
+    // if the about is bigger then before throw error
+    if (isUserExist.Currency) {
+      if (removeCurrencyFromUser.amount > isUserExist?.Currency?.amount) {
+        throw new ApiError(
+          httpStatus.BAD_REQUEST,
+          'Something went wrong try again latter '
+        );
+      }
+    }
     const isAdmin = isSellerExist.role === UserRole.admin;
     const isSuperAdmin = isSellerExist.role === UserRole.superAdmin;
     if (isAdmin || isSuperAdmin) {
