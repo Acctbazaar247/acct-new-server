@@ -14,6 +14,7 @@ const createNowPayInvoice = async ({
   order_description?: string;
   success_url: string;
   cancel_url: string;
+
   pay_currency_btc: boolean | undefined;
 }): Promise<InvoiceReturn> => {
   const nowPaymentsApiKey = config.nowPaymentApiKey || ''; // Use your sandbox API key
@@ -31,6 +32,7 @@ const createNowPayInvoice = async ({
           : undefined,
         price_currency: 'USD',
         pay_currency: pay_currency_btc ? 'BTC' : undefined,
+        is_fee_paid_by_user: true,
       },
       {
         headers: {

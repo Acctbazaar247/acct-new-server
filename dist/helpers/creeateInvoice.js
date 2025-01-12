@@ -35,7 +35,7 @@ const createNowPayInvoice = (_a) => __awaiter(void 0, void 0, void 0, function* 
     try {
         const response = yield axios_1.default.post(sandboxApiUrl, Object.assign(Object.assign({}, invoice), { price_amount: invoice.price_amount, ipn_callback_url: invoice.ipn_callback_url
                 ? config_1.default.baseServerUrl + invoice.ipn_callback_url
-                : undefined, price_currency: 'USD', pay_currency: pay_currency_btc ? 'BTC' : undefined }), {
+                : undefined, price_currency: 'USD', pay_currency: pay_currency_btc ? 'BTC' : undefined, is_fee_paid_by_user: true }), {
             headers: {
                 'x-api-key': nowPaymentsApiKey,
                 'Content-Type': 'application/json',
