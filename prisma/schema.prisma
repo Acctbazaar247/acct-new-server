@@ -30,52 +30,53 @@ enum EBadgeTitle {
 }
 
 model User {
-  id                  String              @id @default(uuid())
-  name                String
-  email               String              @unique
-  password            String
-  phoneNumber         String?
-  userName            String?
-  shouldSendEmail     Boolean             @default(true)
-  txId                String?
-  createdAt           DateTime            @default(now())
-  updatedAt           DateTime            @updatedAt
-  role                UserRole            @default(user)
-  profileImg          String?             @default("/assets/demo-user.png")
-  isVerified          Boolean             @default(false)
-  isApprovedForSeller Boolean             @default(false)
-  isVerifiedByAdmin   Boolean?
-  isBusinessVerified  Boolean?            @default(false)
-  badge               EBadge?
-  badgeTitle          EBadgeTitle?
-  isBlocked           Boolean?
-  isPaidForSeller     Boolean?
-  withdrawalPin       String?
-  country             String?
-  state               String?
-  city                String?
-  address             String?
-  dateOfBirth         DateTime?
-  failedLoginAttempt  Int?                @default(0)
-  payWith             EPayWith?
-  Account             Account[]
-  Orders              Orders[]
-  Cart                Cart[]
-  Currency            Currency?
-  CurrencyRequest     CurrencyRequest[]
-  WithdrawalRequest   WithdrawalRequest[]
-  VerificationOtp     VerificationOtp[]
-  Message             Message[]
-  SeenMessage         SeenMessage[]
-  Notifications       Notifications[]
-  Kyc                 Kyc?
-  Plan                Plan?
-  Referral            Referral?           @relation(name: "Referral_OwnBy")
-  ReferredByMe        Referral[]          @relation(name: "Referral_By")
-  Review              Review[]            @relation(name: "Review_By")
-  ReviewSeller        Review[]            @relation(name: "Review_Seller_Info")
-  ReviewReply         ReviewReply[]
-  BusinessKyc         BusinessKyc?
+  id                    String                  @id @default(uuid())
+  name                  String
+  email                 String                  @unique
+  password              String
+  phoneNumber           String?
+  userName              String?
+  shouldSendEmail       Boolean                 @default(true)
+  txId                  String?
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  role                  UserRole                @default(user)
+  profileImg            String?                 @default("/assets/demo-user.png")
+  isVerified            Boolean                 @default(false)
+  isApprovedForSeller   Boolean                 @default(false)
+  isVerifiedByAdmin     Boolean?
+  isBusinessVerified    Boolean?                @default(false)
+  badge                 EBadge?
+  badgeTitle            EBadgeTitle?
+  isBlocked             Boolean?
+  isPaidForSeller       Boolean?
+  withdrawalPin         String?
+  country               String?
+  state                 String?
+  city                  String?
+  address               String?
+  dateOfBirth           DateTime?
+  failedLoginAttempt    Int?                    @default(0)
+  payWith               EPayWith?
+  Account               Account[]
+  Orders                Orders[]
+  Cart                  Cart[]
+  Currency              Currency?
+  CurrencyRequest       CurrencyRequest[]
+  WithdrawalRequest     WithdrawalRequest[]
+  VerificationOtp       VerificationOtp[]
+  Message               Message[]
+  SeenMessage           SeenMessage[]
+  Notifications         Notifications[]
+  Kyc                   Kyc?
+  Plan                  Plan?
+  Referral              Referral?               @relation(name: "Referral_OwnBy")
+  ReferredByMe          Referral[]              @relation(name: "Referral_By")
+  Review                Review[]                @relation(name: "Review_By")
+  ReviewSeller          Review[]                @relation(name: "Review_Seller_Info")
+  ReviewReply           ReviewReply[]
+  ManualCurrencyRequest ManualCurrencyRequest[]
+  BusinessKyc           BusinessKyc?
 }
 
 enum EPayWith {
@@ -375,6 +376,31 @@ model WithdrawalRequest {
   ownBy         User                       @relation(fields: [ownById], references: [id], onDelete: Cascade)
   createdAt     DateTime                   @default(now())
   updatedAt     DateTime                   @updatedAt
+}
+
+enum EStatusOfManualCurrencyRequest {
+  pending
+  approved
+  denied
+}
+
+model ManualCurrencyRequest {
+  id              String                         @id @unique @default(uuid())
+  message         String?
+  image           String?
+  requestedAmount Float
+  receivedAmount  Float
+  ownById         String
+  status          EStatusOfManualCurrencyRequest @default(pending)
+  accountName     String?
+  accountNumber   String?
+  bankName        String?
+  walletAddress   String?
+  dollarRate      Float?
+  isTrc           Boolean?
+  ownBy           User                           @relation(fields: [ownById], references: [id], onDelete: Cascade)
+  createdAt       DateTime                       @default(now())
+  updatedAt       DateTime                       @updatedAt
 }
 
 model Message {
