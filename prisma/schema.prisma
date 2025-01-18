@@ -389,18 +389,50 @@ model ManualCurrencyRequest {
   message         String?
   image           String?
   requestedAmount Float
-  receivedAmount  Float
+  receivedAmount  Float?
   ownById         String
   status          EStatusOfManualCurrencyRequest @default(pending)
   accountName     String?
   accountNumber   String?
   bankName        String?
-  walletAddress   String?
+  transactionHash String?
   dollarRate      Float?
-  isTrc           Boolean?
   ownBy           User                           @relation(fields: [ownById], references: [id], onDelete: Cascade)
   createdAt       DateTime                       @default(now())
   updatedAt       DateTime                       @updatedAt
+  bankId          String?
+  bank            Bank?                          @relation(fields: [bankId], references: [id], onDelete: Cascade)
+  cryptoBankId    String?
+  cryptoBank      CryptoBank?                    @relation(fields: [cryptoBankId], references: [id], onDelete: Cascade)
+}
+
+model Bank {
+  id                    String                  @id @unique @default(uuid())
+  accountNumber         String
+  accountName           String
+  bankName              String
+  isActive              Boolean                 @default(true)
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  ManualCurrencyRequest ManualCurrencyRequest[]
+}
+
+enum ECryptoType {
+  USDT
+  USDC
+  BTC
+  SOLANA
+}
+
+model CryptoBank {
+  id                    String                  @id @unique @default(uuid())
+  walletAddress         String
+  cryptoType            ECryptoType
+  isTrc                 Boolean?
+  isActive              Boolean                 @default(true)
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  ManualCurrencyRequest ManualCurrencyRequest[]
 }
 
 model Message {

@@ -7,6 +7,7 @@ import { CurrencyRoutes } from '../modules/currency/currency.router';
 import { CurrencyRequestRoutes } from '../modules/currencyRequest/currencyRequest.router';
 import { fileUploadRoutes } from '../modules/fileUpload/fileUpload.route';
 import { KycRoutes } from '../modules/kyc/kyc.router';
+import { ManualCurrencyRequestRoutes } from '../modules/manualCurrencyRequest/manualCurrencyRequest.router';
 import { MessageRoutes } from '../modules/message/message.router';
 import { NotificationsRoutes } from '../modules/notifications/notifications.router';
 import { OrdersRoutes } from '../modules/orders/orders.router';
@@ -94,6 +95,10 @@ const moduleRoutes = [
   {
     path: '/review',
     route: ReviewRoutes,
+  },
+  {
+    path: '/manual-currency-request',
+    route: ManualCurrencyRequestRoutes,
   },
 ];
 
