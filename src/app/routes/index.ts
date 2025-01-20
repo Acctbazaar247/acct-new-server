@@ -1,8 +1,10 @@
 import express from 'express';
 import { AccountRoutes } from '../modules/account/account.router';
 import { AuthRoutes } from '../modules/auth/auth.route';
+import { BankRoutes } from '../modules/bank/bank.router';
 import { BusinessKycRoutes } from '../modules/businessKyc/businessKyc.router';
 import { CartRoutes } from '../modules/cart/cart.router';
+import { CryptoBankRoutes } from '../modules/cryptoBank/cryptoBank.router';
 import { CurrencyRoutes } from '../modules/currency/currency.router';
 import { CurrencyRequestRoutes } from '../modules/currencyRequest/currencyRequest.router';
 import { fileUploadRoutes } from '../modules/fileUpload/fileUpload.route';
@@ -95,6 +97,14 @@ const moduleRoutes = [
   {
     path: '/review',
     route: ReviewRoutes,
+  },
+  {
+    path: '/bank',
+    route: BankRoutes,
+  },
+  {
+    path: '/crypto-bank',
+    route: CryptoBankRoutes,
   },
   {
     path: '/manual-currency-request',

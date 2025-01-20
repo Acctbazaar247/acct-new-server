@@ -6,12 +6,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const account_router_1 = require("../modules/account/account.router");
 const auth_route_1 = require("../modules/auth/auth.route");
+const bank_router_1 = require("../modules/bank/bank.router");
 const businessKyc_router_1 = require("../modules/businessKyc/businessKyc.router");
 const cart_router_1 = require("../modules/cart/cart.router");
+const cryptoBank_router_1 = require("../modules/cryptoBank/cryptoBank.router");
 const currency_router_1 = require("../modules/currency/currency.router");
 const currencyRequest_router_1 = require("../modules/currencyRequest/currencyRequest.router");
 const fileUpload_route_1 = require("../modules/fileUpload/fileUpload.route");
 const kyc_router_1 = require("../modules/kyc/kyc.router");
+const manualCurrencyRequest_router_1 = require("../modules/manualCurrencyRequest/manualCurrencyRequest.router");
 const message_router_1 = require("../modules/message/message.router");
 const notifications_router_1 = require("../modules/notifications/notifications.router");
 const orders_router_1 = require("../modules/orders/orders.router");
@@ -96,6 +99,18 @@ const moduleRoutes = [
     {
         path: '/review',
         route: review_router_1.ReviewRoutes,
+    },
+    {
+        path: '/bank',
+        route: bank_router_1.BankRoutes,
+    },
+    {
+        path: '/crypto-bank',
+        route: cryptoBank_router_1.CryptoBankRoutes,
+    },
+    {
+        path: '/manual-currency-request',
+        route: manualCurrencyRequest_router_1.ManualCurrencyRequestRoutes,
     },
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));

@@ -12,7 +12,8 @@ router.get(
     UserRole.admin,
     UserRole.superAdmin,
     UserRole.user,
-    UserRole.financeAdmin
+    UserRole.financeAdmin,
+    UserRole.seller
   ),
   ManualCurrencyRequestController.getAllManualCurrencyRequest
 );

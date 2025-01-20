@@ -66,6 +66,48 @@ const getAllManualCurrencyRequest = async (
         : {
             createdAt: 'desc',
           },
+    select: {
+      id: true,
+      message: true,
+      image: true,
+      requestedAmount: true,
+      receivedAmount: true,
+      ownById: true,
+      status: true,
+      accountName: true,
+      accountNumber: true,
+      bankName: true,
+      transactionHash: true,
+      dollarRate: true,
+      createdAt: true,
+      updatedAt: true,
+      bankId: true,
+      cryptoBankId: true,
+      ownBy: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          profileImg: true,
+        },
+      },
+      bank: {
+        select: {
+          id: true,
+          accountName: true,
+          accountNumber: true,
+          bankName: true,
+        },
+      },
+      cryptoBank: {
+        select: {
+          id: true,
+          walletAddress: true,
+          isTrc: true,
+          cryptoType: true,
+        },
+      },
+    },
   });
   const total = await prisma.manualCurrencyRequest.count();
   const output = {
@@ -202,7 +244,7 @@ const updateManualCurrencyRequest = async (
         },
       });
 
-      return tx.manualCurrencyRequest.update({
+      return await tx.manualCurrencyRequest.update({
         where: {
           id: isManualCurrencyRequestExist.id,
         },
@@ -211,6 +253,13 @@ const updateManualCurrencyRequest = async (
           receivedAmount: amountToIncrement,
         },
       });
+    });
+  } else {
+    result = await prisma.manualCurrencyRequest.update({
+      where: {
+        id: isManualCurrencyRequestExist.id,
+      },
+      data: payload,
     });
   }
   if (!result) {
