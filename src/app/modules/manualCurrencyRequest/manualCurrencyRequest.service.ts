@@ -103,8 +103,7 @@ const getAllManualCurrencyRequest = async (
         select: {
           id: true,
           walletAddress: true,
-          isTrc: true,
-          cryptoType: true,
+          name: true,
         },
       },
     },

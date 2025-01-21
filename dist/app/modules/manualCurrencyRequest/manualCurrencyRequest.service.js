@@ -108,8 +108,7 @@ const getAllManualCurrencyRequest = (filters, paginationOptions) => __awaiter(vo
                 select: {
                     id: true,
                     walletAddress: true,
-                    isTrc: true,
-                    cryptoType: true,
+                    name: true,
                 },
             },
         },
