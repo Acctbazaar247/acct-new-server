@@ -51,7 +51,7 @@ const createManualCurrencyRequest = (0, catchAsync_1.default)((req, res) => __aw
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Invalidate Data for Manual Currency Request');
     }
     const user = req.user;
-    const result = yield manualCurrencyRequest_service_1.ManualCurrencyRequestService.createManualCurrencyRequest(Object.assign(Object.assign({}, ManualCurrencyRequestData), { ownById: user.userId, status: client_1.EStatusOfManualCurrencyRequest.pending, dollarRate: config_1.default.dollarRate, receivedAmount: null }));
+    const result = yield manualCurrencyRequest_service_1.ManualCurrencyRequestService.createManualCurrencyRequest(Object.assign(Object.assign({}, ManualCurrencyRequestData), { ownById: user.userId, status: client_1.EStatusOfManualCurrencyRequest.pending, dollarRate: config_1.default.manualDollarRate, receivedAmount: null }));
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,

@@ -61,7 +61,7 @@ const createManualCurrencyRequest: RequestHandler = catchAsync(
         ...ManualCurrencyRequestData,
         ownById: user.userId,
         status: EStatusOfManualCurrencyRequest.pending,
-        dollarRate: config.dollarRate,
+        dollarRate: config.manualDollarRate,
         receivedAmount: null,
       });
     sendResponse<ManualCurrencyRequest>(res, {

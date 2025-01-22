@@ -58,4 +58,5 @@ exports.default = {
     oneSignalID: process.env.ONESIGNAL_ID,
     oneSignalApi: process.env.ONESIGNAL_API,
     koraApiSecretKey: process.env.KORA_API_SECRET_KEY,
+    manualDollarRate: parseFloat(process.env.MANUAL_DOLLAR_RATE),
 };
