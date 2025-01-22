@@ -28,6 +28,8 @@ const client_1 = require("@prisma/client");
 const http_status_1 = __importDefault(require("http-status"));
 const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const paginationHelper_1 = require("../../../helpers/paginationHelper");
+const sendEmail_1 = __importDefault(require("../../../helpers/sendEmail"));
+const EmailTemplates_1 = __importDefault(require("../../../shared/EmailTemplates"));
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
 const manualCurrencyRequest_constant_1 = require("./manualCurrencyRequest.constant");
 const getAllManualCurrencyRequest = (filters, paginationOptions) => __awaiter(void 0, void 0, void 0, function* () {
@@ -222,7 +224,7 @@ const updateManualCurrencyRequest = (id, payload) => __awaiter(void 0, void 0, v
                     },
                 },
             });
-            return yield tx.manualCurrencyRequest.update({
+            const output = yield tx.manualCurrencyRequest.update({
                 where: {
                     id: isManualCurrencyRequestExist.id,
                 },
@@ -231,6 +233,13 @@ const updateManualCurrencyRequest = (id, payload) => __awaiter(void 0, void 0, v
                     receivedAmount: amountToIncrement,
                 },
             });
+            (0, sendEmail_1.default)({ to: user.email }, {
+                subject: EmailTemplates_1.default.manualCurrencyRequestApproved.subject,
+                html: EmailTemplates_1.default.manualCurrencyRequestApproved.html({
+                    amount: amountToIncrement,
+                }),
+            });
+            return output;
         }));
     }
     else {

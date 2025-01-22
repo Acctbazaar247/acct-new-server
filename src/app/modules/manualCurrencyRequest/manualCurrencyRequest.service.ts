@@ -6,8 +6,10 @@ import {
 import httpStatus from 'http-status';
 import ApiError from '../../../errors/ApiError';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
+import sendEmail from '../../../helpers/sendEmail';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
+import EmailTemplates from '../../../shared/EmailTemplates';
 import prisma from '../../../shared/prisma';
 import { manualCurrencyRequestSearchableFields } from './manualCurrencyRequest.constant';
 import { IManualCurrencyRequestFilters } from './manualCurrencyRequest.interface';
@@ -243,7 +245,7 @@ const updateManualCurrencyRequest = async (
         },
       });
 
-      return await tx.manualCurrencyRequest.update({
+      const output = await tx.manualCurrencyRequest.update({
         where: {
           id: isManualCurrencyRequestExist.id,
         },
@@ -252,6 +254,16 @@ const updateManualCurrencyRequest = async (
           receivedAmount: amountToIncrement,
         },
       });
+      sendEmail(
+        { to: user.email },
+        {
+          subject: EmailTemplates.manualCurrencyRequestApproved.subject,
+          html: EmailTemplates.manualCurrencyRequestApproved.html({
+            amount: amountToIncrement,
+          }),
+        }
+      );
+      return output;
     });
   } else {
     result = await prisma.manualCurrencyRequest.update({
