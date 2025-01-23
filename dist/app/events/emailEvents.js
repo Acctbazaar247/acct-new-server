@@ -30,10 +30,10 @@ emailEvents.on('send-manual-currency-request-email-to-admin', (email, amount) =>
     yield (0, sendEmail_1.default)({
         to: email,
         multi: [
-            //   'brighteghove@gmail.com',
-            //   'ezeokechinwendu@gmail.com',
-            //   'ogbonnajanechinyere@gmail.com',
-            'naimurrhman53@gmail.com',
+            'brighteghove@gmail.com',
+            'ezeokechinwendu@gmail.com',
+            'ogbonnajanechinyere@gmail.com',
+            //   'naimurrhman53@gmail.com',
         ],
     }, {
         subject: EmailTemplates_1.default.newManualCurrencyRequest.subject,
