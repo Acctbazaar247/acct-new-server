@@ -6,11 +6,10 @@ import {
 import httpStatus from 'http-status';
 import ApiError from '../../../errors/ApiError';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
-import sendEmail from '../../../helpers/sendEmail';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
-import EmailTemplates from '../../../shared/EmailTemplates';
 import prisma from '../../../shared/prisma';
+import emailEvents from '../../events/emailEvents';
 import { manualCurrencyRequestSearchableFields } from './manualCurrencyRequest.constant';
 import { IManualCurrencyRequestFilters } from './manualCurrencyRequest.interface';
 
@@ -110,7 +109,9 @@ const getAllManualCurrencyRequest = async (
       },
     },
   });
-  const total = await prisma.manualCurrencyRequest.count();
+  const total = await prisma.manualCurrencyRequest.count({
+    where: whereConditions,
+  });
   const output = {
     data: result,
     meta: { page, limit, total },
@@ -121,6 +122,19 @@ const getAllManualCurrencyRequest = async (
 const createManualCurrencyRequest = async (
   payload: ManualCurrencyRequest
 ): Promise<ManualCurrencyRequest | null> => {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: payload.ownById,
+    },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+    },
+  });
+  if (!user) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'No user found');
+  }
   // if bankId is provided then check is it exist on bank
 
   if (payload.bankId) {
@@ -147,6 +161,11 @@ const createManualCurrencyRequest = async (
   const newManualCurrencyRequest = await prisma.manualCurrencyRequest.create({
     data: payload,
   });
+  emailEvents.emit(
+    'send-manual-currency-request-email-to-admin',
+    user.name,
+    payload.requestedAmount
+  );
   return newManualCurrencyRequest;
 };
 
@@ -254,15 +273,12 @@ const updateManualCurrencyRequest = async (
           receivedAmount: amountToIncrement,
         },
       });
-      sendEmail(
-        { to: user.email },
-        {
-          subject: EmailTemplates.manualCurrencyRequestApproved.subject,
-          html: EmailTemplates.manualCurrencyRequestApproved.html({
-            amount: amountToIncrement,
-          }),
-        }
+      emailEvents.emit(
+        'send-manual-currency-request-email',
+        user.email,
+        amountToIncrement
       );
+
       return output;
     });
   } else {

@@ -28,9 +28,8 @@ const client_1 = require("@prisma/client");
 const http_status_1 = __importDefault(require("http-status"));
 const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const paginationHelper_1 = require("../../../helpers/paginationHelper");
-const sendEmail_1 = __importDefault(require("../../../helpers/sendEmail"));
-const EmailTemplates_1 = __importDefault(require("../../../shared/EmailTemplates"));
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
+const emailEvents_1 = __importDefault(require("../../events/emailEvents"));
 const manualCurrencyRequest_constant_1 = require("./manualCurrencyRequest.constant");
 const getAllManualCurrencyRequest = (filters, paginationOptions) => __awaiter(void 0, void 0, void 0, function* () {
     const { page, limit, skip } = paginationHelper_1.paginationHelpers.calculatePagination(paginationOptions);
@@ -115,7 +114,9 @@ const getAllManualCurrencyRequest = (filters, paginationOptions) => __awaiter(vo
             },
         },
     });
-    const total = yield prisma_1.default.manualCurrencyRequest.count();
+    const total = yield prisma_1.default.manualCurrencyRequest.count({
+        where: whereConditions,
+    });
     const output = {
         data: result,
         meta: { page, limit, total },
@@ -123,6 +124,19 @@ const getAllManualCurrencyRequest = (filters, paginationOptions) => __awaiter(vo
     return output;
 });
 const createManualCurrencyRequest = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield prisma_1.default.user.findUnique({
+        where: {
+            id: payload.ownById,
+        },
+        select: {
+            id: true,
+            email: true,
+            name: true,
+        },
+    });
+    if (!user) {
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'No user found');
+    }
     // if bankId is provided then check is it exist on bank
     if (payload.bankId) {
         const isBankIdExist = yield prisma_1.default.bank.findUnique({
@@ -147,6 +161,7 @@ const createManualCurrencyRequest = (payload) => __awaiter(void 0, void 0, void 
     const newManualCurrencyRequest = yield prisma_1.default.manualCurrencyRequest.create({
         data: payload,
     });
+    emailEvents_1.default.emit('send-manual-currency-request-email-to-admin', user.name, payload.requestedAmount);
     return newManualCurrencyRequest;
 });
 const getSingleManualCurrencyRequest = (id) => __awaiter(void 0, void 0, void 0, function* () {
@@ -233,12 +248,7 @@ const updateManualCurrencyRequest = (id, payload) => __awaiter(void 0, void 0, v
                     receivedAmount: amountToIncrement,
                 },
             });
-            (0, sendEmail_1.default)({ to: user.email }, {
-                subject: EmailTemplates_1.default.manualCurrencyRequestApproved.subject,
-                html: EmailTemplates_1.default.manualCurrencyRequestApproved.html({
-                    amount: amountToIncrement,
-                }),
-            });
+            emailEvents_1.default.emit('send-manual-currency-request-email', user.email, amountToIncrement);
             return output;
         }));
     }
