@@ -44,3 +44,27 @@ export type TKoraPayWebhookResponse = {
   };
   timestamp: string; // The timestamp of the event
 };
+
+export enum EOxWebhookStatus {
+  Success = 'Success',
+  Pending = 'Pending',
+  Failed = 'Failed',
+}
+
+export type TOXWebhookResponse = {
+  PaymentId: number;
+  MerchantId: string;
+  Amount: number;
+  TotalAmount: number;
+  Currency: string;
+  Email: string;
+  Status: EOxWebhookStatus; // Assuming these are possible statuses
+  Signature: string;
+  BillingID: string;
+  AmountUSD: number;
+  TotalAmountUSD: number;
+  Insufficient: boolean;
+  Test: boolean;
+  ClientId: string;
+  TxHashes: string[];
+};

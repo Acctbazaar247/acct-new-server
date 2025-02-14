@@ -60,9 +60,16 @@ router.post(
   validateRequest(CurrencyRequestValidation.createValidation),
   CurrencyRequestController.createCurrencyRequestInvoice
 );
+router.post(
+  '/ox-process',
+  auth(UserRole.seller, UserRole.user),
+  validateRequest(CurrencyRequestValidation.createValidation),
+  CurrencyRequestController.createCurrencyRequestWithOX
+);
 
 router.post('/webhook', CurrencyRequestController.payStackWebHook);
 router.post('/kora-pay-webhook', CurrencyRequestController.koraPayWebHook);
+router.post('/ox-process-webhook', CurrencyRequestController.OxWebHook);
 router.post(
   '/nowpayments-ipn',
   CurrencyRequestController.getSingleCurrencyRequestIpn

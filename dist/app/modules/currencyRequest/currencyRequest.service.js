@@ -28,6 +28,7 @@ const client_1 = require("@prisma/client");
 const http_status_1 = __importDefault(require("http-status"));
 const config_1 = __importDefault(require("../../../config"));
 const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
+const OxPaymentInvoice_1 = __importDefault(require("../../../helpers/OxPaymentInvoice"));
 const UpdateCurrencyByRequestAfterPay_1 = __importDefault(require("../../../helpers/UpdateCurrencyByRequestAfterPay"));
 const createFlutterWaveInvoice_1 = __importDefault(require("../../../helpers/createFlutterWaveInvoice"));
 const createKoraPayCheckout_1 = require("../../../helpers/createKoraPayCheckout");
@@ -127,6 +128,32 @@ const createCurrencyRequestInvoice = (payload) => __awaiter(void 0, void 0, void
     }));
     return newCurrencyRequest;
 });
+const createCurrencyRequestWithOX = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const newCurrencyRequest = prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+        const { pay_currency_btc } = payload, others = __rest(payload, ["pay_currency_btc"]);
+        const result = yield tx.currencyRequest.create({
+            data: Object.assign(Object.assign({}, others), { message: 'auto', status: client_1.EStatusOfCurrencyRequest.pending }),
+            include: {
+                ownBy: true,
+            },
+        });
+        if (!newCurrencyRequest) {
+            throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Failed to create Invoie');
+        }
+        // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+        const dataUrl = yield (0, OxPaymentInvoice_1.default)({
+            amountUsd: result.amount,
+            email: result.ownBy.email,
+            clientId: result.id,
+            billingId: result.id,
+            paymentType: common_1.EPaymentType.addFunds,
+            redirectUrl: config_1.default.frontendUrl + 'account/wallet' || '',
+        });
+        return Object.assign(Object.assign({}, result), { url: dataUrl });
+    }));
+    return newCurrencyRequest;
+});
 const createCurrencyRequestWithPayStack = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const newCurrencyRequest = prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
         const result = yield tx.currencyRequest.create({
@@ -183,6 +210,31 @@ const createCurrencyRequestWithKoraPay = (payload) => __awaiter(void 0, void 0, 
         return Object.assign(Object.assign({}, result), { url: koraPay.checkoutUrl });
     }));
     return newCurrencyRequest;
+});
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const OxWebHook = (data) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(data, 'from Ox');
+    const order_id = data.BillingID.split('_$_')[1];
+    console.log({ order_id });
+    const payment_status = 'finished';
+    const isCurrencyRequestExits = yield prisma_1.default.currencyRequest.findUnique({
+        where: { id: order_id },
+    });
+    if (!isCurrencyRequestExits) {
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'currency request not found!');
+    }
+    // change status of currency Request and add money to user
+    yield (0, UpdateCurrencyByRequestAfterPay_1.default)({
+        order_id,
+        payment_status,
+        price_amount: isCurrencyRequestExits.amount,
+    });
+    // const result = await prisma.currencyRequest.findUnique({
+    //   where: {
+    //     id,
+    //   },
+    // });
+    // return result;
 });
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const payStackWebHook = (data) => __awaiter(void 0, void 0, void 0, function* () {
@@ -342,4 +394,6 @@ exports.CurrencyRequestService = {
     payStackWebHook,
     createCurrencyRequestWithKoraPay,
     koraPayWebHook,
+    createCurrencyRequestWithOX,
+    OxWebHook,
 };

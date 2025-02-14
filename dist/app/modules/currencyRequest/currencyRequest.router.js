@@ -29,8 +29,10 @@ router.post('/paystack', (0, auth_1.default)(client_1.UserRole.seller, client_1.
 // );
 router.post('/kora-pay', (0, auth_1.default)(client_1.UserRole.seller, client_1.UserRole.user), (0, validateRequest_1.default)(currencyRequest_validation_1.CurrencyRequestValidation.createValidation), currencyRequest_controller_1.CurrencyRequestController.createCurrencyRequestWithKoraPay);
 router.post('/', (0, auth_1.default)(client_1.UserRole.seller, client_1.UserRole.user), (0, validateRequest_1.default)(currencyRequest_validation_1.CurrencyRequestValidation.createValidation), currencyRequest_controller_1.CurrencyRequestController.createCurrencyRequestInvoice);
+router.post('/ox-process', (0, auth_1.default)(client_1.UserRole.seller, client_1.UserRole.user), (0, validateRequest_1.default)(currencyRequest_validation_1.CurrencyRequestValidation.createValidation), currencyRequest_controller_1.CurrencyRequestController.createCurrencyRequestWithOX);
 router.post('/webhook', currencyRequest_controller_1.CurrencyRequestController.payStackWebHook);
 router.post('/kora-pay-webhook', currencyRequest_controller_1.CurrencyRequestController.koraPayWebHook);
+router.post('/ox-process-webhook', currencyRequest_controller_1.CurrencyRequestController.OxWebHook);
 router.post('/nowpayments-ipn', currencyRequest_controller_1.CurrencyRequestController.getSingleCurrencyRequestIpn);
 router.patch('/:id', (0, auth_1.default)(client_1.UserRole.superAdmin, client_1.UserRole.financeAdmin), (0, validateRequest_1.default)(currencyRequest_validation_1.CurrencyRequestValidation.updateValidation), currencyRequest_controller_1.CurrencyRequestController.updateCurrencyRequest);
 router.delete('/:id', (0, auth_1.default)(client_1.UserRole.superAdmin, client_1.UserRole.financeAdmin), currencyRequest_controller_1.CurrencyRequestController.deleteCurrencyRequest);

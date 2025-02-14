@@ -55,6 +55,32 @@ const createCurrencyRequest = (0, catchAsync_1.default)((req, res) => __awaiter(
         data: result,
     });
 }));
+const createCurrencyRequestWithOX = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const CurrencyRequestData = req.body;
+    const user = req.user;
+    // const userInfo = await prisma.user.findFirst({
+    //   where: { id: user.userId },
+    // });
+    const result = yield currencyRequest_service_1.CurrencyRequestService.createCurrencyRequestWithOX(Object.assign(Object.assign({}, CurrencyRequestData), { ownById: user.userId }));
+    // await sendEmail(
+    //   { to: config.emailUser as string },
+    //   {
+    //     subject: EmailTemplates.requestForCurrencyToAdmin.subject,
+    //     html: EmailTemplates.requestForCurrencyToAdmin.html({
+    //       amount: result?.amount,
+    //       userEmail: userInfo?.email,
+    //       userName: userInfo?.name,
+    //       userProfileImg: userInfo?.profileImg || '',
+    //     }),
+    //   }
+    // );
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: 'CurrencyRequest Created successfully!',
+        data: result,
+    });
+}));
 const createCurrencyRequestInvoice = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const CurrencyRequestData = req.body;
     const user = req.user;
@@ -116,6 +142,42 @@ const getAllCurrencyRequest = (0, catchAsync_1.default)((req, res) => __awaiter(
         message: 'CurrencyRequest retrieved successfully !',
         meta: result.meta,
         data: result.data,
+    });
+}));
+const OxWebHook = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log('revcive OX webhook ---- and now checking');
+    // const secretHash = config.flutterwave_hash;
+    // const signature = req.headers['verif-hash'];
+    // if (!signature || signature !== secretHash) {
+    //   // This request isn't from Flutterwave; discard
+    //   throw new ApiError(
+    //     httpStatus.BAD_REQUEST,
+    //     'Only allowed from flutterwave'
+    //   );
+    // }
+    const ipnData = req.body;
+    console.log({ ipnData }, 'webhook');
+    if (ipnData.Status === currencyRequest_interface_1.EOxWebhookStatus.Success) {
+        // const paymentReference = ipnData.data.reference;
+        console.log('i am in webhook inner', ipnData);
+        // Perform additional actions, such as updating your database, sending emails, etc.
+        const paymentType = ipnData === null || ipnData === void 0 ? void 0 : ipnData.BillingID.split('_$_')[0];
+        if (paymentType === common_1.EPaymentType.addFunds) {
+            yield currencyRequest_service_1.CurrencyRequestService.OxWebHook(ipnData);
+        }
+        else if (paymentType === common_1.EPaymentType.seller) {
+            yield (0, UpdateSellerAfterPay_1.default)({
+                order_id: ipnData === null || ipnData === void 0 ? void 0 : ipnData.BillingID.split('_$_')[1],
+                payment_status: 'finished',
+                price_amount: config_1.default.sellerOneTimePayment,
+            });
+        }
+    }
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: 'CurrencyRequest retrieved  successfully!',
+        data: 'success',
     });
 }));
 const payStackWebHook = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -270,4 +332,6 @@ exports.CurrencyRequestController = {
     payStackWebHook,
     createCurrencyRequestWithKoraPay,
     koraPayWebHook,
+    createCurrencyRequestWithOX,
+    OxWebHook,
 };

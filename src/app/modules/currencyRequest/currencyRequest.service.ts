@@ -6,6 +6,7 @@ import {
 import httpStatus from 'http-status';
 import config from '../../../config';
 import ApiError from '../../../errors/ApiError';
+import OxPaymentInvoice from '../../../helpers/OxPaymentInvoice';
 import UpdateCurrencyByRequestAfterPay from '../../../helpers/UpdateCurrencyByRequestAfterPay';
 import generateFlutterWavePaymentURL from '../../../helpers/createFlutterWaveInvoice';
 import { createKoraPayCheckout } from '../../../helpers/createKoraPayCheckout';
@@ -23,6 +24,7 @@ import {
   ICreateCurrencyRequestRes,
   ICurrencyRequestFilters,
   TKoraPayWebhookResponse,
+  TOXWebhookResponse,
 } from './currencyRequest.interface';
 
 const getAllCurrencyRequest = async (
@@ -134,6 +136,40 @@ const createCurrencyRequestInvoice = async (
 
   return newCurrencyRequest;
 };
+const createCurrencyRequestWithOX = async (
+  payload: CurrencyRequestPayload
+): Promise<ICreateCurrencyRequestRes | null> => {
+  const newCurrencyRequest = prisma.$transaction(async tx => {
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+    const { pay_currency_btc, ...others } = payload;
+    const result = await tx.currencyRequest.create({
+      data: {
+        ...others,
+        message: 'auto',
+        status: EStatusOfCurrencyRequest.pending,
+      },
+      include: {
+        ownBy: true,
+      },
+    });
+    if (!newCurrencyRequest) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to create Invoie');
+    }
+
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+    const dataUrl = await OxPaymentInvoice({
+      amountUsd: result.amount,
+      email: result.ownBy.email,
+      clientId: result.id,
+      billingId: result.id,
+      paymentType: EPaymentType.addFunds,
+      redirectUrl: config.frontendUrl + 'account/wallet' || '',
+    });
+    return { ...result, url: dataUrl };
+  });
+
+  return newCurrencyRequest;
+};
 const createCurrencyRequestWithPayStack = async (
   payload: CurrencyRequest
 ): Promise<ICreateCurrencyRequestRes | null> => {
@@ -206,6 +242,32 @@ const createCurrencyRequestWithKoraPay = async (
   });
 
   return newCurrencyRequest;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const OxWebHook = async (data: TOXWebhookResponse): Promise<void> => {
+  console.log(data, 'from Ox');
+  const order_id = data.BillingID.split('_$_')[1];
+  console.log({ order_id });
+  const payment_status = 'finished';
+  const isCurrencyRequestExits = await prisma.currencyRequest.findUnique({
+    where: { id: order_id },
+  });
+  if (!isCurrencyRequestExits) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'currency request not found!');
+  }
+  // change status of currency Request and add money to user
+  await UpdateCurrencyByRequestAfterPay({
+    order_id,
+    payment_status,
+    price_amount: isCurrencyRequestExits.amount,
+  });
+  // const result = await prisma.currencyRequest.findUnique({
+  //   where: {
+  //     id,
+  //   },
+  // });
+  // return result;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -386,4 +448,6 @@ export const CurrencyRequestService = {
   payStackWebHook,
   createCurrencyRequestWithKoraPay,
   koraPayWebHook,
+  createCurrencyRequestWithOX,
+  OxWebHook,
 };

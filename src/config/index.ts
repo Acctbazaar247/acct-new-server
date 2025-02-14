@@ -71,4 +71,5 @@ export default {
   oneSignalApi: process.env.ONESIGNAL_API as string,
   koraApiSecretKey: process.env.KORA_API_SECRET_KEY as string,
   manualDollarRate: parseFloat(process.env.MANUAL_DOLLAR_RATE as string),
+  oxAPIKey: process.env.OX_MERCHANT_KEY as string,
 };
