@@ -26,7 +26,7 @@ const OxPaymentInvoice = (params) => __awaiter(void 0, void 0, void 0, function*
         Email: params.email,
         ClientId: params.clientId,
         MerchantId: config_1.default.oxAPIKey,
-        BillingID: `${params.billingId}_$_${params.paymentType}`,
+        BillingID: `${params.paymentType}_$_${params.billingId}`,
         Test: test.toString(),
         ReturnUrl: true.toString(),
         CancelUrl: params.redirectUrl.toString(),
