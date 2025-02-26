@@ -12,6 +12,7 @@ interface CreatePaymentParams {
   redirectUrl: string; // Optional: Return payment form as a RedirectURL
   autoReturn?: boolean; // Optional: Auto-redirect to SuccessUrl after transaction
   paymentType: EPaymentType;
+  currency: string;
 }
 
 const OxPaymentInvoice = async (
@@ -21,7 +22,7 @@ const OxPaymentInvoice = async (
   const test = true;
   const payload = {
     AmountUSD: params.amountUsd.toString(),
-    Currency: 'BTC',
+    Currency: params.currency,
     Email: params.email,
     ClientId: params.clientId,
     MerchantId: config.oxAPIKey,

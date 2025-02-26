@@ -33,6 +33,7 @@ const createBycryptPassword_1 = __importDefault(require("../../../helpers/create
 const createKoraPayCheckout_1 = require("../../../helpers/createKoraPayCheckout");
 const creeateInvoice_1 = __importDefault(require("../../../helpers/creeateInvoice"));
 const jwtHelpers_1 = require("../../../helpers/jwtHelpers");
+const OxPaymentInvoice_1 = __importDefault(require("../../../helpers/OxPaymentInvoice"));
 const sendEmail_1 = __importDefault(require("../../../helpers/sendEmail"));
 const common_1 = require("../../../interfaces/common");
 const EmailTemplates_1 = __importDefault(require("../../../shared/EmailTemplates"));
@@ -276,7 +277,7 @@ const sendWithdrawalTokenEmail = (id) => __awaiter(void 0, void 0, void 0, funct
         otp,
     };
 });
-const becomeSeller = (id, payType) => __awaiter(void 0, void 0, void 0, function* () {
+const becomeSeller = (id, payType, currency) => __awaiter(void 0, void 0, void 0, function* () {
     const isUserExist = yield prisma_1.default.user.findUnique({
         where: { id },
     });
@@ -308,7 +309,6 @@ const becomeSeller = (id, payType) => __awaiter(void 0, void 0, void 0, function
         //   paymentType: EPaymentType.seller,
         // });
         const reference = `${common_1.EPaymentType.seller}__${isUserExist.id}__${Math.floor(Math.random() * 339)}`;
-        console.log(reference);
         const koraPayurl = yield (0, createKoraPayCheckout_1.createKoraPayCheckout)({
             amount: config_1.default.sellerOneTimePayment,
             customerEmail: isUserExist.email,
@@ -318,6 +318,18 @@ const becomeSeller = (id, payType) => __awaiter(void 0, void 0, void 0, function
             currency: 'NGN',
         });
         txId = koraPayurl.checkoutUrl;
+    }
+    else if (payType === client_1.EPayWith.oxProcessing) {
+        const data = yield (0, OxPaymentInvoice_1.default)({
+            amountUsd: config_1.default.sellerOneTimePayment,
+            email: isUserExist.email,
+            redirectUrl: config_1.default.frontendUrl + `/account/sell-your-account`,
+            billingId: isUserExist.id,
+            clientId: isUserExist.id,
+            paymentType: common_1.EPaymentType.seller,
+            currency: currency || 'BTC',
+        });
+        txId = data;
     }
     else {
         const data = yield (0, creeateInvoice_1.default)({

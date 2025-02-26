@@ -208,8 +208,12 @@ const sendForgotEmail: RequestHandler = catchAsync(
 const becomeSeller: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const user = req.user as JwtPayload;
-    const { payWith } = req.body;
-    const output = await AuthService.becomeSeller(user.userId, payWith);
+    const { payWith, currency } = req.body;
+    const output = await AuthService.becomeSeller(
+      user.userId,
+      payWith,
+      currency
+    );
 
     sendResponse<{ txId: string }>(res, {
       statusCode: httpStatus.OK,

@@ -29,7 +29,7 @@ router.post('/paystack', (0, auth_1.default)(client_1.UserRole.seller, client_1.
 // );
 router.post('/kora-pay', (0, auth_1.default)(client_1.UserRole.seller, client_1.UserRole.user), (0, validateRequest_1.default)(currencyRequest_validation_1.CurrencyRequestValidation.createValidation), currencyRequest_controller_1.CurrencyRequestController.createCurrencyRequestWithKoraPay);
 router.post('/', (0, auth_1.default)(client_1.UserRole.seller, client_1.UserRole.user), (0, validateRequest_1.default)(currencyRequest_validation_1.CurrencyRequestValidation.createValidation), currencyRequest_controller_1.CurrencyRequestController.createCurrencyRequestInvoice);
-router.post('/ox-process', (0, auth_1.default)(client_1.UserRole.seller, client_1.UserRole.user), (0, validateRequest_1.default)(currencyRequest_validation_1.CurrencyRequestValidation.createValidation), currencyRequest_controller_1.CurrencyRequestController.createCurrencyRequestWithOX);
+router.post('/ox-process', (0, auth_1.default)(client_1.UserRole.seller, client_1.UserRole.user), (0, validateRequest_1.default)(currencyRequest_validation_1.CurrencyRequestValidation.createValidationForOx), currencyRequest_controller_1.CurrencyRequestController.createCurrencyRequestWithOX);
 router.post('/webhook', currencyRequest_controller_1.CurrencyRequestController.payStackWebHook);
 router.post('/kora-pay-webhook', currencyRequest_controller_1.CurrencyRequestController.koraPayWebHook);
 router.post('/ox-process-webhook', currencyRequest_controller_1.CurrencyRequestController.OxWebHook);

@@ -15,6 +15,10 @@ export type ICreateCurrencyRequestRes = {
 export type CurrencyRequestPayload = {
   pay_currency_btc: boolean | undefined;
 } & CurrencyRequest;
+export type CurrencyRequestPayloadForOx = {
+  pay_currency_btc: boolean | undefined;
+  currency: string;
+} & CurrencyRequest;
 export enum KoraPayEvent {
   // eslint-disable-next-line no-unused-vars
   PAYMENT_SUCCESS = 'charge.success',

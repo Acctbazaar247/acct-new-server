@@ -22,7 +22,7 @@ const OxPaymentInvoice = (params) => __awaiter(void 0, void 0, void 0, function*
     const test = true;
     const payload = {
         AmountUSD: params.amountUsd.toString(),
-        Currency: 'BTC',
+        Currency: params.currency,
         Email: params.email,
         ClientId: params.clientId,
         MerchantId: config_1.default.oxAPIKey,

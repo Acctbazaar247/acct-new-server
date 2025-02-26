@@ -70,7 +70,7 @@ const initiateWithdrawal = ({ tx, account_bank, account_number, amount, narratio
     }
     catch (error) {
         // Handle any errors that occurred during the request
-        console.error('Error initiating withdrawal:', error);
+        // console.error('Error initiating withdrawal:', error);
     }
 });
 exports.initiateWithdrawal = initiateWithdrawal;

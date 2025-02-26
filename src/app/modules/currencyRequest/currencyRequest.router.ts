@@ -63,7 +63,7 @@ router.post(
 router.post(
   '/ox-process',
   auth(UserRole.seller, UserRole.user),
-  validateRequest(CurrencyRequestValidation.createValidation),
+  validateRequest(CurrencyRequestValidation.createValidationForOx),
   CurrencyRequestController.createCurrencyRequestWithOX
 );
 

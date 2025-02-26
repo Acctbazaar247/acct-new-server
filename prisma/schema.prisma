@@ -83,6 +83,7 @@ enum EPayWith {
   paystack
   nowpay
   wallet
+  oxProcessing
 }
 
 model VerificationOtp {

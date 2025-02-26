@@ -76,6 +76,6 @@ WithdrawalParams): Promise<any> => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     // Handle any errors that occurred during the request
-    console.error('Error initiating withdrawal:', error);
+    // console.error('Error initiating withdrawal:', error);
   }
 };

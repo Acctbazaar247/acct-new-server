@@ -14,6 +14,7 @@ import createBycryptPassword from '../../../helpers/createBycryptPassword';
 import { createKoraPayCheckout } from '../../../helpers/createKoraPayCheckout';
 import createNowPayInvoice from '../../../helpers/creeateInvoice';
 import { jwtHelpers } from '../../../helpers/jwtHelpers';
+import OxPaymentInvoice from '../../../helpers/OxPaymentInvoice';
 import sendEmail from '../../../helpers/sendEmail';
 import { EPaymentType } from '../../../interfaces/common';
 import EmailTemplates from '../../../shared/EmailTemplates';
@@ -336,7 +337,8 @@ const sendWithdrawalTokenEmail = async (
 };
 const becomeSeller = async (
   id: string,
-  payType: EPayWith
+  payType: EPayWith,
+  currency: string | undefined
 ): Promise<{ txId: string }> => {
   const isUserExist = await prisma.user.findUnique({
     where: { id },
@@ -371,7 +373,6 @@ const becomeSeller = async (
     const reference = `${EPaymentType.seller}__${isUserExist.id}__${Math.floor(
       Math.random() * 339
     )}`;
-    console.log(reference);
     const koraPayurl = await createKoraPayCheckout({
       amount: config.sellerOneTimePayment,
       customerEmail: isUserExist.email,
@@ -381,6 +382,17 @@ const becomeSeller = async (
       currency: 'NGN',
     });
     txId = koraPayurl.checkoutUrl;
+  } else if (payType === EPayWith.oxProcessing) {
+    const data = await OxPaymentInvoice({
+      amountUsd: config.sellerOneTimePayment,
+      email: isUserExist.email,
+      redirectUrl: config.frontendUrl + `/account/sell-your-account`,
+      billingId: isUserExist.id,
+      clientId: isUserExist.id,
+      paymentType: EPaymentType.seller,
+      currency: currency || 'BTC',
+    });
+    txId = data;
   } else {
     const data = await createNowPayInvoice({
       price_amount: config.sellerOneTimePayment,

@@ -21,6 +21,7 @@ import prisma from '../../../shared/prisma';
 import { currencyRequestSearchableFields } from './currencyRequest.constant';
 import {
   CurrencyRequestPayload,
+  CurrencyRequestPayloadForOx,
   ICreateCurrencyRequestRes,
   ICurrencyRequestFilters,
   TKoraPayWebhookResponse,
@@ -137,11 +138,11 @@ const createCurrencyRequestInvoice = async (
   return newCurrencyRequest;
 };
 const createCurrencyRequestWithOX = async (
-  payload: CurrencyRequestPayload
+  payload: CurrencyRequestPayloadForOx
 ): Promise<ICreateCurrencyRequestRes | null> => {
   const newCurrencyRequest = prisma.$transaction(async tx => {
     // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-    const { pay_currency_btc, ...others } = payload;
+    const { pay_currency_btc, currency, ...others } = payload;
     const result = await tx.currencyRequest.create({
       data: {
         ...others,
@@ -162,6 +163,7 @@ const createCurrencyRequestWithOX = async (
       email: result.ownBy.email,
       clientId: result.id,
       billingId: result.id,
+      currency: currency,
       paymentType: EPaymentType.addFunds,
       redirectUrl: config.frontendUrl + 'account/wallet' || '',
     });
