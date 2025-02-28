@@ -156,6 +156,24 @@ const OxWebHook = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void
     //   );
     // }
     const ipnData = req.body;
+    const WEBHOOK_PASSWORD = config_1.default.oxProcessingWebHookPassword;
+    const { PaymentId, MerchantId, Email, Currency, Signature } = req.body;
+    // Check that all required fields exist
+    if (!PaymentId || !MerchantId || !Email || !Currency || !Signature) {
+        console.error('Missing required parameters for signature verification.');
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Only allowed from oxProcessing');
+    }
+    const dataString = `${PaymentId}:${MerchantId}:${Email}:${Currency}:${WEBHOOK_PASSWORD}`;
+    console.log('Data string to hash:', dataString);
+    // Compute the MD5 hash of the string
+    const computedHash = crypto_1.default
+        .createHash('md5')
+        .update(dataString)
+        .digest('hex');
+    console.log('Computed hash:', computedHash);
+    console.log('Received signature:', Signature);
+    // Compare the computed hash with the signature from the request
+    console.log(computedHash === Signature, 'this is the result of comparison');
     console.log({ ipnData }, 'webhook');
     if (ipnData.Status === currencyRequest_interface_1.EOxWebhookStatus.Success) {
         // const paymentReference = ipnData.data.reference;

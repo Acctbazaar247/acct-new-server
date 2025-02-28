@@ -72,4 +72,5 @@ export default {
   koraApiSecretKey: process.env.KORA_API_SECRET_KEY as string,
   manualDollarRate: parseFloat(process.env.MANUAL_DOLLAR_RATE as string),
   oxAPIKey: process.env.OX_MERCHANT_KEY as string,
+  oxProcessingWebHookPassword: process.env.OX_WEBHOOK_PASSWORD,
 };
