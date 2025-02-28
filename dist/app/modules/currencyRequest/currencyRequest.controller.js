@@ -174,6 +174,10 @@ const OxWebHook = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void
     console.log('Received signature:', Signature);
     // Compare the computed hash with the signature from the request
     console.log(computedHash === Signature, 'this is the result of comparison');
+    // break if not same
+    if (computedHash !== Signature) {
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Only allowed from oxProcessing');
+    }
     console.log({ ipnData }, 'webhook');
     if (ipnData.Status === currencyRequest_interface_1.EOxWebhookStatus.Success) {
         // const paymentReference = ipnData.data.reference;

@@ -221,7 +221,13 @@ const OxWebHook: RequestHandler = catchAsync(
 
     // Compare the computed hash with the signature from the request
     console.log(computedHash === Signature, 'this is the result of comparison');
-
+    // break if not same
+    if (computedHash !== Signature) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        'Only allowed from oxProcessing'
+      );
+    }
     console.log({ ipnData }, 'webhook');
     if (ipnData.Status === EOxWebhookStatus.Success) {
       // const paymentReference = ipnData.data.reference;
